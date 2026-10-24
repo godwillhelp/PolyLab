@@ -1,0 +1,140 @@
+<UserControl x:Class="NDZ.PBOGPacker.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+  <UserControl.Resources>
+    <Style x:Key="SecTitle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="22"/>
+      <Setter Property="Foreground" Value="{StaticResource B.Text}"/>
+      <Setter Property="Margin" Value="0,34,0,14"/>
+    </Style>
+    <Style x:Key="Feature" TargetType="ContentControl" BasedOn="{StaticResource Hud}">
+      <Setter Property="Margin" Value="0,0,12,12"/>
+    </Style>
+  </UserControl.Resources>
+  <Grid>
+    <Rectangle>
+      <Rectangle.Fill>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+          <GradientStop Color="#E60A0B0B" Offset="0"/>
+          <GradientStop Color="#CC0A0B0B" Offset="0.62"/>
+          <GradientStop Color="#590A0B0B" Offset="1"/>
+        </LinearGradientBrush>
+      </Rectangle.Fill>
+    </Rectangle>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="44,26,44,40" MaxWidth="1000" HorizontalAlignment="Left">
+
+        <StackPanel Orientation="Horizontal">
+          <Image Source="/NDZ_PBOGPacker;component/Assets/Brand/pbog.png" Width="104" Height="104" VerticalAlignment="Center" Margin="0,0,20,0"
+                 RenderOptions.BitmapScalingMode="HighQuality"/>
+          <TextBlock Text="NDZ" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="116" Foreground="#E3DED0"
+                     OpacityMask="{StaticResource B.Grunge}" Margin="0,-20,24,-18" VerticalAlignment="Center"/>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="PBOG Packer" FontSize="38" FontWeight="Bold"/>
+            <TextBlock Text="{DynamicResource About.Tagline}" FontSize="17" Foreground="{StaticResource B.Accent}" Margin="0,2,0,6"/>
+            <TextBlock Text="{Binding AboutVersion}" Style="{StaticResource T.Mono}" Foreground="{StaticResource B.Dim}"/>
+          </StackPanel>
+        </StackPanel>
+
+        <TextBlock Text="{DynamicResource About.Lead}" FontSize="17" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" LineHeight="25" MaxWidth="820" HorizontalAlignment="Left" Margin="0,22,0,0"/>
+
+        <TextBlock Text="{DynamicResource About.Thanks}" Style="{StaticResource SecTitle}"/>
+        <ContentControl Style="{StaticResource Hud}" BorderBrush="{StaticResource B.Accent}" x:Name="Sr" MaxWidth="880" HorizontalAlignment="Left">
+          <Grid Margin="24,22,24,22">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Width="76" Height="76" VerticalAlignment="Top" Margin="0,0,22,0">
+              <Border BorderBrush="{StaticResource B.Accent}" BorderThickness="1" Background="#141515"/>
+              <c:Ico Kind="cpu" Size="42" StrokeThickness="1.4" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=Sr}"/>
+            </Grid>
+            <StackPanel Grid.Column="1">
+              <TextBlock FontSize="32" FontWeight="Bold"><Run Text="[KR]" Foreground="{StaticResource B.Orange}"/><Run Text=" 6wingSeraph"/></TextBlock>
+              <TextBlock Text="{DynamicResource About.SeraphRole}" Style="{StaticResource T.Mono}" Foreground="{StaticResource B.Orange}" Margin="0,2,0,0"/>
+              <TextBlock Text="{DynamicResource About.SeraphText}" FontSize="15.5" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" LineHeight="22" Margin="0,14,0,18"/>
+              <WrapPanel>
+                <Button ToolTip="{DynamicResource Tip.OpenLink}" Style="{StaticResource Btn.Sand}" Command="{Binding OpenCmd}" CommandParameter="{Binding DiscordUrl}" Margin="0,0,20,6" x:Name="Ds">
+                  <StackPanel Orientation="Horizontal">
+                    <c:Ico Kind="discord" Size="18" Foreground="{StaticResource B.SandInk}" Margin="0,0,9,0" Hot="{Binding IsMouseOver, ElementName=Ds}"/>
+                    <TextBlock Text="{DynamicResource About.LinkDiscord}" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </Button>
+                <Button ToolTip="{DynamicResource Tip.OpenLink}" Style="{StaticResource Btn.Link}" Command="{Binding OpenCmd}" CommandParameter="{Binding SeraphUrl}" Margin="0,0,22,6" x:Name="L3">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="ext" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=L3}"/><TextBlock Text="{DynamicResource About.LinkSeraph}"/></StackPanel>
+                </Button>
+                <Button ToolTip="{DynamicResource Tip.OpenLink}" Style="{StaticResource Btn.Link}" Command="{Binding OpenCmd}" CommandParameter="{Binding GraftUrl}" Margin="0,0,0,6" x:Name="L1">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="ext" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=L1}"/><TextBlock Text="{DynamicResource About.LinkGraft}"/></StackPanel>
+                </Button>
+              </WrapPanel>
+              <TextBlock Text="discord.gg/3dBy8Rq8ht" Style="{StaticResource T.Mono}" Foreground="{StaticResource B.Dim}" Margin="0,4,0,0"/>
+            </StackPanel>
+          </Grid>
+        </ContentControl>
+
+        <TextBlock Text="{DynamicResource About.Features}" Style="{StaticResource SecTitle}"/>
+        <UniformGrid Columns="2" Margin="0,0,-12,0">
+          <UniformGrid.Resources>
+            <Style TargetType="TextBlock" x:Key="FT"><Setter Property="FontSize" Value="18"/></Style>
+            <Style TargetType="TextBlock" x:Key="FD">
+              <Setter Property="FontSize" Value="14"/>
+              <Setter Property="Foreground" Value="{StaticResource B.Text2}"/>
+              <Setter Property="TextWrapping" Value="Wrap"/>
+              <Setter Property="LineHeight" Value="20"/>
+              <Setter Property="Margin" Value="0,5,0,0"/>
+            </Style>
+          </UniformGrid.Resources>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A1">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="mods" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A1}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F1.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F1.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A2">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="pack" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A2}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F2.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F2.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A3">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="terminal" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A3}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F3.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F3.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A4">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="env" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A4}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F4.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F4.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A5">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="servers" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A5}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F5.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F5.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A6">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="keys" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A6}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F6.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F6.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A7">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="copy" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A7}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F7.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F7.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+          <ContentControl Style="{StaticResource Feature}" x:Name="A8">
+            <DockPanel Margin="18,16"><c:Ico DockPanel.Dock="Left" Kind="globe" Size="26" VerticalAlignment="Top" Margin="0,2,16,0" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, ElementName=A8}"/>
+              <StackPanel><TextBlock Text="{DynamicResource F8.T}" Style="{StaticResource FT}"/><TextBlock Text="{DynamicResource F8.D}" Style="{StaticResource FD}"/></StackPanel></DockPanel>
+          </ContentControl>
+        </UniformGrid>
+
+        <TextBlock Text="{DynamicResource About.Materials}" Style="{StaticResource SecTitle}"/>
+        <TextBlock Text="{DynamicResource About.Fonts}" FontSize="14" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap"/>
+        <TextBlock Text="{DynamicResource About.Photos}" FontSize="14" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" Margin="0,8,0,10"/>
+        <ItemsControl ItemsSource="{Binding Credits}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button ToolTip="{DynamicResource Tip.OpenLink}" Style="{StaticResource Btn.Link}" HorizontalAlignment="Left" Margin="0,0,0,3"
+                      Command="{Binding DataContext.OpenCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding page}">
+                <TextBlock Text="{Binding Line}" FontFamily="{StaticResource F.Mono}" FontSize="11.5" TextTrimming="CharacterEllipsis" MaxWidth="980"/>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Rectangle Style="{StaticResource Sep}" Margin="0,20,0,12"/>
+        <TextBlock Text="{DynamicResource About.Legal}" FontSize="13" Foreground="{StaticResource B.Dim}" TextWrapping="Wrap"/>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

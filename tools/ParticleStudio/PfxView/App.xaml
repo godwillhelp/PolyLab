@@ -1,0 +1,24 @@
+<Application x:Class="PfxView.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+  <Application.Resources>
+    <ResourceDictionary>
+      <SolidColorBrush x:Key="BgBase" Color="#161B1F" />
+      <SolidColorBrush x:Key="BgRaised" Color="#212930" />
+      <SolidColorBrush x:Key="TextBrush" Color="#C3CDD4" />
+      <SolidColorBrush x:Key="TextDim" Color="#8494A0" />
+      <Style TargetType="Button">
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Padding" Value="8,2" />
+      </Style>
+      <Style TargetType="TextBox">
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+      </Style>
+      <Style TargetType="ComboBox">
+        <Setter Property="Margin" Value="2" />
+      </Style>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

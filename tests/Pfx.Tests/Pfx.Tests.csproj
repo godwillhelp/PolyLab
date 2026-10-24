@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Pfx.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.Core\Pfx.Core.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.Textures\Pfx.Textures.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.Sim\Pfx.Sim.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.Render\Pfx.Render.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.App\Pfx.App.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.XRay\Pfx.XRay.csproj" />
+    <ProjectReference Include="..\..\src\ParticleStudio\Pfx.Link\Pfx.Link.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Golden\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

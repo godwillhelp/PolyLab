@@ -1,0 +1,143 @@
+<UserControl x:Class="NDZ.PBOGPacker.Views.EnvView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+  <Grid>
+    <Rectangle Fill="#A60A0B0B"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="40,28,40,40" MaxWidth="980" HorizontalAlignment="Left">
+        <DockPanel Margin="0,0,0,20">
+          <Button ToolTip="{DynamicResource Tip.Recheck}" DockPanel.Dock="Right" Style="{StaticResource Btn.Sand}" Command="{Binding RecheckCmd}" VerticalAlignment="Bottom" x:Name="Re">
+            <StackPanel Orientation="Horizontal">
+              <c:Ico Kind="refresh" Size="17" Foreground="{StaticResource B.SandInk}" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Re}"/>
+              <TextBlock Text="{DynamicResource Act.Recheck}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+          <StackPanel>
+            <TextBlock Text="{DynamicResource Env.Title}" Style="{StaticResource T.H1}"/>
+            <TextBlock Text="clang-cl · CMake · Ninja · AddonBuilder · CfgConvert · DSSignFile · graft · hid.dll" Style="{StaticResource T.Mono}" Foreground="{StaticResource B.Dim}" Margin="0,6,0,0"/>
+          </StackPanel>
+        </DockPanel>
+
+        <ContentControl Style="{StaticResource Hud}" Margin="0,0,0,16">
+          <Grid Margin="22,20">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid Width="76" Height="76">
+              <Border BorderThickness="1" BorderBrush="{Binding EnvKind, Converter={StaticResource KindBrush}}" Background="#141515"/>
+              <Border Background="{StaticResource B.Hazard}" Visibility="{Binding EnvBad, Converter={StaticResource Vis}}" Margin="1"/>
+              <c:Ico Kind="{Binding EnvIcon}" Size="38" StrokeThickness="1.5" Foreground="{Binding EnvKind, Converter={StaticResource KindBrush}}"/>
+            </Grid>
+            <StackPanel Grid.Column="1" Margin="22,0" VerticalAlignment="Center">
+              <TextBlock Text="{DynamicResource Env.Q}" Style="{StaticResource T.Label}"/>
+              <TextBlock Text="{Binding EnvAnswer}" FontSize="30" Margin="0,2,0,4"/>
+              <TextBlock Text="{Binding EnvChecked}" Style="{StaticResource T.Mono}" Foreground="{StaticResource B.Dim}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+              <StackPanel.Resources>
+                <Style TargetType="Border">
+                  <Setter Property="BorderBrush" Value="{StaticResource B.Line2}"/>
+                  <Setter Property="BorderThickness" Value="1"/>
+                  <Setter Property="Width" Value="104"/>
+                  <Setter Property="Padding" Value="12,8"/>
+                  <Setter Property="Margin" Value="8,0,0,0"/>
+                </Style>
+              </StackPanel.Resources>
+              <Border>
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:Ico Kind="check" Size="16" StrokeThickness="2" Foreground="{StaticResource B.Ok}" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding OkN}" FontSize="26"/>
+                  </StackPanel>
+                  <TextBlock Text="{DynamicResource Env.OkN}" Style="{StaticResource T.Label}" FontSize="12"/>
+                </StackPanel>
+              </Border>
+              <Border>
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:Ico Kind="warn" Size="16" StrokeThickness="2" Foreground="{StaticResource B.Warn}" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding WarnN}" FontSize="26"/>
+                  </StackPanel>
+                  <TextBlock Text="{DynamicResource Env.WarnN}" Style="{StaticResource T.Label}" FontSize="12"/>
+                </StackPanel>
+              </Border>
+              <Border>
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:Ico Kind="x" Size="16" StrokeThickness="2" Foreground="{StaticResource B.Err}" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding ErrN}" FontSize="26"/>
+                  </StackPanel>
+                  <TextBlock Text="{DynamicResource Env.ErrN}" Style="{StaticResource T.Label}" FontSize="12"/>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Grid>
+        </ContentControl>
+
+        <ContentControl Style="{StaticResource Hud}">
+          <ItemsControl ItemsSource="{Binding Doctor}" Margin="0,4">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="20,12">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="116"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+                  <Border Width="30" Height="30" BorderThickness="1" BorderBrush="{Binding Kind, Converter={StaticResource KindBrush}}" HorizontalAlignment="Left">
+                    <c:Ico Kind="{Binding Kind, Converter={StaticResource KindIcon}}" Size="16" StrokeThickness="2" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"/>
+                  </Border>
+                  <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="17"/>
+                    <TextBlock Text="{Binding Path}" Style="{StaticResource T.Mono}" FontSize="11" Foreground="{StaticResource B.Dim}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}"/>
+                  </StackPanel>
+                  <TextBlock Grid.Column="2" Text="{Binding Version}" Style="{StaticResource T.Mono}" FontSize="13" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                  <Border Grid.Column="3" Style="{StaticResource Pill}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                          BorderBrush="{Binding Kind, Converter={StaticResource KindBrush}}">
+                    <TextBlock Text="{Binding StateText}" FontSize="12.5" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"/>
+                  </Border>
+                  <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="12,12,0,2" Padding="14,10" Background="#141515"
+                          BorderBrush="{Binding Kind, Converter={StaticResource KindBrush}}" BorderThickness="2,0,0,0"
+                          Visibility="{Binding HasFix, Converter={StaticResource Vis}}">
+                    <StackPanel>
+                      <StackPanel Orientation="Horizontal">
+                        <c:Ico Kind="wrench" Size="15" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{DynamicResource Env.Fix}" FontSize="13" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"/>
+                      </StackPanel>
+                      <TextBlock Text="{Binding FixText}" FontSize="15" TextWrapping="Wrap" Margin="0,6,0,10" MaxWidth="720" HorizontalAlignment="Left"/>
+                      <Grid Visibility="{Binding FixCmd, Converter={StaticResource Vis}}">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#0A0B0B" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Padding="10,7">
+                          <TextBlock Text="{Binding FixCmd}" Style="{StaticResource T.Mono}" FontSize="12.5" Foreground="{StaticResource B.Text}" TextTrimming="CharacterEllipsis"/>
+                        </Border>
+                        <Button ToolTip="{DynamicResource Tip.CopyCmd}" Grid.Column="1" Style="{StaticResource Btn.Dark}" Height="33" Margin="-1,0,0,0" FontSize="14"
+                                Command="{Binding DataContext.CopyCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding FixCmd}" x:Name="Cp">
+                          <StackPanel Orientation="Horizontal">
+                            <c:Ico Kind="copy" Size="15" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Cp}"/>
+                            <TextBlock Text="{DynamicResource Act.Copy}"/>
+                          </StackPanel>
+                        </Button>
+                      </Grid>
+                    </StackPanel>
+                  </Border>
+                  <Rectangle Grid.Row="1" Grid.ColumnSpan="4" Style="{StaticResource Sep}" VerticalAlignment="Bottom" Margin="-20,0,-20,-12"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ContentControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

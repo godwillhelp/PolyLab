@@ -1,0 +1,39 @@
+<UserControl x:Class="Pfx.App.Views.SubstView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Pfx.App.Views"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:ThemeBrush x:Key="Brush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+  </UserControl.Resources>
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <WrapPanel DockPanel.Dock="Top" Margin="8,5,8,3">
+      <Button x:Name="CheckButton" Content="{DynamicResource Sub.Check}" ToolTip="{DynamicResource Tip.Sub.Check}" Click="OnCheck" Margin="0,0,4,4" />
+      <Button x:Name="AcceptAllButton" Content="{DynamicResource Sub.AcceptAll}" ToolTip="{DynamicResource Tip.Sub.AcceptAll}" Click="OnAcceptAll" Margin="0,0,10,4" />
+      <TextBlock x:Name="InfoText" Style="{StaticResource T.Dim}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,0,4" />
+    </WrapPanel>
+    <TextBlock DockPanel.Dock="Top" Style="{StaticResource T.Dim}" FontSize="10.5" TextWrapping="Wrap" Margin="10,0,10,4" Text="{DynamicResource Sub.Hint}" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl x:Name="RowList" Focusable="False">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type v:SubstRow}">
+            <Border BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,1,0,0" Padding="10,4">
+              <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                  <Button Content="{DynamicResource Sub.Accept}" ToolTip="{DynamicResource Tip.Sub.Accept}" Click="OnAccept" Margin="4,0,0,0" IsEnabled="{Binding CanAccept}" />
+                  <Button Content="{DynamicResource Sub.Pick}" ToolTip="{DynamicResource Tip.Sub.Pick}" Click="OnPick" Margin="4,0,0,0" />
+                  <Button Content="{DynamicResource Sub.Remove}" ToolTip="{DynamicResource Tip.Sub.Remove}" Click="OnRemove" Margin="4,0,0,0" IsEnabled="{Binding Saved}" />
+                </StackPanel>
+                <StackPanel ToolTip="{Binding Tip}" Background="Transparent">
+                  <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource B.TextHi}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Value}" FontSize="10.5" FontFamily="{StaticResource Font.Mono}" Foreground="{Binding Brush, Converter={StaticResource Brush}}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+              </DockPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

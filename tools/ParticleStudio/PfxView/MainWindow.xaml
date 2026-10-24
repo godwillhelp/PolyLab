@@ -1,0 +1,77 @@
+<Window x:Class="PfxView.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource Title}" Width="1280" Height="720" MinWidth="800" MinHeight="480"
+        Background="{StaticResource BgBase}">
+  <!-- Implicit text styles here, not in App.xaml: application-level implicit TextBlock styles also reach the
+       TextBlocks inside button and combo-box templates. -->
+  <Window.Resources>
+    <Style TargetType="TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="6,0,3,0" />
+    </Style>
+    <Style TargetType="CheckBox">
+      <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="6,0,3,0" />
+    </Style>
+  </Window.Resources>
+  <DockPanel>
+    <WrapPanel DockPanel.Dock="Top" Background="{StaticResource BgRaised}">
+      <Button x:Name="OpenButton" Content="{DynamicResource Btn.Open}" ToolTip="{DynamicResource Tip.Open}" Click="OnOpen" />
+      <TextBlock Text="{DynamicResource Lbl.Roots}" ToolTip="{DynamicResource Tip.Roots}" />
+      <TextBox x:Name="RootsBox" Width="240" ToolTip="{DynamicResource Tip.Roots}" LostFocus="OnRootsCommit" KeyDown="OnCommitKey" />
+      <Button x:Name="PlayButton" ToolTip="{DynamicResource Tip.Play}" Click="OnPlay" />
+      <Button Content="{DynamicResource Btn.Step}" ToolTip="{DynamicResource Tip.Step}" Click="OnStep" />
+      <Button Content="{DynamicResource Btn.Restart}" ToolTip="{DynamicResource Tip.Restart}" Click="OnRestart" />
+      <TextBlock Text="{DynamicResource Lbl.Seed}" ToolTip="{DynamicResource Tip.Seed}" />
+      <TextBox x:Name="SeedBox" Width="50" ToolTip="{DynamicResource Tip.Seed}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.StepSize}" ToolTip="{DynamicResource Tip.StepSize}" />
+      <TextBox x:Name="StepBox" Width="70" ToolTip="{DynamicResource Tip.StepSize}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.Lang}" ToolTip="{DynamicResource Tip.Lang}" />
+      <ComboBox x:Name="LangBox" Width="55" ToolTip="{DynamicResource Tip.Lang}" SelectionChanged="OnLang" />
+      <Button Content="{DynamicResource Btn.Shot}" ToolTip="{DynamicResource Tip.Shot}" Click="OnShot" />
+      <Button Content="{DynamicResource Btn.Loss}" ToolTip="{DynamicResource Tip.Loss}" Click="OnDeviceLoss" />
+    </WrapPanel>
+    <WrapPanel DockPanel.Dock="Top" Background="{StaticResource BgRaised}">
+      <TextBlock Text="{DynamicResource Lbl.View}" ToolTip="{DynamicResource Tip.View.Free}" />
+      <Button Content="{DynamicResource View.Free}" ToolTip="{DynamicResource Tip.View.Free}" Tag="Free" Click="OnView" />
+      <Button Content="{DynamicResource View.Top}" ToolTip="{DynamicResource Tip.View.Top}" Tag="Top" Click="OnView" />
+      <Button Content="{DynamicResource View.Side}" ToolTip="{DynamicResource Tip.View.Side}" Tag="Side" Click="OnView" />
+      <Button Content="{DynamicResource View.Front}" ToolTip="{DynamicResource Tip.View.Front}" Tag="Front" Click="OnView" />
+      <Button Content="{DynamicResource View.Eye}" ToolTip="{DynamicResource Tip.View.Eye}" Tag="Eye" Click="OnView" />
+      <TextBlock Text="{DynamicResource Lbl.Fov}" ToolTip="{DynamicResource Tip.Fov}" />
+      <Slider x:Name="FovSlider" Width="110" Minimum="5" Maximum="120" VerticalAlignment="Center" ToolTip="{DynamicResource Tip.Fov}"
+              ValueChanged="OnFov" />
+      <TextBlock x:Name="FovText" Width="28" ToolTip="{DynamicResource Tip.Fov}" />
+      <TextBlock Text="{DynamicResource Lbl.Sky}" ToolTip="{DynamicResource Tip.Sky}" />
+      <ComboBox x:Name="SkyBox" Width="160" ToolTip="{DynamicResource Tip.Sky}" SelectionChanged="OnViewOptions" />
+      <CheckBox x:Name="FogBox" Content="{DynamicResource Chk.Fog}" ToolTip="{DynamicResource Tip.Fog}" Click="OnViewOptions" />
+      <CheckBox x:Name="GroundBox" Content="{DynamicResource Chk.Ground}" ToolTip="{DynamicResource Tip.Ground}" Click="OnViewOptions" />
+      <TextBlock Text="{DynamicResource Lbl.Helper}" ToolTip="{DynamicResource Tip.Helper}" />
+      <ComboBox x:Name="HelperBox" Width="105" ToolTip="{DynamicResource Tip.Helper}" SelectionChanged="OnViewOptions" />
+      <CheckBox x:Name="GizmoBox" Content="{DynamicResource Chk.Gizmos}" ToolTip="{DynamicResource Tip.Gizmos}" Click="OnViewOptions" />
+    </WrapPanel>
+    <WrapPanel DockPanel.Dock="Top" Background="{StaticResource BgRaised}">
+      <TextBlock Text="{DynamicResource Lbl.Motion}" ToolTip="{DynamicResource Tip.Motion}" />
+      <ComboBox x:Name="MotionBox" Width="100" ToolTip="{DynamicResource Tip.Motion}" SelectionChanged="OnSettingsCommit" />
+      <TextBlock Text="{DynamicResource Lbl.Radius}" ToolTip="{DynamicResource Tip.Radius}" />
+      <TextBox x:Name="RadiusBox" Width="40" ToolTip="{DynamicResource Tip.Radius}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.Speed}" ToolTip="{DynamicResource Tip.Speed}" />
+      <TextBox x:Name="SpeedBox" Width="40" ToolTip="{DynamicResource Tip.Speed}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.Axis}" ToolTip="{DynamicResource Tip.Axis}" />
+      <ComboBox x:Name="AxisBox" Width="50" ToolTip="{DynamicResource Tip.Axis}" SelectionChanged="OnSettingsCommit" />
+      <TextBlock Text="{DynamicResource Lbl.Turn}" ToolTip="{DynamicResource Tip.Turn}" />
+      <TextBox x:Name="TurnBox" Width="40" ToolTip="{DynamicResource Tip.Turn}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.Copies}" ToolTip="{DynamicResource Tip.Copies}" />
+      <TextBox x:Name="CopiesBox" Width="45" ToolTip="{DynamicResource Tip.Copies}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.Spacing}" ToolTip="{DynamicResource Tip.Spacing}" />
+      <TextBox x:Name="SpacingBox" Width="40" ToolTip="{DynamicResource Tip.Spacing}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+      <TextBlock Text="{DynamicResource Lbl.LowFps}" ToolTip="{DynamicResource Tip.LowFps}" />
+      <TextBox x:Name="LowFpsBox" Width="40" ToolTip="{DynamicResource Tip.LowFps}" LostFocus="OnSettingsCommit" KeyDown="OnCommitKey" />
+    </WrapPanel>
+    <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Foreground="{StaticResource TextDim}" Margin="6,2" />
+    <Border x:Name="ViewportSlot" />
+  </DockPanel>
+</Window>

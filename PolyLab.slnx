@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ui/Suite.Ui.csproj" />
+    <Project Path="src/PBOGPacker/NDZ_PBOGPacker.csproj" />
+  </Folder>
+  <Folder Name="/src/ParticleStudio/">
+    <Project Path="src/ParticleStudio/Pfx.App/Pfx.App.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.Core/Pfx.Core.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.Link/Pfx.Link.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.Render/Pfx.Render.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.Sim/Pfx.Sim.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.Textures/Pfx.Textures.csproj" />
+    <Project Path="src/ParticleStudio/Pfx.XRay/Pfx.XRay.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Pfx.Tests/Pfx.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/ParticleStudio/">
+    <Project Path="tools/ParticleStudio/PfxSim/PfxSim.csproj" />
+    <Project Path="tools/ParticleStudio/PfxTex/PfxTex.csproj" />
+    <Project Path="tools/ParticleStudio/PfxView/PfxView.csproj" />
+    <Project Path="tools/ParticleStudio/PfxXr/PfxXr.csproj" />
+  </Folder>
+</Solution>

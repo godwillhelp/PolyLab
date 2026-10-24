@@ -1,0 +1,119 @@
+<UserControl x:Class="Pfx.App.Views.CurvesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cv="clr-namespace:Pfx.App.Curves"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:VisibleIf x:Key="Vis" />
+    <c:ThemeBrush x:Key="Brush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="BarBtn" TargetType="ButtonBase" BasedOn="{StaticResource Btn.Icon}">
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Margin" Value="1,0" />
+    </Style>
+    <Style x:Key="Small" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <Border DockPanel.Dock="Top" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Padding="6,3">
+      <WrapPanel VerticalAlignment="Center">
+        <TextBlock x:Name="TargetText" Style="{StaticResource T.Hi}" FontSize="11" MaxWidth="170" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="2,0,8,0" />
+        <StackPanel Orientation="Horizontal" Margin="0,0,6,0">
+          <ToggleButton x:Name="LifeButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Curve.Life}" ToolTip="{DynamicResource Tip.CurveLife}" Click="OnKind" Tag="life" />
+          <ToggleButton x:Name="MasterButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Curve.Master}" ToolTip="{DynamicResource Tip.CurveMaster}" Click="OnKind" Tag="mast" />
+        </StackPanel>
+        <Button x:Name="PresetButton" Content="{DynamicResource Curve.Presets}" ToolTip="{DynamicResource Tip.CurvePresets}" Click="OnPresets" Margin="0,0,6,0" />
+        <ToggleButton x:Name="DrawButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.CurveDraw}" Click="OnDraw"><Path Data="{StaticResource Ic.Pen}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton x:Name="SnapButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.CurveSnap}" Click="OnSnap"><Path Data="{StaticResource Ic.Grid}" Style="{StaticResource Ico}" /></ToggleButton>
+        <StackPanel x:Name="UnitBar" Orientation="Horizontal" Margin="4,0,4,0">
+          <ToggleButton x:Name="NormButton" Style="{StaticResource Btn.Seg}" Content="0–1" ToolTip="{DynamicResource Tip.CurveNorm}" Click="OnUnit" Tag="norm" />
+          <ToggleButton x:Name="SecButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Curve.Seconds}" ToolTip="{DynamicResource Tip.CurveSeconds}" Click="OnUnit" Tag="sec" />
+        </StackPanel>
+        <Border Style="{StaticResource Sep.V}" />
+        <Button x:Name="CopyButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.CurveCopy}" Click="OnCopy"><Path Data="{StaticResource Ic.Clone}" Style="{StaticResource Ico}" /></Button>
+        <Button x:Name="PasteButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.CurvePaste}" Click="OnPaste"><Path Data="{StaticResource Ic.Paste}" Style="{StaticResource Ico}" /></Button>
+        <Button x:Name="DeleteButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.CurveDelete}" Click="OnDelete"><Path Data="{StaticResource Ic.Trash}" Style="{StaticResource Ico}" /></Button>
+        <Border Style="{StaticResource Sep.V}" />
+        <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Curve.MaxError}" ToolTip="{DynamicResource Tip.CurveMaxError}" Margin="2,0,4,0" />
+        <TextBox x:Name="ErrorBox" Style="{StaticResource Box.Num}" Width="52" ToolTip="{DynamicResource Tip.CurveMaxError}" KeyDown="OnErrorKey" LostKeyboardFocus="OnErrorLost" />
+        <TextBlock x:Name="BakeText" Style="{StaticResource Small}" Margin="6,0,0,0" MaxWidth="230" TextTrimming="CharacterEllipsis" />
+      </WrapPanel>
+    </Border>
+
+    <Border DockPanel.Dock="Left" Width="170" Background="{StaticResource B.BgPanel}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,1,0">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl x:Name="LayerList" Margin="0,3">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type cv:CurveLayerRow}">
+              <Border x:Name="Row" Height="24" Padding="4,0,8,0" Background="{StaticResource B.Transparent}">
+                <DockPanel>
+                  <ToggleButton DockPanel.Dock="Left" Style="{StaticResource Btn.RowToggle}" IsChecked="{Binding Shown, Mode=OneWay}" ToolTip="{DynamicResource Tip.CurveShow}" Click="OnShow" Tag="{Binding Index}">
+                    <Path Data="{StaticResource Ic.Eye}" Style="{StaticResource Ico.Small}" />
+                  </ToggleButton>
+                  <Button Style="{StaticResource Btn.Flat}" Padding="4,0" HorizontalContentAlignment="Stretch" ToolTip="{Binding Tip}" Click="OnLayer" Tag="{Binding Index}">
+                    <DockPanel>
+                      <Border DockPanel.Dock="Left" Width="10" Height="10" CornerRadius="2" Background="{Binding Brush, Converter={StaticResource Brush}}" Margin="0,0,7,0" />
+                      <TextBlock DockPanel.Dock="Right" Text="{Binding Mark}" Foreground="{Binding MarkBrush, Converter={StaticResource Brush}}" Margin="4,0,0,0" />
+                      <TextBlock DockPanel.Dock="Right" Text="{Binding Count}" Style="{StaticResource T.Dim}" FontFamily="{StaticResource Font.Mono}" FontSize="10" />
+                      <TextBlock Text="{Binding Name}" FontSize="11" TextTrimming="CharacterEllipsis" Foreground="{Binding NameBrush, Converter={StaticResource Brush}}" />
+                    </DockPanel>
+                  </Button>
+                </DockPanel>
+              </Border>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Active}" Value="True">
+                  <Setter TargetName="Row" Property="Background" Value="{StaticResource B.BgSelected}" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+    <Border DockPanel.Dock="Right" Width="204" Background="{StaticResource B.BgPanel}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="1,0,0,0">
+      <DockPanel>
+        <Grid DockPanel.Dock="Top" Margin="8,4,8,2">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="22" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+          <TextBlock Style="{StaticResource Small}" Text="№" ToolTip="{DynamicResource Tip.CurveKeyNumber}" />
+          <TextBlock x:Name="TimeHeader" Grid.Column="1" Style="{StaticResource Small}" TextTrimming="CharacterEllipsis" Margin="2,0" />
+          <TextBlock x:Name="ValueHeader" Grid.Column="2" Style="{StaticResource Small}" TextTrimming="CharacterEllipsis" Margin="2,0" />
+        </Grid>
+        <Button DockPanel.Dock="Bottom" HorizontalAlignment="Left" Content="{DynamicResource Btn.GraphAdd}" ToolTip="{DynamicResource Tip.GraphAdd}" Click="OnAddKey" Margin="8,3,8,4" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl x:Name="KeyList" Margin="8,0">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type cv:CurveKeyRow}">
+                <Border x:Name="Row" Padding="0,1" CornerRadius="3" Background="{StaticResource B.Transparent}" MouseLeftButtonDown="OnKeyRow" Tag="{Binding Index}">
+                  <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="22" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Number}" Style="{StaticResource T.Dim}" FontSize="10" VerticalAlignment="Center" Margin="2,0,0,0" />
+                    <TextBox Grid.Column="1" Style="{StaticResource Box.Num}" Margin="2,0" Text="{Binding Time, Mode=OneWay}" ToolTip="{Binding TimeTip}" Tag="t" KeyDown="OnCellKey" LostKeyboardFocus="OnCellLost" GotKeyboardFocus="OnCellFocus" />
+                    <TextBox Grid.Column="2" Style="{StaticResource Box.Num}" Margin="2,0" Text="{Binding Value, Mode=OneWay}" ToolTip="{Binding ValueTip}" Foreground="{Binding ValueBrush, Converter={StaticResource Brush}}" Tag="v" KeyDown="OnCellKey" LostKeyboardFocus="OnCellLost" GotKeyboardFocus="OnCellFocus" />
+                  </Grid>
+                </Border>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding Selected}" Value="True">
+                    <Setter TargetName="Row" Property="Background" Value="{StaticResource B.BgSelected}" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+
+    <DockPanel>
+      <cv:GradientStrip x:Name="Strip" DockPanel.Dock="Bottom" ToolTip="{DynamicResource Tip.CurveStrip}" />
+      <Grid>
+        <cv:CurveCanvas x:Name="Canvas" ToolTip="{DynamicResource Tip.CurveCanvas}" />
+        <TextBlock x:Name="EmptyText" Style="{StaticResource T.Dim}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" Text="{DynamicResource Curve.Empty}" />
+      </Grid>
+    </DockPanel>
+  </DockPanel>
+</UserControl>

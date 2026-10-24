@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Pfx.App</RootNamespace>
+    <AssemblyName>NDZ_ParticleStudio</AssemblyName>
+    <SatelliteResourceLanguages>ru;uk</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System.IO" />
+    <Using Include="Pfx.App.Core.Loc" Alias="Loc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dirkster.AvalonDock" Version="4.74.1" />
+    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="4.74.1" />
+    <PackageReference Include="NAudio.Core" Version="2.2.1" />
+    <PackageReference Include="NAudio.WinMM" Version="2.2.1" />
+    <PackageReference Include="NVorbis" Version="0.10.5" />
+    <!-- Vortice's SharpGen.Runtime pulls System.Text.Json 9 in; SharpGen never loads it, so the app keeps the framework's
+         own copy and ships no System.* package DLLs. -->
+    <PackageReference Include="System.Text.Json" Version="9.0.1" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.1" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.IO.Pipelines" Version="9.0.1" ExcludeAssets="compile;runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pfx.Core\Pfx.Core.csproj" />
+    <ProjectReference Include="..\Pfx.Render\Pfx.Render.csproj" />
+    <ProjectReference Include="..\Pfx.XRay\Pfx.XRay.csproj" />
+    <ProjectReference Include="..\Pfx.Link\Pfx.Link.csproj" />
+    <ProjectReference Include="..\..\Ui\Suite.Ui.csproj" />
+  </ItemGroup>
+
+  <!-- Written beside the tool on first use (Core/Payload.cs). The link mod's PBO
+       comes from link\pack.ps1 -Out link\dist; a build without it has no link mod to hand out. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Tools\pfx_upscale.py" LogicalName="pfx_upscale.py" />
+    <EmbeddedResource Include="..\..\..\link\dist\@NDZ_PfxLink\addons\NDZ_PfxLink.pbo" LogicalName="NDZ_PfxLink.pbo"
+                      Condition="Exists('..\..\..\link\dist\@NDZ_PfxLink\addons\NDZ_PfxLink.pbo')" />
+  </ItemGroup>
+
+</Project>

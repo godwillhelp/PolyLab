@@ -1,0 +1,266 @@
+<UserControl x:Class="Pfx.App.Views.ImportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:xr="clr-namespace:Pfx.App.XRay"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:ThemeBrush x:Key="Brush" />
+    <BooleanToVisibilityConverter x:Key="Vis" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="Pan" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource B.BgPanel}" />
+      <Setter Property="BorderBrush" Value="{StaticResource B.LineSubtle}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style x:Key="Head" TargetType="Border">
+      <Setter Property="Background" Value="{StaticResource B.BgRaised}" />
+      <Setter Property="BorderBrush" Value="{StaticResource B.LineSubtle}" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="CornerRadius" Value="6,6,0,0" />
+      <Setter Property="Height" Value="28" />
+      <Setter Property="Padding" Value="10,0" />
+    </Style>
+    <Style x:Key="HeadText" TargetType="TextBlock" BasedOn="{StaticResource T.Hi}">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style x:Key="Small" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="10.5" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style x:Key="Num" TargetType="TextBlock" BasedOn="{StaticResource T.Base}">
+      <Setter Property="FontFamily" Value="{StaticResource Font.Mono}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+
+  <!-- Below 500 px of height (1280 x 720 with the bottom dock open) the tab scrolls instead of squeezing its lists. -->
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="{StaticResource B.BgBase}">
+  <DockPanel MinHeight="500">
+    <!-- Folder bar -->
+    <Border DockPanel.Dock="Top" Style="{StaticResource Pan}" Margin="10,10,10,8" Padding="10,8">
+      <StackPanel>
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Left" Style="{StaticResource T.Hi}" FontWeight="SemiBold" Text="{DynamicResource Xr.Folder}" VerticalAlignment="Center" Margin="0,0,8,0"
+                     ToolTip="{DynamicResource Tip.Xr.Folder}" />
+          <Button x:Name="CancelButton" DockPanel.Dock="Right" Content="{DynamicResource Xr.Cancel}" ToolTip="{DynamicResource Tip.Xr.Cancel}" Click="OnCancel" Margin="4,0,0,0" />
+          <Button x:Name="ScanButton" DockPanel.Dock="Right" Style="{StaticResource Btn.Accent}" Content="{DynamicResource Xr.Scan}" ToolTip="{DynamicResource Tip.Xr.Scan}" Click="OnScan" Margin="4,0,0,0" />
+          <Button DockPanel.Dock="Right" Content="{DynamicResource Xr.Browse}" ToolTip="{DynamicResource Tip.Xr.Browse}" Click="OnBrowse" Margin="4,0,0,0" />
+          <TextBox x:Name="FolderBox" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.Xr.Folder}" KeyDown="OnFolderKey" />
+        </DockPanel>
+        <DockPanel Margin="0,6,0,0">
+          <TextBlock x:Name="StatusText" DockPanel.Dock="Right" Style="{StaticResource Num}" Margin="8,0,0,0" ToolTip="{DynamicResource Tip.Xr.Status}" />
+          <ProgressBar x:Name="Bar" DockPanel.Dock="Right" Width="150" Height="6" Minimum="0" Maximum="1" Foreground="{StaticResource B.Ok}"
+                       Background="{StaticResource B.BgInput}" BorderBrush="{StaticResource B.Line}" ToolTip="{DynamicResource Tip.Xr.Status}" />
+          <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Xr.FolderHint}" VerticalAlignment="Center" ToolTip="{DynamicResource Xr.FolderHint}" />
+        </DockPanel>
+      </StackPanel>
+    </Border>
+
+    <Grid Margin="10,0,10,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="5*" MinWidth="230" />
+        <ColumnDefinition Width="10" />
+        <ColumnDefinition Width="7*" MinWidth="280" />
+        <ColumnDefinition Width="10" />
+        <ColumnDefinition Width="5*" MinWidth="250" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Found / skipped / archives -->
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="8" />
+          <RowDefinition Height="*" MinHeight="110" />
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource Pan}">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Style="{StaticResource Head}">
+              <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Small}" Text="{DynamicResource Xr.ByContent}" VerticalAlignment="Center" ToolTip="{DynamicResource Tip.Xr.ByContent}" />
+                <TextBlock Style="{StaticResource HeadText}" Text="{DynamicResource Xr.Found}" ToolTip="{DynamicResource Tip.Xr.Found}" />
+              </DockPanel>
+            </Border>
+            <ItemsControl x:Name="KindList" Focusable="False" Margin="0,2,0,4">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type xr:KindRow}">
+                  <DockPanel Margin="10,2" ToolTip="{Binding Tip}" Background="Transparent">
+                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource Num}" Text="{Binding Count}" Foreground="{Binding Brush, Converter={StaticResource Brush}}" Margin="6,0,0,0" />
+                    <TextBlock FontSize="11" TextTrimming="CharacterEllipsis"><Run Text="{Binding Title, Mode=OneWay}" Foreground="{StaticResource B.TextHi}" /><Run Text="  " /><Run Text="{Binding How, Mode=OneWay}" Foreground="{StaticResource B.TextDim}" FontSize="10.5" /></TextBlock>
+                  </DockPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </DockPanel>
+        </Border>
+        <Border Grid.Row="2" Style="{StaticResource Pan}">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Style="{StaticResource Head}">
+              <TextBlock Style="{StaticResource HeadText}" Text="{DynamicResource Xr.Skipped}" ToolTip="{DynamicResource Tip.Xr.Skipped}" />
+            </Border>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Margin="0,2,0,4">
+                <ItemsControl x:Name="ArchiveList" Focusable="False">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type xr:ArchiveRow}">
+                      <Border Margin="8,3" Padding="6,4" Background="{StaticResource B.BgInput}" CornerRadius="4" ToolTip="{Binding Tip}">
+                        <StackPanel>
+                          <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource B.Warn}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Target}" Style="{StaticResource Small}" Visibility="{Binding Asking, Converter={StaticResource Vis}}" TextWrapping="Wrap" />
+                          <WrapPanel Margin="0,3,0,0">
+                            <Button Content="{DynamicResource Xr.Unpack}" ToolTip="{DynamicResource Tip.Xr.Unpack}" Click="OnUnpack" Margin="0,0,4,0" />
+                            <Button Content="{DynamicResource Xr.UnpackNo}" ToolTip="{DynamicResource Tip.Xr.UnpackNo}" Click="OnUnpackNo" Visibility="{Binding Asking, Converter={StaticResource Vis}}" />
+                          </WrapPanel>
+                        </StackPanel>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl x:Name="SkipList" Focusable="False">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type xr:SkipRow}">
+                      <DockPanel Margin="10,2" ToolTip="{Binding Tip}" Background="Transparent">
+                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource Num}" Text="{Binding Count}" Foreground="{StaticResource B.TextDim}" Margin="6,0,0,0" />
+                        <TextBlock Text="{Binding Reason}" FontSize="11" Foreground="{StaticResource B.TextDim}" TextTrimming="CharacterEllipsis" />
+                      </DockPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock x:Name="NothingText" Style="{StaticResource T.Dim}" Foreground="{StaticResource B.Warn}" FontSize="11" TextWrapping="Wrap" Margin="10,6" Visibility="Collapsed"
+                           Text="{DynamicResource Xr.Nothing}" />
+              </StackPanel>
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
+      </Grid>
+
+      <!-- Mod and its options -->
+      <Border Grid.Column="2" Style="{StaticResource Pan}">
+        <DockPanel>
+          <Border DockPanel.Dock="Top" Style="{StaticResource Head}">
+            <DockPanel>
+              <TextBlock x:Name="RootCount" DockPanel.Dock="Right" Style="{StaticResource Small}" VerticalAlignment="Center" Margin="6,0,0,0" ToolTip="{DynamicResource Tip.Xr.RootCount}" />
+              <TextBlock Style="{StaticResource HeadText}" Text="{DynamicResource Xr.Mod}" ToolTip="{DynamicResource Tip.Xr.Mod}" />
+            </DockPanel>
+          </Border>
+          <DockPanel DockPanel.Dock="Top" Margin="10,6,10,4">
+            <Border x:Name="GuessChip" DockPanel.Dock="Right" BorderBrush="{StaticResource B.Info}" BorderThickness="1" CornerRadius="3" Padding="6,1" Margin="6,0,0,0" VerticalAlignment="Center">
+              <TextBlock x:Name="GuessText" FontSize="10.5" Foreground="{StaticResource B.Info}" MaxWidth="190" TextTrimming="CharacterEllipsis" />
+            </Border>
+            <ComboBox x:Name="ModBox" ToolTip="{DynamicResource Tip.Xr.ModBox}" SelectionChanged="OnMod" />
+          </DockPanel>
+          <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Small}" TextWrapping="Wrap" Margin="10,6,10,8" Text="{DynamicResource Xr.ModHint}" TextTrimming="None" />
+          <Grid DockPanel.Dock="Top" Margin="10,2,10,2">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="34" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="58" />
+              <ColumnDefinition Width="96" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" Style="{StaticResource Small}" Text="{DynamicResource Xr.Col.Folder}" ToolTip="{DynamicResource Tip.Xr.Col.Folder}" />
+            <TextBlock Grid.Column="2" Style="{StaticResource Small}" Text="{DynamicResource Xr.Col.Effects}" ToolTip="{DynamicResource Tip.Xr.Col.Effects}" />
+            <TextBlock Grid.Column="3" Style="{StaticResource Small}" Text="{DynamicResource Xr.Col.Overrides}" ToolTip="{DynamicResource Tip.Xr.Col.Overrides}" />
+          </Grid>
+          <ListBox x:Name="RootList" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="{DynamicResource Tip.Xr.Roots}">
+            <ListBox.ItemTemplate>
+              <DataTemplate DataType="{x:Type xr:RootRow}">
+                <Grid Margin="2,2" ToolTip="{Binding Tip}" Background="Transparent">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="58" />
+                    <ColumnDefinition Width="96" />
+                  </Grid.ColumnDefinitions>
+                  <ToggleButton Style="{StaticResource Switch}" IsChecked="{Binding Selected}" IsEnabled="{Binding CanToggle}" ToolTip="{DynamicResource Tip.Xr.RootOn}" Click="OnRootToggle"
+                                VerticalAlignment="Center" HorizontalAlignment="Left" />
+                  <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                    <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource B.TextHi}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Path}" Style="{StaticResource Small}" Foreground="{StaticResource B.TextOff}" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="2" Style="{StaticResource Num}" Text="{Binding Effects}" />
+                  <TextBlock Grid.Column="3" FontSize="11" Text="{Binding Overrides}" Foreground="{Binding OverridesBrush, Converter={StaticResource Brush}}" VerticalAlignment="Center"
+                             TextTrimming="CharacterEllipsis" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+
+      <!-- Anomalies, source, saved sources -->
+      <Grid Grid.Column="4">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" MinHeight="90" />
+          <RowDefinition Height="8" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border Style="{StaticResource Pan}">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Style="{StaticResource Head}">
+              <TextBlock Style="{StaticResource HeadText}" Text="{DynamicResource Xr.Anomalies}" ToolTip="{DynamicResource Tip.Xr.Anomalies}" />
+            </Border>
+            <TextBlock x:Name="AnomalyHint" DockPanel.Dock="Top" Style="{StaticResource Small}" TextWrapping="Wrap" Margin="10,6" TextTrimming="None" />
+            <ListBox x:Name="AnomalyList" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="{DynamicResource Tip.Xr.AnomalyList}"
+                     SelectionChanged="OnAnomaly">
+              <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type xr:AnomalyRow}">
+                  <DockPanel Margin="4,2" ToolTip="{Binding Tip}" Background="Transparent">
+                    <Border DockPanel.Dock="Right" BorderBrush="{Binding Brush, Converter={StaticResource Brush}}" BorderThickness="1" CornerRadius="3" Padding="5,0" Margin="6,0,0,0"
+                            VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}" FontSize="10" Foreground="{Binding Brush, Converter={StaticResource Brush}}" />
+                    </Border>
+                    <StackPanel>
+                      <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource B.TextHi}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Info}" Style="{StaticResource Small}" />
+                    </StackPanel>
+                  </DockPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </DockPanel>
+        </Border>
+        <Border Grid.Row="2" Style="{StaticResource Pan}">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Style="{StaticResource Head}">
+              <TextBlock Style="{StaticResource HeadText}" Text="{DynamicResource Xr.Source}" ToolTip="{DynamicResource Tip.Xr.Source}" />
+            </Border>
+            <StackPanel Margin="10,6,10,6">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource T.Dim}" FontSize="11" Text="{DynamicResource Xr.Tag}" VerticalAlignment="Center" Margin="0,0,6,0" ToolTip="{DynamicResource Tip.Xr.Tag}" />
+                <TextBox x:Name="TagBox" Style="{StaticResource Box.Num}" Width="56" ToolTip="{DynamicResource Tip.Xr.Tag}" TextChanged="OnTag" />
+                <TextBlock x:Name="OrderText" Style="{StaticResource T.Dim}" FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0" ToolTip="{DynamicResource Tip.Xr.Order}" />
+              </StackPanel>
+              <TextBlock x:Name="TagProblem" Style="{StaticResource Small}" Foreground="{StaticResource B.Err}" TextWrapping="Wrap" Margin="0,3,0,0" Visibility="Collapsed" TextTrimming="None" />
+              <WrapPanel Margin="0,6,0,0">
+                <Button x:Name="AddSourceButton" Style="{StaticResource Btn.Accent}" Content="{DynamicResource Xr.AddSource}" ToolTip="{DynamicResource Tip.Xr.AddSource}" Click="OnAddSource" Margin="0,0,4,4" />
+                <Button x:Name="ImportButton" Content="{DynamicResource Xr.ImportPicked}" ToolTip="{DynamicResource Tip.Xr.ImportPicked}" Click="OnImport" Margin="0,0,4,4" />
+              </WrapPanel>
+              <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{DynamicResource Xr.Sources}" Margin="0,2,0,2" ToolTip="{DynamicResource Tip.Xr.Sources}" />
+              <ScrollViewer MaxHeight="88" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <ItemsControl x:Name="SourceList" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type xr:SourceRow}">
+                    <DockPanel Margin="0,1" ToolTip="{Binding Tip}" Background="Transparent">
+                      <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Tiny}" Width="20" Height="20" ToolTip="{DynamicResource Tip.Xr.SourceRemove}" Click="OnSourceRemove">
+                        <Path Data="{StaticResource Ic.Close}" Style="{StaticResource Ico.Small}" Width="8" Height="8" />
+                      </Button>
+                      <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Tiny}" Width="20" Height="20" ToolTip="{DynamicResource Tip.Xr.SourceDown}" Click="OnSourceDown" Content="↓" />
+                      <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Tiny}" Width="20" Height="20" ToolTip="{DynamicResource Tip.Xr.SourceUp}" Click="OnSourceUp" Content="↑" />
+                      <TextBlock Style="{StaticResource Num}" Text="{Binding Title}" Foreground="{StaticResource B.TextHi}" Width="32" />
+                      <TextBlock Text="{Binding Info}" FontSize="11" Foreground="{StaticResource B.TextDim}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    </DockPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              </ScrollViewer>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+      </Grid>
+    </Grid>
+  </DockPanel>
+  </ScrollViewer>
+</UserControl>

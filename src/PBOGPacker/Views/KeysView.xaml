@@ -1,0 +1,105 @@
+<UserControl x:Class="NDZ.PBOGPacker.Views.KeysView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+  <Grid>
+    <Rectangle Fill="#A60A0B0B"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="40,28,40,40" MaxWidth="1100" HorizontalAlignment="Left">
+        <DockPanel Margin="0,0,0,20">
+          <StackPanel DockPanel.Dock="Right" VerticalAlignment="Bottom">
+            <TextBlock Text="{DynamicResource Keys.New}" Style="{StaticResource T.Label}" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal">
+              <TextBox Text="{Binding NewKeyTag, UpdateSourceTrigger=PropertyChanged}" Width="190" Height="40" FontFamily="{StaticResource F.Mono}" FontSize="14" MaxLength="24">
+                <TextBox.InputBindings>
+                  <KeyBinding Key="Enter" Command="{Binding CreateKeyCmd}"/>
+                </TextBox.InputBindings>
+              </TextBox>
+              <Button ToolTip="{DynamicResource Tip.CreateKey}" Style="{StaticResource Btn.Sand}" Command="{Binding CreateKeyCmd}" Margin="10,0,0,0" x:Name="Mk">
+                <StackPanel Orientation="Horizontal">
+                  <c:Ico Kind="plus" Size="17" Foreground="{StaticResource B.SandInk}" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Mk}"/>
+                  <TextBlock Text="{DynamicResource Act.CreateKey}" VerticalAlignment="Center"/>
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </StackPanel>
+          <StackPanel VerticalAlignment="Bottom">
+            <TextBlock Text="{DynamicResource Keys.Title}" Style="{StaticResource T.H1}"/>
+            <TextBlock Text="{DynamicResource Keys.Sub}" Style="{StaticResource T.Label}" FontSize="15" Margin="0,4,0,0"/>
+          </StackPanel>
+        </DockPanel>
+
+        <ItemsControl ItemsSource="{Binding Keys}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <ContentControl Style="{StaticResource Hud}" Margin="0,0,14,14">
+                <StackPanel Margin="20,16,20,16">
+                  <DockPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding Created}" Style="{StaticResource T.Mono}" VerticalAlignment="Center"/>
+                    <Grid Width="40" Height="40" Margin="0,0,14,0">
+                      <Border BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Background="#141515"/>
+                      <c:Ico Kind="keys" Size="22" Foreground="#DCD8CC" Hot="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ContentControl}}"/>
+                    </Grid>
+                    <TextBlock Text="{Binding Tag}" FontFamily="{StaticResource F.Mono}" FontSize="26" FontWeight="Medium" VerticalAlignment="Center"/>
+                  </DockPanel>
+                  <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto"/>
+                      <RowDefinition Height="Auto"/>
+                      <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{DynamicResource Keys.Fp}" FontSize="15" FontWeight="Bold" Margin="0,0,10,8"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Fingerprint}" Style="{StaticResource T.Mono}" FontSize="13" Foreground="{StaticResource B.Text}" VerticalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Grid.Row="1" Text="{DynamicResource Keys.Signed}" FontSize="15" FontWeight="Bold" Margin="0,0,10,8"/>
+                    <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+                      <ItemsControl ItemsSource="{Binding Signed}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate>
+                            <Border BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Padding="6,1" Margin="0,0,6,4">
+                              <TextBlock Text="{Binding}" Style="{StaticResource T.Mono}" FontSize="11.5"/>
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <TextBlock Text="{DynamicResource Keys.None}" FontSize="15" Foreground="{StaticResource B.Dim}"
+                                 Visibility="{Binding HasSigned, Converter={StaticResource Vis}, ConverterParameter=!}"/>
+                    </Grid>
+                    <TextBlock Grid.Row="2" Text="{DynamicResource Keys.Path}" FontSize="15" FontWeight="Bold" Margin="0,0,10,0"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path}" Style="{StaticResource T.Mono}" FontSize="11.5" Foreground="{StaticResource B.Dim}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                  </Grid>
+                  <Rectangle Style="{StaticResource Sep}" Margin="0,14,0,12"/>
+                  <StackPanel Orientation="Horizontal">
+                    <Button ToolTip="{DynamicResource Tip.ExportKey}" Style="{StaticResource Btn.Dark}" Height="34" FontSize="15" x:Name="Ex"
+                            Command="{Binding DataContext.ExportKeyCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                      <StackPanel Orientation="Horizontal">
+                        <c:Ico Kind="download" Size="16" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Ex}"/>
+                        <TextBlock Text="{DynamicResource Act.Export}" VerticalAlignment="Center"/>
+                      </StackPanel>
+                    </Button>
+                    <Button ToolTip="{DynamicResource Tip.CopyFp}" Style="{StaticResource Btn.Link}" Margin="18,0,0,0" x:Name="Fp"
+                            Command="{Binding DataContext.CopyCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Fingerprint}">
+                      <StackPanel Orientation="Horizontal">
+                        <c:Ico Kind="fingerprint" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=Fp}"/>
+                        <TextBlock Text="{DynamicResource Act.Copy}"/>
+                      </StackPanel>
+                    </Button>
+                  </StackPanel>
+                </StackPanel>
+              </ContentControl>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -1,0 +1,40 @@
+<UserControl x:Class="Pfx.App.Views.TimelineView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tl="clr-namespace:Pfx.App.Timeline">
+  <UserControl.Resources>
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="BarBtn" TargetType="ButtonBase" BasedOn="{StaticResource Btn.Icon}">
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Margin" Value="1,0" />
+    </Style>
+    <Style x:Key="Small" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <Border DockPanel.Dock="Top" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Padding="6,3">
+      <WrapPanel VerticalAlignment="Center">
+        <Button x:Name="PlayButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.Play}" Click="OnPlay"><Path x:Name="PlayIcon" Data="{StaticResource Ic.Play}" Style="{StaticResource Ico}" /></Button>
+        <Button Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.Restart}" Click="OnRestart"><Path Data="{StaticResource Ic.Restart}" Style="{StaticResource Ico}" /></Button>
+        <Button Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.Step}" Click="OnStep"><Path Data="{StaticResource Ic.Step}" Style="{StaticResource Ico}" /></Button>
+        <TextBox x:Name="TimeBox" Style="{StaticResource Box.Num}" Width="64" Margin="6,0,2,0" ToolTip="{DynamicResource Tip.TimeBox}" KeyDown="OnTimeKey" />
+        <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Unit.Seconds}" Margin="0,0,8,0" />
+        <Border Style="{StaticResource Sep.V}" />
+        <ToggleButton x:Name="LoopButton" Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.Loop}" Click="OnLoop"><Path Data="{StaticResource Ic.Loop}" Style="{StaticResource Ico}" /></ToggleButton>
+        <Button Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.MarkIn}" Click="OnMarkIn"><Path Data="{StaticResource Ic.MarkIn}" Style="{StaticResource Ico}" /></Button>
+        <Button Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.MarkOut}" Click="OnMarkOut"><Path Data="{StaticResource Ic.MarkOut}" Style="{StaticResource Ico}" /></Button>
+        <TextBlock x:Name="AreaText" Style="{StaticResource Small}" Margin="4,0,8,0" ToolTip="{DynamicResource Tip.AreaText}" />
+        <Button Style="{StaticResource BarBtn}" ToolTip="{DynamicResource Tip.Fit}" Click="OnFit"><Path Data="{StaticResource Ic.Fit}" Style="{StaticResource Ico}" /></Button>
+        <Border Style="{StaticResource Sep.V}" />
+        <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Lbl.StateSample}" ToolTip="{DynamicResource Tip.StateSample}" Margin="2,0,4,0" />
+        <ComboBox x:Name="SampleBox" Width="118" ToolTip="{DynamicResource Tip.StateSample}" SelectionChanged="OnSample" VerticalAlignment="Center" />
+        <Button x:Name="CycleButton" Content="{DynamicResource Btn.WholeCycle}" ToolTip="{DynamicResource Tip.WholeCycle}" Click="OnCycle" Margin="4,0,0,0" />
+      </WrapPanel>
+    </Border>
+    <tl:TimelineCanvas x:Name="Canvas" ToolTip="{DynamicResource Tip.Timeline}" />
+  </DockPanel>
+</UserControl>

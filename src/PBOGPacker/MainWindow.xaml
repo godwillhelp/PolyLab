@@ -1,0 +1,439 @@
+<Window x:Class="NDZ.PBOGPacker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls"
+        xmlns:v="clr-namespace:NDZ.PBOGPacker.Views"
+        Title="NDZ PBOG Packer" Width="1320" Height="800" MinWidth="1240" MinHeight="700"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
+        Background="{StaticResource B.Bg}" FontFamily="{StaticResource F.Ui}" Foreground="{StaticResource B.Text}"
+        UseLayoutRounding="True" AllowDrop="True" Icon="/NDZ_PBOGPacker;component/Assets/app.ico">
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0"/>
+  </WindowChrome.WindowChrome>
+  <Window.InputBindings>
+    <KeyBinding Modifiers="Ctrl" Key="B" Command="{Binding BuildCmd}"/>
+  </Window.InputBindings>
+
+  <Grid x:Name="Root" ClipToBounds="True">
+    <Image x:Name="BgBack" Stretch="UniformToFill" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+    <Image x:Name="BgFront" Stretch="UniformToFill" HorizontalAlignment="Right" VerticalAlignment="Top"
+           Source="{Binding PageBackground, Converter={StaticResource PathImage}}"/>
+    <Rectangle>
+      <Rectangle.Fill>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Color="#E6080909" Offset="0"/>
+          <GradientStop Color="#66080909" Offset="0.16"/>
+          <GradientStop Color="#1A080909" Offset="0.45"/>
+          <GradientStop Color="#B3080909" Offset="0.8"/>
+          <GradientStop Color="#F2080909" Offset="1"/>
+        </LinearGradientBrush>
+      </Rectangle.Fill>
+    </Rectangle>
+    <Rectangle Fill="{StaticResource B.Scan}" IsHitTestVisible="False"/>
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="232"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <Border Background="{StaticResource B.Side}" BorderBrush="{StaticResource B.Line}" BorderThickness="0,0,1,0">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="96"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <Grid MouseLeftButtonDown="OnDrag" Background="Transparent">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0">
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image Source="/NDZ_PBOGPacker;component/Assets/Brand/pbog.png" Width="40" Height="40" VerticalAlignment="Center" Margin="0,0,11,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="NDZ" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="50" Foreground="#DCD8CC"
+                           VerticalAlignment="Center" OpacityMask="{StaticResource B.Grunge}" Margin="0,-8,0,-10"/>
+              </StackPanel>
+              <Grid HorizontalAlignment="Center" Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Border BorderBrush="#DCD8CC" BorderThickness="1" Padding="4,0,4,1" Margin="0,0,7,0" VerticalAlignment="Center">
+                  <TextBlock Text="PBOG" FontSize="10.5" FontWeight="Bold" Foreground="#DCD8CC"/>
+                </Border>
+                <TextBlock Grid.Column="1" Text="P  A  C  K  E  R" FontSize="13" Foreground="#A8A59C" VerticalAlignment="Center"/>
+              </Grid>
+            </StackPanel>
+            <Rectangle Style="{StaticResource Sep}" VerticalAlignment="Bottom" Margin="30,0"/>
+          </Grid>
+
+          <Grid Grid.Row="1" Margin="30,14,18,4" Height="22" Visibility="{Binding IsEmpty, Converter={StaticResource Vis}, ConverterParameter=!}">
+            <DockPanel Visibility="{Binding MultiSelect, Converter={StaticResource Vis}, ConverterParameter=!}">
+              <Button x:Name="MultiBtn" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" FontSize="13" Command="{Binding MultiCmd}" ToolTip="{Binding MultiTip}">
+                <StackPanel Orientation="Horizontal">
+                  <c:Ico Kind="check" Size="13" StrokeThickness="2" Margin="0,0,5,0" AnimateIn="False" Hot="{Binding IsMouseOver, ElementName=MultiBtn}"/>
+                  <TextBlock Text="{DynamicResource Side.Multi}"/>
+                </StackPanel>
+              </Button>
+              <TextBlock Text="{Binding ModsCountText}" Style="{StaticResource T.Caps}" VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel Visibility="{Binding MultiSelect, Converter={StaticResource Vis}}">
+              <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Chrome}" Width="20" Height="20" Margin="8,0,0,0"
+                      Command="{Binding MultiCmd}" ToolTip="{DynamicResource Tip.MultiOff}">
+                <c:Ico Kind="close" Size="10"/>
+              </Button>
+              <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" FontSize="13" Margin="10,0,0,0"
+                      Command="{Binding CheckNoneCmd}" Content="{DynamicResource Side.None}" ToolTip="{DynamicResource Tip.CheckNone}"/>
+              <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" FontSize="13"
+                      Command="{Binding CheckAllCmd}" Content="{DynamicResource Side.All}" ToolTip="{DynamicResource Tip.CheckAll}"/>
+              <TextBlock Text="{Binding CheckedText}" FontSize="13" Foreground="{StaticResource B.Accent}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            </DockPanel>
+          </Grid>
+
+          <ListBox x:Name="ModList" Grid.Row="2" Style="{StaticResource PlainList}" ItemsSource="{Binding Mods}" SelectedItem="{Binding SelectedMod, Mode=TwoWay}"
+                   ItemContainerStyle="{StaticResource SideItem}" PreviewMouseLeftButtonDown="OnModClick">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid Background="Transparent">
+                  <Grid.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="{DynamicResource Logo.Pick}" Command="{Binding PlacementTarget.Tag.PickLogoCmd, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"/>
+                      <MenuItem Header="{DynamicResource Logo.Clear}" Command="{Binding PlacementTarget.Tag.ClearLogoCmd, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"
+                                IsEnabled="{Binding HasLogo}"/>
+                      <Separator/>
+                      <MenuItem Header="{DynamicResource Mod.Folder}" Command="{Binding PlacementTarget.Tag.OpenCmd, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding Path}"/>
+                    </ContextMenu>
+                  </Grid.ContextMenu>
+                  <Grid.Tag>
+                    <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                  </Grid.Tag>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Border Grid.ColumnSpan="2" Margin="-30,-10,-16,-10" Background="#14E4DAB4" IsHitTestVisible="False"
+                          Visibility="{Binding IsChecked, Converter={StaticResource Vis}}"/>
+                  <Button Width="50" Height="50" x:Name="Thumb" Style="{StaticResource Btn.Base}" ToolTip="{DynamicResource Logo.Hint}"
+                          Command="{Binding DataContext.PickLogoCmd, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                    <Button.Template>
+                      <ControlTemplate TargetType="Button">
+                        <Grid Background="#141515">
+                          <ContentPresenter/>
+                          <Border x:Name="ov" Background="#B0101111" Opacity="0">
+                            <c:Ico Kind="folder" Size="20" Foreground="{StaticResource B.Accent}" Hot="{Binding IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}"/>
+                          </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                          <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                              <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="ov" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15"/></Storyboard></BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                              <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="ov" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15"/></Storyboard></BeginStoryboard>
+                            </Trigger.ExitActions>
+                          </Trigger>
+                        </ControlTemplate.Triggers>
+                      </ControlTemplate>
+                    </Button.Template>
+                    <Grid>
+                      <TextBlock Text="{Binding Abbrev}" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="24"
+                                 Foreground="#E4E0D4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                      <Image Source="{Binding Logo, Converter={StaticResource PathImage}, ConverterParameter=120}" Stretch="UniformToFill"/>
+                    </Grid>
+                  </Button>
+                  <Grid Width="50" Height="50" IsHitTestVisible="False">
+                    <Border BorderBrush="{StaticResource B.Line2}" BorderThickness="1"/>
+                    <Border Width="18" Height="18" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-5,-5,0,0" BorderThickness="1"
+                            Visibility="{Binding DataContext.MultiSelect, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource Vis}}">
+                      <Border.Style>
+                        <Style TargetType="Border">
+                          <Setter Property="Background" Value="#E6121313"/>
+                          <Setter Property="BorderBrush" Value="{StaticResource B.LineHi}"/>
+                          <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                              <Setter Property="Background" Value="{StaticResource B.Accent}"/>
+                              <Setter Property="BorderBrush" Value="{StaticResource B.Accent}"/>
+                            </DataTrigger>
+                          </Style.Triggers>
+                        </Style>
+                      </Border.Style>
+                      <c:Ico Kind="check" Size="12" StrokeThickness="2.6" Foreground="{StaticResource B.SandInk}"
+                             Visibility="{Binding IsChecked, Converter={StaticResource Vis}}"/>
+                    </Border>
+                    <Border Width="14" Height="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-4,-4"
+                            Background="#121313" BorderBrush="{Binding StatusKind, Converter={StaticResource KindBrush}}" BorderThickness="1">
+                      <c:Ico Size="10" StrokeThickness="2.4" Kind="{Binding StatusKind, Converter={StaticResource KindIcon}}"
+                             Foreground="{Binding StatusKind, Converter={StaticResource KindBrush}}"/>
+                    </Border>
+                  </Grid>
+                  <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding KindTag}" FontFamily="{StaticResource F.Mono}" FontSize="9.5" Foreground="{StaticResource B.Dim}" Margin="0,-3,0,0"/>
+                    <TextBlock x:Name="nm" Text="{Binding Name}" FontSize="16" Foreground="{StaticResource B.Text2}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding StatusText}" FontSize="12.5" Margin="0,1,0,0"
+                               Foreground="{Binding StatusKind, Converter={StaticResource KindBrush}}" TextTrimming="CharacterEllipsis"/>
+                  </StackPanel>
+                </Grid>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="nm" Property="Foreground" Value="{StaticResource B.Text}"/>
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Grid.Row="2" Text="{DynamicResource Side.Empty}" Style="{StaticResource T.Label}" Margin="30,24,30,0"
+                     Visibility="{Binding IsEmpty, Converter={StaticResource Vis}}"/>
+
+          <StackPanel Grid.Row="3" Margin="30,0,30,22">
+            <Border Background="#141515" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Padding="12,9,12,11" Margin="0,10,0,12"
+                    Visibility="{Binding IsBatching, Converter={StaticResource Vis}}">
+              <StackPanel>
+                <DockPanel>
+                  <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Chrome}" Width="22" Height="22" Margin="6,-2,-4,0"
+                          Command="{Binding CancelCmd}" ToolTip="{DynamicResource Tip.CancelBatch}">
+                    <c:Ico Kind="stop" Size="12" Foreground="{StaticResource B.Err}"/>
+                  </Button>
+                  <TextBlock Text="{Binding BatchTitle}" Style="{StaticResource T.Caps}" VerticalAlignment="Center"/>
+                </DockPanel>
+                <TextBlock Text="{Binding BatchModName}" FontSize="14" Foreground="{StaticResource B.Text}" TextTrimming="CharacterEllipsis" Margin="0,4,0,8"/>
+                <Grid Height="4">
+                  <Rectangle Fill="{StaticResource B.Line2}"/>
+                  <Rectangle Fill="{StaticResource B.Accent}" RenderTransformOrigin="0,0.5">
+                    <Rectangle.RenderTransform>
+                      <ScaleTransform ScaleX="{Binding BatchFraction}"/>
+                    </Rectangle.RenderTransform>
+                  </Rectangle>
+                </Grid>
+              </StackPanel>
+            </Border>
+            <Button x:Name="PackSel" Style="{StaticResource Btn.Sand}" Padding="8,0" Margin="0,10,0,10" Command="{Binding PackCheckedCmd}"
+                    ToolTip="{Binding PackCheckedTip}" Visibility="{Binding ShowPackChecked, Converter={StaticResource Vis}}">
+              <StackPanel Orientation="Horizontal">
+                <c:Ico Kind="pack" Size="18" StrokeThickness="1.8" Foreground="{StaticResource B.SandInk}" Margin="0,0,9,0" Hot="{Binding IsMouseOver, ElementName=PackSel}"/>
+                <TextBlock Text="{Binding PackCheckedText}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <Button ToolTip="{DynamicResource Tip.AddMod}" Style="{StaticResource Btn.Dark}" Command="{Binding AddModCmd}" x:Name="AddBtn">
+              <StackPanel Orientation="Horizontal">
+                <c:Ico Kind="plus" Size="18" Hot="{Binding IsMouseOver, ElementName=AddBtn}" Margin="0,0,10,0"/>
+                <TextBlock Text="{DynamicResource Side.Add}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <Button x:Name="Cred" Style="{StaticResource Btn.Tab}" Command="{Binding NavCmd}" CommandParameter="about"
+                    HorizontalAlignment="Center" Margin="0,14,0,0" ToolTip="{DynamicResource About.Thanks}"
+                    c:Ui.Active="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=about}">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                  <c:Ico Kind="logo" Size="12" Margin="0,0,5,0" Foreground="{StaticResource B.Dim}" Hot="{Binding IsMouseOver, ElementName=Cred}"/>
+                  <TextBlock Text="{DynamicResource Sb.Powered}" FontSize="11.5" Foreground="{StaticResource B.Dim}"/>
+                </StackPanel>
+                <TextBlock FontSize="14" HorizontalAlignment="Center" Margin="0,3,0,0"><Run Text="[KR]" Foreground="{StaticResource B.Orange}"/><Run Text=" 6wingSeraph"/></TextBlock>
+              </StackPanel>
+            </Button>
+            <Rectangle Style="{StaticResource Sep}" Margin="20,10,20,8"/>
+            <TextBlock Text="{Binding FooterGraft}" Style="{StaticResource T.Mono}" FontSize="10.5" Foreground="{StaticResource B.Dim}"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding FooterBuild}" Style="{StaticResource T.Mono}" FontSize="10.5" Foreground="{StaticResource B.Dim}"
+                       HorizontalAlignment="Center" Margin="0,2,0,0"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Column="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="96"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Background="Transparent" MouseLeftButtonDown="OnDrag">
+          <Rectangle Style="{StaticResource Sep}" VerticalAlignment="Bottom"/>
+          <StackPanel x:Name="NavBar" Orientation="Horizontal" Margin="16,0,0,0" Height="64" VerticalAlignment="Bottom">
+            <RadioButton ToolTip="{DynamicResource Tip.NavBuild}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Build}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=build}"/>
+            <RadioButton ToolTip="{DynamicResource Tip.NavServers}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Servers}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=servers}"/>
+            <RadioButton ToolTip="{DynamicResource Tip.NavKeys}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Keys}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=keys}"/>
+            <RadioButton ToolTip="{DynamicResource Tip.NavEnv}" Style="{StaticResource Nav}" GroupName="nav"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=env}">
+              <Grid>
+                <TextBlock Text="{DynamicResource Nav.Env}"/>
+                <Rectangle Width="7" Height="7" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,2,-11,0"
+                           Fill="{Binding EnvKind, Converter={StaticResource KindBrush}}" Visibility="{Binding EnvBad, Converter={StaticResource Vis}}"/>
+              </Grid>
+            </RadioButton>
+            <RadioButton ToolTip="{DynamicResource Tip.NavSettings}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Settings}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=settings}"/>
+            <RadioButton ToolTip="{DynamicResource Tip.NavAbout}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.About}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=about}"/>
+          </StackPanel>
+
+          <Button ToolTip="{DynamicResource Tip.Toolchain}" x:Name="TcBtn" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,34,14" Command="{Binding MenuCmd}"
+                  Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}">
+            <StackPanel Orientation="Horizontal">
+              <Grid Width="48" Height="48">
+                <Image Source="/NDZ_PBOGPacker;component/Assets/Photos/tc_tile.jpg" Stretch="UniformToFill"/>
+                <Rectangle Fill="#400B0C0C"/>
+                <Border BorderBrush="{StaticResource B.Line2}" BorderThickness="1"/>
+                <c:Ico Kind="tower" Size="30" Foreground="#DCD8CC" Hot="{Binding IsMouseOver, ElementName=TcBtn}"/>
+              </Grid>
+              <StackPanel Margin="12,2,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource Tc.Name}" FontSize="16" FontWeight="Bold"/>
+                <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                  <Grid Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,6,0">
+                    <Ellipse Fill="{Binding EnvKind, Converter={StaticResource KindBrush}}"/>
+                  </Grid>
+                  <TextBlock Text="{Binding EnvStatus}" FontSize="14" FontWeight="Bold" Foreground="{StaticResource B.Text}"/>
+                  <c:Ico Kind="chevDown" Size="14" Margin="4,1,0,0" StrokeThickness="2"/>
+                </StackPanel>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Popup IsOpen="{Binding MenuOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=TcBtn}" Placement="Bottom"
+                 StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade" HorizontalOffset="-110" VerticalOffset="4">
+            <Grid Width="300" TextElement.FontFamily="{StaticResource F.Ui}">
+              <Path Data="M0,8 L8,0 L16,8 Z" Fill="#F7141515" Stroke="{StaticResource B.Line2}" HorizontalAlignment="Right" Margin="0,0,40,0"/>
+              <Border Margin="0,7,0,0" Background="#F7141515" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Padding="0,6">
+                <StackPanel>
+                  <StackPanel.Resources>
+                    <Style TargetType="c:Ico">
+                      <Setter Property="Size" Value="18"/>
+                      <Setter Property="Margin" Value="0,0,12,0"/>
+                      <Setter Property="Hot" Value="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                    </Style>
+                  </StackPanel.Resources>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding RecheckCmd}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="refresh"/><TextBlock Text="{DynamicResource Menu.Recheck}"/></StackPanel>
+                  </Button>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding OpenCmd}" CommandParameter="{Binding ToolsDir}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="folder"/><TextBlock Text="{DynamicResource Menu.Tools}"/></StackPanel>
+                  </Button>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding OpenCmd}" CommandParameter="{Binding Settings.Tools.KeyDir}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="keys"/><TextBlock Text="{DynamicResource Menu.KeysDir}"/></StackPanel>
+                  </Button>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding OpenCmd}" CommandParameter="{Binding GraftReleases}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="ext"/><TextBlock Text="{DynamicResource Menu.Graft}"/></StackPanel>
+                  </Button>
+                  <Rectangle Style="{StaticResource Sep}" Margin="0,6"/>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding NavCmd}" CommandParameter="settings">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="settings"/><TextBlock Text="{DynamicResource Menu.Settings}"/></StackPanel>
+                  </Button>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding NavCmd}" CommandParameter="about">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="tower"/><TextBlock Text="{DynamicResource Menu.About}"/></StackPanel>
+                  </Button>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding LangCmd}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="globe"/><TextBlock Text="{DynamicResource Menu.Lang}"/></StackPanel>
+                  </Button>
+                  <StackPanel Visibility="{Binding IsDemo, Converter={StaticResource Vis}}">
+                    <Rectangle Style="{StaticResource Sep}" Margin="0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="14,4,14,6">
+                      <c:Ico Kind="flask" Size="14" Foreground="{StaticResource B.Warn}" Margin="0,0,8,0" Hot="False"/>
+                      <TextBlock Text="{DynamicResource Demo.Title}" FontSize="12.5" Foreground="{StaticResource B.Warn}"/>
+                    </StackPanel>
+                    <CheckBox Content="{DynamicResource Demo.Empty}" IsChecked="{Binding DemoEmpty}" Margin="16,4" FontSize="14"/>
+                    <CheckBox Content="{DynamicResource Demo.Env}" IsChecked="{Binding DemoEnv}" Margin="16,4" FontSize="14"/>
+                    <CheckBox Content="{DynamicResource Demo.Fail}" IsChecked="{Binding DemoFail}" Margin="16,4" FontSize="14"/>
+                    <Button Style="{StaticResource Btn.Menu}" Command="{Binding DemoResetCmd}">
+                      <StackPanel Orientation="Horizontal"><c:Ico Kind="refresh"/><TextBlock Text="{DynamicResource Demo.Reset}"/></StackPanel>
+                    </Button>
+                  </StackPanel>
+                  <Rectangle Style="{StaticResource Sep}" Margin="0,6"/>
+                  <Button Style="{StaticResource Btn.Menu}" Command="{Binding QuitCmd}">
+                    <StackPanel Orientation="Horizontal"><c:Ico Kind="x" Foreground="{StaticResource B.Err}" StrokeThickness="2.2"/><TextBlock Text="{DynamicResource Menu.Quit}"/></StackPanel>
+                  </Button>
+                  <Grid Margin="14,8,14,2">
+                    <TextBlock Text="{DynamicResource Menu.Version}" FontSize="12" Foreground="#4E4D48"/>
+                    <TextBlock Text="{Binding AppVersion}" FontSize="12" Foreground="#4E4D48" HorizontalAlignment="Right"/>
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </Grid>
+          </Popup>
+        </Grid>
+
+        <Grid Grid.Row="1" x:Name="Pages">
+          <v:BuildView x:Name="PgBuild" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=build}"/>
+          <v:ServersView x:Name="PgServers" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=servers}"/>
+          <v:KeysView x:Name="PgKeys" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=keys}"/>
+          <v:EnvView x:Name="PgEnv" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=env}"/>
+          <v:SettingsView x:Name="PgSettings" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=settings}"/>
+          <v:AboutView x:Name="PgAbout" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=about}"/>
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <c:HeaderParticles x:Name="Fx" Height="96" VerticalAlignment="Top">
+      <c:HeaderParticles.OpacityMask>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Color="#FF000000" Offset="0"/>
+          <GradientStop Color="#FF000000" Offset="0.84"/>
+          <GradientStop Color="#00000000" Offset="1"/>
+        </LinearGradientBrush>
+      </c:HeaderParticles.OpacityMask>
+    </c:HeaderParticles>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+      <Button x:Name="WMin" Style="{StaticResource Btn.Win}" Click="OnMin" ToolTip="{DynamicResource Win.Min}">
+        <c:Ico Kind="minus" Size="16" StrokeThickness="1.4" Hot="{Binding IsMouseOver, ElementName=WMin}"/>
+      </Button>
+      <Button ToolTip="{DynamicResource Tip.Max}" x:Name="WMax" Style="{StaticResource Btn.Win}" Click="OnMax">
+        <c:Ico x:Name="WMaxIco" Kind="square" Size="16" StrokeThickness="1.4"/>
+      </Button>
+      <Button x:Name="WClose" Style="{StaticResource Btn.WinClose}" Click="OnClose" ToolTip="{DynamicResource Win.Close}">
+        <c:Ico Kind="close" Size="16" StrokeThickness="1.4"/>
+      </Button>
+    </StackPanel>
+
+    <ItemsControl ItemsSource="{Binding Toasts}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,104,26,0" Width="360" Panel.ZIndex="10">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Background="#F4151616" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Margin="0,0,0,8" Padding="12,10,8,12">
+            <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+            <Border.Triggers>
+              <EventTrigger RoutedEvent="Loaded">
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2"/>
+                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.X" From="24" To="0" Duration="0:0:0.2" EasingFunction="{StaticResource Ease}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </EventTrigger>
+            </Border.Triggers>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Border Width="30" Height="30" VerticalAlignment="Top" BorderThickness="1"
+                      BorderBrush="{Binding Kind, Converter={StaticResource KindBrush}}">
+                <c:Ico Size="16" StrokeThickness="2" Kind="{Binding Kind, Converter={StaticResource KindIcon}}" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"/>
+              </Border>
+              <StackPanel Grid.Column="1" Margin="12,0,6,0">
+                <TextBlock Text="{Binding Title}" FontSize="15" Foreground="{StaticResource B.Text}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Sub}" Style="{StaticResource T.Mono}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"
+                           Visibility="{Binding Sub, Converter={StaticResource Vis}}"/>
+              </StackPanel>
+              <Button ToolTip="{DynamicResource Tip.Close}" Grid.Column="2" Style="{StaticResource Btn.Chrome}" Width="22" Height="22" VerticalAlignment="Top"
+                      Command="{Binding DataContext.ToastCloseCmd, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}">
+                <c:Ico Kind="close" Size="11"/>
+              </Button>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <v:ResultDialog Visibility="{Binding ResultOpen, Converter={StaticResource Vis}}"/>
+    <v:WorkshopDialog Visibility="{Binding WorkshopOpen, Converter={StaticResource Vis}}"/>
+
+    <Grid Visibility="{Binding DropActive, Converter={StaticResource Vis}}" Background="#C8080909" IsHitTestVisible="False">
+      <Rectangle Margin="16" Stroke="{StaticResource B.Accent}" StrokeDashArray="6 4" StrokeThickness="1"/>
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <c:Ico Kind="download" Size="54" Foreground="{StaticResource B.Accent}" HorizontalAlignment="Center" StrokeThickness="1.3"/>
+        <TextBlock Text="{DynamicResource Drop.Hint}" FontSize="26" Foreground="{StaticResource B.Accent}" Margin="0,16,0,0"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

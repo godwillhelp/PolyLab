@@ -1,0 +1,371 @@
+<UserControl x:Class="Pfx.App.Views.InspectorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ins="clr-namespace:Pfx.App.Inspector"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:VisibleIf x:Key="Vis" />
+    <c:VisibleIf x:Key="VisNot" Invert="True" />
+    <c:ColorBrush x:Key="ColorBrush" />
+    <c:ThemeBrush x:Key="Brush" />
+    <c:Not x:Key="NotBool" />
+
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="Label" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Present}" Value="True">
+          <Setter Property="Foreground" Value="{StaticResource B.Text}" />
+          <Setter Property="FontWeight" Value="SemiBold" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="Mark" TargetType="TextBlock" BasedOn="{StaticResource T.Base}">
+      <Setter Property="Grid.Column" Value="2" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Text" Value="{Binding Mark}" />
+      <Setter Property="ToolTip" Value="{Binding MarkTip}" />
+      <Setter Property="Foreground" Value="{Binding MarkBrush, Converter={StaticResource Brush}}" />
+      <Setter Property="Background" Value="{StaticResource B.Transparent}" />
+      <Setter Property="Width" Value="18" />
+      <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="Note" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="Grid.Row" Value="1" />
+      <Setter Property="Grid.Column" Value="1" />
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+      <Setter Property="FontSize" Value="10.5" />
+      <Setter Property="Text" Value="{Binding Note}" />
+      <Setter Property="Visibility" Value="{Binding HasNote, Converter={StaticResource Vis}}" />
+    </Style>
+    <!-- A row: label | editor | mark, note line under it. FlashBox lies under the row and fades out once when a typed
+         value was clamped or rejected (opacity, because style brushes are frozen and cannot be colour-animated). -->
+    <Style x:Key="Row" TargetType="Border">
+      <Setter Property="Padding" Value="10,3,4,3" />
+      <Setter Property="Background" Value="{StaticResource B.Transparent}" />
+    </Style>
+    <Style x:Key="FlashBox" TargetType="Border">
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{StaticResource B.Err}" />
+      <Setter Property="Background" Value="{StaticResource B.ErrSoft}" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Flash}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard>
+              <Storyboard>
+                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.9" />
+              </Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.EnterActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="Box" TargetType="TextBox" BasedOn="{StaticResource Box.Num}">
+      <EventSetter Event="KeyDown" Handler="OnBoxKey" />
+      <EventSetter Event="LostKeyboardFocus" Handler="OnBoxLost" />
+      <EventSetter Event="GotKeyboardFocus" Handler="OnBoxGot" />
+      <Setter Property="IsReadOnly" Value="{Binding DataContext.ReadOnly, RelativeSource={RelativeSource AncestorType=Border}}" />
+    </Style>
+    <Style x:Key="Unit" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="FontSize" Value="10.5" />
+    </Style>
+
+    <DataTemplate DataType="{x:Type ins:NumberField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <c:ScrubLabel Field="{Binding}" Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" EditRequested="OnScrubEdit" />
+          <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <c:ValueSlider Field="{Binding}" Value="{Binding Value, Mode=OneWay}" ToolTip="{Binding Tip}" Margin="0,0,6,0"
+                           Visibility="{Binding IsSlider, Converter={StaticResource Vis}}" />
+            <Grid>
+              <Grid.Style>
+                <Style TargetType="Grid">
+                  <Setter Property="Grid.ColumnSpan" Value="2" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsSlider}" Value="True">
+                      <Setter Property="Grid.Column" Value="1" />
+                      <Setter Property="Grid.ColumnSpan" Value="1" />
+                      <Setter Property="Width" Value="58" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Grid.Style>
+              <TextBox Style="{StaticResource Box}" Text="{Binding Text, Mode=OneWay}" ToolTip="{Binding Tip}" />
+              <TextBlock Style="{StaticResource Unit}" Text="{Binding Unit}" />
+              <TextBlock Style="{StaticResource T.Dim}" Margin="6,0,0,0" IsHitTestVisible="False" Text="{Binding MixedList}"
+                         Visibility="{Binding Mixed, Converter={StaticResource Vis}}" TextTrimming="CharacterEllipsis" />
+            </Grid>
+          </Grid>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:PairField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <c:ScrubLabel Field="{Binding Base}" Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" EditRequested="OnScrubEdit" />
+          <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+            <Grid>
+              <TextBox Style="{StaticResource Box}" Tag="base" Text="{Binding Base.Text, Mode=OneWay}" ToolTip="{Binding Base.Tip}" />
+              <TextBlock Style="{StaticResource Unit}" Text="{Binding Base.Unit}" />
+            </Grid>
+            <c:ScrubLabel Grid.Column="1" Field="{Binding Rnd}" Text="+" Margin="5,0" Foreground="{StaticResource B.TextDim}" ToolTip="{Binding RndTip}" />
+            <TextBox Grid.Column="2" Style="{StaticResource Box}" Tag="rnd" Text="{Binding Rnd.Text, Mode=OneWay}" ToolTip="{Binding RndTip}" />
+          </Grid>
+          <TextBlock Style="{StaticResource Mark}" />
+          <Grid Grid.Row="1" Grid.Column="1" Margin="0,4,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <c:RangeBar Field="{Binding}" Version="{Binding RangeText}" ToolTip="{DynamicResource Tip.RangeBar}" />
+            <TextBlock Grid.Column="1" Style="{StaticResource T.Dim}" FontSize="10.5" Margin="8,0,0,0" Text="{Binding RangeText}" />
+          </Grid>
+          <TextBlock Style="{StaticResource Note}" Grid.Row="2" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:VectorField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <UniformGrid Grid.Column="1" Rows="1">
+            <DockPanel Margin="0,0,3,0">
+              <c:ScrubLabel DockPanel.Dock="Left" Field="{Binding}" Axis="0" Text="X" Foreground="{StaticResource B.AxisX}" FontWeight="SemiBold" Margin="0,0,3,0" ToolTip="{DynamicResource Tip.AxisX}" />
+              <TextBox Style="{StaticResource Box}" Tag="0" Text="{Binding X, Mode=OneWay}" ToolTip="{Binding Tip}" BorderBrush="{StaticResource B.AxisX}" />
+            </DockPanel>
+            <DockPanel Margin="0,0,3,0">
+              <c:ScrubLabel DockPanel.Dock="Left" Field="{Binding}" Axis="1" Text="Y" Foreground="{StaticResource B.AxisY}" FontWeight="SemiBold" Margin="0,0,3,0" ToolTip="{DynamicResource Tip.AxisY}" />
+              <TextBox Style="{StaticResource Box}" Tag="1" Text="{Binding Y, Mode=OneWay}" ToolTip="{Binding Tip}" BorderBrush="{StaticResource B.AxisY}" />
+            </DockPanel>
+            <DockPanel>
+              <c:ScrubLabel DockPanel.Dock="Left" Field="{Binding}" Axis="2" Text="Z" Foreground="{StaticResource B.AxisZ}" FontWeight="SemiBold" Margin="0,0,3,0" ToolTip="{DynamicResource Tip.AxisZ}" />
+              <TextBox Style="{StaticResource Box}" Tag="2" Text="{Binding Z, Mode=OneWay}" ToolTip="{Binding Tip}" BorderBrush="{StaticResource B.AxisZ}" />
+            </DockPanel>
+          </UniformGrid>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:ToggleField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Height="22">
+            <ToggleButton Style="{StaticResource Switch}" IsChecked="{Binding IsOn, Mode=OneWay}" ToolTip="{Binding Tip}" Click="OnToggle" IsEnabled="{Binding ReadOnly, Converter={StaticResource NotBool}}" />
+            <TextBlock Style="{StaticResource T.Dim}" Margin="8,0,0,0" Text="{Binding StateText}" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:ChoiceField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <ItemsControl Grid.Column="1" ItemsSource="{Binding Options}" Visibility="{Binding Few, Converter={StaticResource Vis}}" IsEnabled="{Binding ReadOnly, Converter={StaticResource NotBool}}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <ToggleButton Style="{StaticResource Btn.Seg}" Content="{Binding Text}" ToolTip="{Binding Tip}" IsChecked="{Binding IsOn, Mode=OneWay}" Click="OnChoice" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedItem="{Binding Selected, Mode=TwoWay}"
+                    ToolTip="{Binding Tip}" Visibility="{Binding Few, Converter={StaticResource VisNot}}" IsEnabled="{Binding ReadOnly, Converter={StaticResource NotBool}}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding Text}" ToolTip="{Binding Tip}" TextTrimming="CharacterEllipsis" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" Foreground="{StaticResource B.Warn}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:GraphField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <Button Grid.Column="1" Style="{StaticResource Btn.Flat}" Padding="0" Height="22" ToolTip="{DynamicResource Tip.GraphThumb}"
+                  HorizontalContentAlignment="Stretch" Click="OnGraphOpen">
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+              <c:GraphThumb Field="{Binding}" Version="{Binding Numbers}" Height="20" />
+              <TextBlock Grid.Column="1" Style="{StaticResource T.Dim}" FontSize="10" Margin="6,0,2,0" Text="{Binding KeyCount}" />
+            </Grid>
+          </Button>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" Foreground="{StaticResource B.Err}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:PathField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <DockPanel Grid.Column="1">
+            <Button DockPanel.Dock="Right" Style="{StaticResource Btn.Tiny}" Width="22" Height="22" Margin="3,0,0,0" ToolTip="{DynamicResource Tip.Browse}" Click="OnBrowse">
+              <Path Data="{StaticResource Ic.Folder}" Style="{StaticResource Ico.Small}" />
+            </Button>
+            <TextBox Style="{StaticResource Box}" Text="{Binding Text, Mode=OneWay}" ToolTip="{Binding Text}" />
+          </DockPanel>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" Foreground="{StaticResource B.Warn}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:ColorField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <DockPanel Grid.Column="1">
+            <Border DockPanel.Dock="Left" Width="18" Height="18" CornerRadius="3" BorderBrush="{StaticResource B.Line}" BorderThickness="1" Margin="0,0,4,0"
+                    Background="{Binding Swatch, Converter={StaticResource ColorBrush}}" ToolTip="{DynamicResource Tip.Swatch}" />
+            <UniformGrid Rows="1">
+              <TextBox Style="{StaticResource Box}" Tag="0" Margin="0,0,2,0" Text="{Binding R, Mode=OneWay}" ToolTip="{DynamicResource Tip.ChR}" BorderBrush="{StaticResource B.AxisX}" />
+              <TextBox Style="{StaticResource Box}" Tag="1" Margin="0,0,2,0" Text="{Binding G, Mode=OneWay}" ToolTip="{DynamicResource Tip.ChG}" BorderBrush="{StaticResource B.AxisY}" />
+              <TextBox Style="{StaticResource Box}" Tag="2" Margin="0,0,2,0" Text="{Binding B, Mode=OneWay}" ToolTip="{DynamicResource Tip.ChB}" BorderBrush="{StaticResource B.AxisZ}" />
+              <TextBox Style="{StaticResource Box}" Tag="3" Text="{Binding A, Mode=OneWay}" ToolTip="{DynamicResource Tip.ChA}" />
+            </UniformGrid>
+          </DockPanel>
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:TextField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <TextBox Grid.Column="1" Style="{StaticResource Box}" Text="{Binding Text, Mode=OneWay}" ToolTip="{Binding Tip}" />
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type ins:ChildrenField}">
+      <Grid ContextMenuOpening="OnRowMenu" Background="{StaticResource B.Transparent}">
+        <Grid.ContextMenu><ContextMenu /></Grid.ContextMenu>
+        <Border Style="{StaticResource FlashBox}" />
+        <Border Style="{StaticResource Row}">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+          <TextBlock Text="{Binding Label}" ToolTip="{Binding Tip}" Style="{StaticResource Label}" />
+          <TextBlock Grid.Column="1" Style="{StaticResource T.Num}" Text="{Binding Text}" ToolTip="{Binding Tip}" />
+          <TextBlock Style="{StaticResource Mark}" />
+          <TextBlock Style="{StaticResource Note}" />
+        </Grid>
+      </Border>
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <Border DockPanel.Dock="Top" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Padding="10,0" MinHeight="28">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Right" Style="{StaticResource T.Dim}" Text="{Binding Subtitle}" Margin="8,0,0,0" />
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
+      </DockPanel>
+    </Border>
+    <TextBlock DockPanel.Dock="Top" Style="{StaticResource T.Dim}" Margin="12" TextWrapping="Wrap" Text="{Binding Empty}" Visibility="{Binding HasEmpty, Converter={StaticResource Vis}}" />
+    <ScrollViewer x:Name="Scroller" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+      <ItemsControl ItemsSource="{Binding Sections}" Focusable="False">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type ins:SectionVm}">
+            <StackPanel Visibility="{Binding Visible, Converter={StaticResource Vis}}">
+              <ToggleButton Style="{StaticResource SectionHeader}" IsChecked="{Binding IsOpen, Mode=TwoWay}" ToolTip="{DynamicResource Tip.Section}">
+                <DockPanel>
+                  <Path DockPanel.Dock="Left" x:Name="Arrow" Data="{StaticResource Ic.Right}" Style="{StaticResource Ico.Small}" Width="9" Height="9" Margin="0,0,7,0"
+                        Stroke="{StaticResource B.TextDim}" />
+                  <TextBlock DockPanel.Dock="Left" Style="{StaticResource T.Hi}" FontSize="11" Text="{Binding Name}" />
+                  <TextBlock Style="{StaticResource T.Dim}" Margin="10,0,0,0" Text="{Binding Summary}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" ToolTip="{Binding Summary}" />
+                </DockPanel>
+              </ToggleButton>
+              <ItemsControl ItemsSource="{Binding Shown}" Visibility="{Binding IsOpen, Converter={StaticResource Vis}}" Focusable="False" />
+            </StackPanel>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Ic.Down}" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

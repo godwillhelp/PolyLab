@@ -1,0 +1,344 @@
+<Window x:Class="Pfx.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ad="https://github.com/Dirkster99/AvalonDock"
+        xmlns:v="clr-namespace:Pfx.App.Views"
+        xmlns:vm="clr-namespace:Pfx.App.ViewModels"
+        xmlns:c="clr-namespace:Pfx.App.Controls"
+        Width="1366" Height="768" MinWidth="960" MinHeight="560"
+        Background="{StaticResource B.BgBase}" FontFamily="{StaticResource Font.Ui}" FontSize="{StaticResource F.Ui}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display">
+  <!-- Implicit text styles live here, not in App.xaml: application-level implicit TextBlock styles also reach the
+       TextBlocks inside control templates (P4 trap). -->
+  <Window.Resources>
+    <c:VisibleIf x:Key="Vis" />
+    <c:VisibleIf x:Key="VisNot" Invert="True" />
+    <c:ColorBrush x:Key="ColorBrush" />
+    <c:ThemeBrush x:Key="Brush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="ToolBtn" TargetType="ToggleButton" BasedOn="{StaticResource Btn.Icon}">
+      <Setter Property="Margin" Value="0,1" />
+      <EventSetter Event="Click" Handler="OnTool" />
+    </Style>
+    <Style x:Key="BarBtn" TargetType="ButtonBase" BasedOn="{StaticResource Btn.Icon}">
+      <Setter Property="Width" Value="26" />
+      <Setter Property="Height" Value="26" />
+      <Setter Property="Margin" Value="1,0" />
+    </Style>
+    <Style x:Key="OptBox" TargetType="TextBox" BasedOn="{StaticResource Box.Num}">
+      <Setter Property="Width" Value="56" />
+      <Setter Property="Margin" Value="4,0,10,0" />
+      <EventSetter Event="KeyDown" Handler="OnOptionKey" />
+      <EventSetter Event="LostKeyboardFocus" Handler="OnOptionLost" />
+    </Style>
+    <Style x:Key="OptLabel" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+  </Window.Resources>
+
+  <DockPanel>
+    <!-- Title row: menus, workspace, live link, play. -->
+    <Border DockPanel.Dock="Top" Background="{StaticResource B.BgDeep}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Height="30">
+      <DockPanel Margin="8,0">
+        <Path DockPanel.Dock="Left" Data="{StaticResource Ic.Logo}" Style="{StaticResource Ico}" Stroke="{StaticResource B.Accent}" Margin="0,0,6,0" />
+        <TextBlock DockPanel.Dock="Left" Style="{StaticResource T.Hi}" Text="Particle Studio" Margin="0,0,12,0" />
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <TextBlock x:Name="WorkspaceText" Style="{StaticResource T.Dim}" Margin="0,0,12,0" ToolTip="{DynamicResource Tip.Workspace}" />
+          <Button x:Name="LinkButton" Style="{StaticResource Btn.Base}" IsEnabled="False" ToolTip="{DynamicResource Tip.Link}" Margin="0,0,8,0">
+            <StackPanel Orientation="Horizontal">
+              <Ellipse x:Name="LinkDot" Width="7" Height="7" Fill="{StaticResource B.TextOff}" Margin="0,0,6,0" />
+              <TextBlock x:Name="LinkText" Text="{DynamicResource Lbl.LinkOff}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+            </StackPanel>
+          </Button>
+          <Button x:Name="PlayButton" Style="{StaticResource Btn.Accent}" Click="OnPlay" ToolTip="{DynamicResource Tip.Play}" Padding="10,0" MinWidth="96">
+            <StackPanel Orientation="Horizontal">
+              <Path x:Name="PlayIcon" Data="{StaticResource Ic.Pause}" Style="{StaticResource Ico.Small}" Stroke="{StaticResource B.BgDeep}" StrokeThickness="2.2" Margin="0,0,6,0" />
+              <TextBlock x:Name="PlayText" Foreground="{StaticResource B.BgDeep}" FontWeight="SemiBold" />
+            </StackPanel>
+          </Button>
+        </StackPanel>
+        <Menu x:Name="MainMenu" VerticalAlignment="Center" />
+      </DockPanel>
+    </Border>
+
+    <!-- Options bar: what the active tool or preview tool can set; search over all properties at the right. -->
+    <Border DockPanel.Dock="Top" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Height="34">
+      <DockPanel Margin="10,0">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Path Data="{StaticResource Ic.Search}" Style="{StaticResource Ico.Small}" Stroke="{StaticResource B.TextDim}" Margin="0,0,6,0" />
+          <Grid Width="200">
+            <TextBox x:Name="SearchBox" Style="{StaticResource {x:Type TextBox}}" ToolTip="{DynamicResource Tip.Search}" TextChanged="OnSearch" KeyDown="OnSearchKey" />
+            <TextBlock x:Name="SearchHint" Style="{StaticResource T.Dim}" Margin="6,0,0,0" IsHitTestVisible="False" Text="{DynamicResource Hint.Search}" />
+          </Grid>
+          <TextBlock x:Name="SearchCount" Style="{StaticResource T.Dim}" Width="78" Margin="8,0,0,0" />
+        </StackPanel>
+        <TextBlock x:Name="OptionsTitle" DockPanel.Dock="Left" Style="{StaticResource T.Hi}" FontSize="11" Margin="0,0,14,0" />
+        <Grid>
+          <StackPanel x:Name="CircleOptions" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Radius}" ToolTip="{DynamicResource Tip.Radius}" />
+            <TextBox x:Name="RadiusBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Radius}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Speed}" ToolTip="{DynamicResource Tip.Speed}" />
+            <TextBox x:Name="SpeedBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Speed}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Axis}" ToolTip="{DynamicResource Tip.Axis}" />
+            <StackPanel Orientation="Horizontal" Margin="4,0,0,0">
+              <ToggleButton x:Name="AxisX" Style="{StaticResource Btn.Seg}" Content="X" Tag="X" ToolTip="{DynamicResource Tip.Axis}" Click="OnAxis" />
+              <ToggleButton x:Name="AxisY" Style="{StaticResource Btn.Seg}" Content="Y" Tag="Y" ToolTip="{DynamicResource Tip.Axis}" Click="OnAxis" />
+              <ToggleButton x:Name="AxisZ" Style="{StaticResource Btn.Seg}" Content="Z" Tag="Z" ToolTip="{DynamicResource Tip.Axis}" Click="OnAxis" />
+            </StackPanel>
+          </StackPanel>
+          <StackPanel x:Name="StressOptions" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Copies}" ToolTip="{DynamicResource Tip.Copies}" />
+            <TextBox x:Name="CopiesBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Copies}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Spacing}" ToolTip="{DynamicResource Tip.Spacing}" />
+            <TextBox x:Name="SpacingBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Spacing}" />
+          </StackPanel>
+          <StackPanel x:Name="LowFpsOptions" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.LowFps}" ToolTip="{DynamicResource Tip.LowFps}" />
+            <TextBox x:Name="LowFpsBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.LowFps}" />
+          </StackPanel>
+          <!-- Gizmo tools (P8): axes of the move, snapping, steps, orientation presets of the rotate tool. -->
+          <StackPanel x:Name="GizmoOptions" Orientation="Horizontal" Visibility="Collapsed">
+            <StackPanel x:Name="SpaceOptions" Orientation="Horizontal">
+              <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Space}" ToolTip="{DynamicResource Tip.Space}" />
+              <StackPanel Orientation="Horizontal" Margin="4,0,10,0">
+                <ToggleButton x:Name="SpaceWorld" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Lbl.SpaceWorld}" ToolTip="{DynamicResource Tip.SpaceWorld}" Click="OnSpace" />
+                <ToggleButton x:Name="SpaceSource" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Lbl.SpaceSource}" ToolTip="{DynamicResource Tip.SpaceSource}" Click="OnSpace" />
+              </StackPanel>
+            </StackPanel>
+            <ToggleButton x:Name="SnapButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Lbl.Snap}" ToolTip="{DynamicResource Tip.Snap}" Click="OnSnap" Margin="0,0,8,0" />
+            <StackPanel x:Name="StepOptions" Orientation="Horizontal">
+              <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.StepMetres}" ToolTip="{DynamicResource Tip.StepMetres}" />
+              <TextBox x:Name="StepMetresBox" Style="{StaticResource OptBox}" Width="44" ToolTip="{DynamicResource Tip.StepMetres}" />
+            </StackPanel>
+            <StackPanel x:Name="AngleOptions" Orientation="Horizontal">
+              <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.StepDegrees}" ToolTip="{DynamicResource Tip.StepDegrees}" />
+              <TextBox x:Name="StepDegreesBox" Style="{StaticResource OptBox}" Width="40" ToolTip="{DynamicResource Tip.StepDegrees}" />
+            </StackPanel>
+            <StackPanel x:Name="PresetOptions" Orientation="Horizontal">
+              <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Presets}" ToolTip="{DynamicResource Tip.Presets}" Margin="0,0,4,0" />
+              <Button Style="{StaticResource Btn.Seg}" Tag="flat" Content="{DynamicResource Preset.flat}" ToolTip="{DynamicResource Tip.Preset.flat}" Click="OnPreset" />
+              <Button Style="{StaticResource Btn.Seg}" Tag="wall" Content="{DynamicResource Preset.wall}" ToolTip="{DynamicResource Tip.Preset.wall}" Click="OnPreset" />
+              <Button Style="{StaticResource Btn.Seg}" Tag="cross" Content="{DynamicResource Preset.cross}" ToolTip="{DynamicResource Tip.Preset.cross}" Click="OnPreset" />
+              <TextBox x:Name="CrossBox" Style="{StaticResource OptBox}" Width="26" Margin="2,0,2,0" ToolTip="{DynamicResource Tip.CrossCount}" />
+              <Button Style="{StaticResource Btn.Seg}" Tag="beam" Content="{DynamicResource Preset.beam}" ToolTip="{DynamicResource Tip.Preset.beam}" Click="OnPreset" />
+              <Button Style="{StaticResource Btn.Seg}" Tag="ring" Content="{DynamicResource Preset.ring}" ToolTip="{DynamicResource Tip.Preset.ring}" Click="OnPreset" />
+            </StackPanel>
+          </StackPanel>
+          <!-- Path tool (P8): drawing plane, what the stroke becomes, its settings and the error readout. -->
+          <DockPanel x:Name="PathOptions" Visibility="Collapsed" LastChildFill="True">
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+              <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Plane}" ToolTip="{DynamicResource Tip.Plane}" />
+              <StackPanel Orientation="Horizontal" Margin="4,0,10,0">
+                <ToggleButton x:Name="PlaneGround" Style="{StaticResource Btn.Seg}" Tag="Ground" Content="{DynamicResource Plane.Ground}" ToolTip="{DynamicResource Tip.Plane.Ground}" Click="OnPlane" />
+                <ToggleButton x:Name="PlaneWall" Style="{StaticResource Btn.Seg}" Tag="Wall" Content="{DynamicResource Plane.Wall}" ToolTip="{DynamicResource Tip.Plane.Wall}" Click="OnPlane" />
+                <ToggleButton x:Name="PlaneFree" Style="{StaticResource Btn.Seg}" Tag="Free" Content="{DynamicResource Plane.Free}" ToolTip="{DynamicResource Tip.Plane.Free}" Click="OnPlane" />
+              </StackPanel>
+              <ComboBox x:Name="UseBox" Width="150" VerticalAlignment="Center" ToolTip="{DynamicResource Tip.PathUse}" SelectionChanged="OnPathUse" Margin="0,0,8,0" />
+              <StackPanel x:Name="ChainOptions" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Chain}" ToolTip="{DynamicResource Tip.Chain}" />
+                <TextBox x:Name="ChainBox" Style="{StaticResource OptBox}" Width="30" ToolTip="{DynamicResource Tip.Chain}" />
+              </StackPanel>
+              <ToggleButton x:Name="YawAlongButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Lbl.YawAlong}" ToolTip="{DynamicResource Tip.YawAlong}" Click="OnYawAlong" Margin="0,0,8,0" />
+            </StackPanel>
+            <TextBlock x:Name="PathReadout" Style="{StaticResource OptLabel}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+          </DockPanel>
+          <StackPanel x:Name="CameraOptions" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Fov}" ToolTip="{DynamicResource Tip.Fov}" />
+            <TextBox x:Name="FovBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Fov}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.Seed}" ToolTip="{DynamicResource Tip.Seed}" />
+            <TextBox x:Name="SeedBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.Seed}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.StepSize}" ToolTip="{DynamicResource Tip.StepSize}" />
+            <TextBox x:Name="StepBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.StepSize}" />
+            <TextBlock Style="{StaticResource OptLabel}" Text="{DynamicResource Lbl.FirstFrame}" ToolTip="{DynamicResource Tip.FirstFrame}" />
+            <TextBox x:Name="FirstFrameBox" Style="{StaticResource OptBox}" ToolTip="{DynamicResource Tip.FirstFrame}" />
+          </StackPanel>
+        </Grid>
+      </DockPanel>
+    </Border>
+
+    <!-- Status bar. -->
+    <Border DockPanel.Dock="Bottom" Background="{StaticResource B.BgDeep}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,1,0,0" Height="24">
+      <DockPanel Margin="10,0">
+        <TextBlock x:Name="UndoText" DockPanel.Dock="Right" Style="{StaticResource T.Dim}" ToolTip="{DynamicResource Tip.UndoText}" />
+        <ItemsControl x:Name="StatusItems" Focusable="False">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="{x:Type vm:StatusItem}">
+              <TextBlock Style="{StaticResource T.Dim}" Margin="0,0,16,0" Text="{Binding Text}" ToolTip="{Binding Tip}" Foreground="{Binding Brush, Converter={StaticResource Brush}}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </DockPanel>
+    </Border>
+
+    <!-- Tool strip. -->
+    <Border DockPanel.Dock="Left" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,1,0" Width="40">
+      <StackPanel x:Name="ToolStrip" Margin="0,6,0,0" HorizontalAlignment="Center">
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="select" IsChecked="True" ToolTip="{DynamicResource Tip.Tool.Select}"><Path Data="{StaticResource Ic.Move}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="rotate" ToolTip="{DynamicResource Tip.Tool.Rotate}"><Path Data="{StaticResource Ic.Rotate}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="scale" ToolTip="{DynamicResource Tip.Tool.Scale}"><Path Data="{StaticResource Ic.Scale}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="shape" ToolTip="{DynamicResource Tip.Tool.Shape}"><Path Data="{StaticResource Ic.Cone}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="path" ToolTip="{DynamicResource Tip.Tool.Path}"><Path Data="{StaticResource Ic.Path}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="pick" IsEnabled="False" ToolTip="{DynamicResource Tip.Tool.Pick}"><Path Data="{StaticResource Ic.Pick}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="measure" IsEnabled="False" ToolTip="{DynamicResource Tip.Tool.Measure}"><Path Data="{StaticResource Ic.Ruler}" Style="{StaticResource Ico}" /></ToggleButton>
+        <ToggleButton Style="{StaticResource ToolBtn}" Tag="recipe" ToolTip="{DynamicResource Tip.Tool.Recipe}"><Path Data="{StaticResource Ic.Star}" Style="{StaticResource Ico}" /></ToggleButton>
+      </StackPanel>
+    </Border>
+
+    <ad:DockingManager x:Name="Dock" AllowMixedOrientation="True" Background="{StaticResource B.BgBase}">
+      <ad:LayoutRoot>
+        <ad:LayoutPanel Orientation="Horizontal">
+          <ad:LayoutPanel Orientation="Vertical">
+            <ad:LayoutDocumentPane>
+              <ad:LayoutDocument x:Name="ViewportDoc" ContentId="viewport" CanClose="False" CanFloat="False">
+                <DockPanel x:Name="ViewportPanel" Background="{StaticResource B.BgBase}">
+                  <!-- Parts of the scene (one .ptc each). -->
+                  <Border DockPanel.Dock="Top" Background="{StaticResource B.BgDeep}" Height="30">
+                    <DockPanel>
+                      <Button DockPanel.Dock="Right" Style="{StaticResource BarBtn}" Click="OnOpen" ToolTip="{DynamicResource Tip.OpenPart}" Margin="0,0,6,0">
+                        <Path Data="{StaticResource Ic.Plus}" Style="{StaticResource Ico}" />
+                      </Button>
+                      <ItemsControl x:Name="TabStrip" Focusable="False" VerticalAlignment="Bottom">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Margin="6,0,0,0" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate DataType="{x:Type vm:DocTab}">
+                            <Border x:Name="Tab" Height="26" CornerRadius="6,6,0,0" Padding="10,0,4,0" Margin="0,0,2,0" Background="{StaticResource B.Transparent}"
+                                    BorderThickness="0,2,0,0" BorderBrush="{StaticResource B.Transparent}" MouseLeftButtonDown="OnTabClick" ToolTip="{Binding Tip}" Cursor="Hand">
+                              <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="TabText" Text="{Binding Title}" Foreground="{StaticResource B.TextDim}" MaxWidth="220" TextTrimming="CharacterEllipsis" />
+                                <Ellipse Width="6" Height="6" Fill="{StaticResource B.Key}" Margin="7,0,0,0" Visibility="{Binding Dirty, Converter={StaticResource Vis}}" ToolTip="{DynamicResource Tip.Dirty}" />
+                                <Button Style="{StaticResource Btn.Tiny}" Width="18" Height="18" Margin="4,0,0,0" Click="OnTabClose" ToolTip="{DynamicResource Tip.CloseTab}">
+                                  <Path Data="{StaticResource Ic.Close}" Style="{StaticResource Ico.Small}" Width="8" Height="8" />
+                                </Button>
+                              </StackPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                              <DataTrigger Binding="{Binding Active}" Value="True">
+                                <Setter TargetName="Tab" Property="Background" Value="{StaticResource B.BgBase}" />
+                                <Setter TargetName="Tab" Property="BorderBrush" Value="{StaticResource B.Accent}" />
+                                <Setter TargetName="TabText" Property="Foreground" Value="{StaticResource B.TextHi}" />
+                              </DataTrigger>
+                            </DataTemplate.Triggers>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </DockPanel>
+                  </Border>
+                  <!-- Preview tools (spec 5.5): the viewport is a child window, so its tools sit in a WPF strip above it. -->
+                  <Border DockPanel.Dock="Top" Background="{StaticResource B.BgPanel}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Padding="4,3">
+                    <WrapPanel x:Name="PreviewBar" VerticalAlignment="Center">
+                      <Button Style="{StaticResource BarBtn}" Click="OnRestart" ToolTip="{DynamicResource Tip.Restart}"><Path Data="{StaticResource Ic.Restart}" Style="{StaticResource Ico}" /></Button>
+                      <Button Style="{StaticResource BarBtn}" Click="OnStep" ToolTip="{DynamicResource Tip.Step}"><Path Data="{StaticResource Ic.Step}" Style="{StaticResource Ico}" /></Button>
+                      <Border Style="{StaticResource Sep.V}" />
+                      <StackPanel x:Name="ViewPresets" Orientation="Horizontal" />
+                      <Border Style="{StaticResource Sep.V}" />
+                      <ComboBox x:Name="SkyBox" Width="118" ToolTip="{DynamicResource Tip.Sky}" SelectionChanged="OnViewOptions" VerticalAlignment="Center" />
+                      <ToggleButton x:Name="FogButton" Style="{StaticResource BarBtn}" Click="OnViewOptions" ToolTip="{DynamicResource Tip.Fog}"><Path Data="{StaticResource Ic.Fog}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="GroundButton" Style="{StaticResource BarBtn}" Click="OnViewOptions" ToolTip="{DynamicResource Tip.Ground}"><Path Data="{StaticResource Ic.Ground}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="HelperButton" Style="{StaticResource BarBtn}" Click="OnViewOptions" ToolTip="{DynamicResource Tip.Helper}"><Path Data="{StaticResource Ic.Person}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="GizmoButton" Style="{StaticResource BarBtn}" Click="OnViewOptions" ToolTip="{DynamicResource Tip.Gizmos}"><Path Data="{StaticResource Ic.Volume}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <Border Style="{StaticResource Sep.V}" />
+                      <ToggleButton x:Name="CircleButton" Style="{StaticResource BarBtn}" Click="OnPreviewTool" Tag="circle" ToolTip="{DynamicResource Tip.Circle}"><Path Data="{StaticResource Ic.Orbit}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="StressButton" Style="{StaticResource BarBtn}" Click="OnPreviewTool" Tag="stress" ToolTip="{DynamicResource Tip.Stress}"><Path Data="{StaticResource Ic.Grid}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="LowFpsButton" Style="{StaticResource BarBtn}" Click="OnPreviewTool" Tag="lowfps" ToolTip="{DynamicResource Tip.LowFpsTool}"><Path Data="{StaticResource Ic.Gauge}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <ToggleButton x:Name="CameraButton" Style="{StaticResource BarBtn}" Click="OnPreviewTool" Tag="camera" ToolTip="{DynamicResource Tip.CameraTool}"><Path Data="{StaticResource Ic.Fov}" Style="{StaticResource Ico}" /></ToggleButton>
+                      <Border Style="{StaticResource Sep.V}" />
+                      <Button Style="{StaticResource BarBtn}" Click="OnCapture" ToolTip="{DynamicResource Tip.Capture}"><Path Data="{StaticResource Ic.Camera}" Style="{StaticResource Ico}" /></Button>
+                    </WrapPanel>
+                  </Border>
+                  <Grid>
+                    <Border x:Name="ViewportSlot" />
+                    <StackPanel x:Name="EmptyHint" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
+                      <TextBlock Style="{StaticResource T.Hi}" HorizontalAlignment="Center" Text="{DynamicResource Empty.Title}" />
+                      <TextBlock Style="{StaticResource T.Dim}" HorizontalAlignment="Center" Margin="0,6,0,12" Text="{DynamicResource Empty.Text}" />
+                      <Button HorizontalAlignment="Center" Style="{StaticResource Btn.Accent}" Content="{DynamicResource Btn.Open}" ToolTip="{DynamicResource Tip.Open}" Click="OnOpen" />
+                    </StackPanel>
+                  </Grid>
+                </DockPanel>
+              </ad:LayoutDocument>
+              <ad:LayoutDocument x:Name="ImportDoc" ContentId="import" CanClose="False" CanFloat="False">
+                <v:ImportView x:Name="ImportTab" />
+              </ad:LayoutDocument>
+            </ad:LayoutDocumentPane>
+            <ad:LayoutAnchorablePane DockHeight="232">
+              <ad:LayoutAnchorable x:Name="TimelinePane" ContentId="timeline" CanClose="False">
+                <v:TimelineView x:Name="TimelinePanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="CurvesPane" ContentId="curves" CanClose="False">
+                <v:CurvesView x:Name="CurvesPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="SlicerPane" ContentId="slicer" CanClose="False">
+                <v:SlicerView x:Name="SlicerPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="AtlasPane" ContentId="atlas" CanClose="False">
+                <v:AtlasView x:Name="AtlasPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="TextPane" ContentId="text" CanClose="False">
+                <TextBox x:Name="FileText" Style="{StaticResource Box.Num}" IsReadOnly="True" AcceptsReturn="True" VerticalContentAlignment="Top"
+                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="0" Padding="8,4"
+                         Background="{StaticResource B.BgInput}" Foreground="{StaticResource B.Text}" IsInactiveSelectionHighlightEnabled="True" ToolTip="{DynamicResource Tip.FileText}">
+                  <TextBox.Template>
+                    <ControlTemplate TargetType="TextBox">
+                      <Border Background="{TemplateBinding Background}">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+                      </Border>
+                    </ControlTemplate>
+                  </TextBox.Template>
+                </TextBox>
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="XrayPane" ContentId="xray" CanClose="False">
+                <v:XrayView x:Name="XrayIndexPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="AbPane" ContentId="xab" CanClose="False">
+                <v:AbView x:Name="AbComparePanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="SubstPane" ContentId="xsubst" CanClose="False">
+                <v:SubstView x:Name="SubstitutesPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="CheckPane" ContentId="checks" CanClose="False">
+                <v:CheckView x:Name="CheckPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="GamePane" ContentId="gameref" CanClose="False">
+                <v:GameView x:Name="GamePanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="ExportPane" ContentId="export" CanClose="False">
+                <v:ExportView x:Name="ExportPanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="SettingsPane" ContentId="settings" CanClose="False">
+                <v:SettingsView x:Name="SettingsPanel" />
+              </ad:LayoutAnchorable>
+            </ad:LayoutAnchorablePane>
+          </ad:LayoutPanel>
+          <ad:LayoutPanel Orientation="Vertical" DockWidth="330">
+            <ad:LayoutAnchorablePane DockHeight="250">
+              <ad:LayoutAnchorable x:Name="LayersPane" ContentId="layers" CanClose="False">
+                <v:LayersView x:Name="Layers" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="LibraryPane" ContentId="library" CanClose="False">
+                <v:LibraryView x:Name="LibraryPanel" />
+              </ad:LayoutAnchorable>
+            </ad:LayoutAnchorablePane>
+            <ad:LayoutAnchorablePane>
+              <ad:LayoutAnchorable x:Name="InspectorPane" ContentId="inspector" CanClose="False">
+                <v:InspectorView x:Name="Inspector" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="MaterialPane" ContentId="material" CanClose="False">
+                <v:InspectorView x:Name="MaterialInspector" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="TexturePane" ContentId="texture" CanClose="False">
+                <v:TextureView x:Name="TexturePanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="ComposePane" ContentId="compose" CanClose="False">
+                <v:ComposeView x:Name="ComposePanel" />
+              </ad:LayoutAnchorable>
+              <ad:LayoutAnchorable x:Name="RecipesPane" ContentId="recipes" CanClose="False">
+                <v:RecipesView x:Name="RecipesPanel" />
+              </ad:LayoutAnchorable>
+
+            </ad:LayoutAnchorablePane>
+          </ad:LayoutPanel>
+        </ad:LayoutPanel>
+      </ad:LayoutRoot>
+    </ad:DockingManager>
+  </DockPanel>
+</Window>

@@ -1,0 +1,107 @@
+<UserControl x:Class="Pfx.App.Views.LayersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Pfx.App.ViewModels"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:VisibleIf x:Key="Vis" />
+    <c:ColorBrush x:Key="ColorBrush" />
+    <c:ThemeBrush x:Key="ThemeBrush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="RowToggle" TargetType="ToggleButton" BasedOn="{StaticResource Btn.RowToggle}" />
+    <Style x:Key="SoloToggle" TargetType="ToggleButton" BasedOn="{StaticResource RowToggle}">
+      <Style.Triggers>
+        <Trigger Property="IsChecked" Value="True">
+          <Setter Property="Foreground" Value="{StaticResource B.Key}" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="LockToggle" TargetType="ToggleButton" BasedOn="{StaticResource RowToggle}">
+      <Style.Triggers>
+        <Trigger Property="IsChecked" Value="True">
+          <Setter Property="Foreground" Value="{StaticResource B.Warn}" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <DataTemplate DataType="{x:Type vm:PartRow}">
+      <DockPanel Margin="6,0" ToolTip="{Binding Tip}" Background="{StaticResource B.Transparent}">
+        <Path DockPanel.Dock="Left" Data="{StaticResource Ic.Layers}" Style="{StaticResource Ico.Small}" Stroke="{StaticResource B.Accent}" Margin="2,0,8,0" />
+        <Ellipse DockPanel.Dock="Right" Width="6" Height="6" Fill="{StaticResource B.Key}" Margin="6,0,2,0" Visibility="{Binding Dirty, Converter={StaticResource Vis}}" ToolTip="{DynamicResource Tip.Dirty}" />
+        <TextBlock DockPanel.Dock="Right" Style="{StaticResource T.Dim}" FontSize="10" Text="{Binding Count}" />
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:RecipeRow}">
+      <DockPanel Margin="6,0" ToolTip="{Binding Tip}" Background="{StaticResource B.Transparent}">
+        <Path DockPanel.Dock="Left" Data="{StaticResource Ic.Star}" Style="{StaticResource Ico.Small}" Stroke="{Binding StatusBrush, Converter={StaticResource ThemeBrush}}" Margin="2,0,8,0" />
+        <TextBlock x:Name="RecipeText" Style="{StaticResource T.Hi}" FontSize="11" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+      </DockPanel>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding Off}" Value="True">
+          <Setter TargetName="RecipeText" Property="Foreground" Value="{StaticResource B.TextOff}" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:MadeRow}">
+      <TextBlock Margin="30,0,6,0" Style="{StaticResource T.Dim}" FontSize="10.5" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Tip}"
+                 Background="{StaticResource B.Transparent}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:EmitterRow}">
+      <StackPanel>
+        <DockPanel Margin="18,0,6,0" ToolTip="{Binding Tip}" Background="{StaticResource B.Transparent}">
+          <ToggleButton DockPanel.Dock="Left" Style="{StaticResource RowToggle}" IsChecked="{Binding Visible, Mode=TwoWay}" ToolTip="{DynamicResource Tip.Eye}">
+            <Path Data="{StaticResource Ic.Eye}" Style="{StaticResource Ico.Small}" />
+          </ToggleButton>
+          <ToggleButton DockPanel.Dock="Left" Style="{StaticResource SoloToggle}" IsChecked="{Binding IsSolo, Mode=TwoWay}" ToolTip="{DynamicResource Tip.Solo}">
+            <Path Data="{StaticResource Ic.Solo}" Style="{StaticResource Ico.Small}" />
+          </ToggleButton>
+          <ToggleButton DockPanel.Dock="Left" Style="{StaticResource LockToggle}" IsChecked="{Binding IsLocked, Mode=TwoWay}" ToolTip="{DynamicResource Tip.Lock}">
+            <Path Data="{StaticResource Ic.Lock}" Style="{StaticResource Ico.Small}" />
+          </ToggleButton>
+          <Border DockPanel.Dock="Left" Width="13" Height="13" CornerRadius="3" Margin="4,0,8,0" Background="{Binding Swatch, Converter={StaticResource ColorBrush}}"
+                  BorderBrush="{StaticResource B.Line}" BorderThickness="1" ToolTip="{DynamicResource Tip.Swatch.Layer}" />
+          <Ellipse DockPanel.Dock="Right" Width="6" Height="6" Fill="{StaticResource B.Key}" Margin="6,0,0,0" Visibility="{Binding Modified, Converter={StaticResource Vis}}" ToolTip="{DynamicResource Mark.Modified}" />
+          <Grid>
+            <TextBlock x:Name="NameText" Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="11" />
+            <TextBox x:Name="RenameBox" Visibility="Collapsed" Text="{Binding Name, Mode=OneWay}" ToolTip="{DynamicResource Tip.Rename}"
+                     KeyDown="OnRenameKey" LostKeyboardFocus="OnRenameLost" TextChanged="OnRenameText" IsVisibleChanged="OnRenameShown" />
+          </Grid>
+        </DockPanel>
+        <TextBlock Margin="74,0,6,3" Style="{StaticResource T.Dim}" FontSize="10.5" Foreground="{StaticResource B.Err}" TextWrapping="Wrap" Text="{Binding RenameProblem}"
+                   Visibility="{Binding HasRenameProblem, Converter={StaticResource Vis}}" />
+      </StackPanel>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding Renaming}" Value="True">
+          <Setter TargetName="NameText" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="RenameBox" Property="Visibility" Value="Visible" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Dim}" Value="True">
+          <Setter TargetName="NameText" Property="Foreground" Value="{StaticResource B.TextOff}" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,1,0,0" Padding="6,5">
+      <WrapPanel>
+        <Button Margin="0,0,4,0" Click="OnAdd" ToolTip="{DynamicResource Tip.AddEmitter}">
+          <StackPanel Orientation="Horizontal"><Path Data="{StaticResource Ic.Plus}" Style="{StaticResource Ico.Small}" Margin="0,0,4,0" /><TextBlock Text="{DynamicResource Btn.AddEmitter}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" /></StackPanel>
+        </Button>
+        <Button x:Name="CloneButton" Margin="0,0,4,0" Click="OnClone" ToolTip="{DynamicResource Tip.Clone}">
+          <StackPanel Orientation="Horizontal"><Path Data="{StaticResource Ic.Clone}" Style="{StaticResource Ico.Small}" Margin="0,0,4,0" /><TextBlock Text="{DynamicResource Btn.Clone}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" /></StackPanel>
+        </Button>
+        <Button x:Name="DeleteButton" Margin="0,0,4,0" Click="OnDelete" ToolTip="{DynamicResource Tip.Delete}">
+          <StackPanel Orientation="Horizontal"><Path Data="{StaticResource Ic.Trash}" Style="{StaticResource Ico.Small}" Margin="0,0,4,0" /><TextBlock Text="{DynamicResource Btn.Delete}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" /></StackPanel>
+        </Button>
+        <Button IsEnabled="False" ToolTip="{DynamicResource Tip.AddOther}" Content="{DynamicResource Btn.AddOther}" />
+      </WrapPanel>
+    </Border>
+    <ListBox x:Name="List" SelectionMode="Extended" AllowDrop="True" SelectionChanged="OnSelection"
+             PreviewMouseLeftButtonDown="OnPress" PreviewMouseMove="OnDragMove" Drop="OnDrop" DragOver="OnDragOver" MouseDoubleClick="OnDoubleClick" KeyDown="OnKey" />
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,252 @@
+<UserControl x:Class="NDZ.PBOGPacker.Views.ResultDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+  <UserControl.Resources>
+    <Style x:Key="Sec" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="17"/>
+      <Setter Property="Foreground" Value="{StaticResource B.Text}"/>
+      <Setter Property="Margin" Value="0,18,0,6"/>
+    </Style>
+  </UserControl.Resources>
+  <Grid>
+    <Rectangle Fill="{StaticResource B.Overlay}" MouseLeftButtonDown="OnBackdrop"/>
+    <Border x:Name="Dlg" Width="820" MinHeight="470" MaxHeight="660" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Background="#FA121313" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" RenderTransformOrigin="0.5,0.5">
+      <Border.RenderTransform><ScaleTransform/></Border.RenderTransform>
+      <Border.Effect>
+        <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.7" Color="Black"/>
+      </Border.Effect>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="240"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid ClipToBounds="True">
+          <Border Visibility="{Binding Result.Ok, Converter={StaticResource Vis}}">
+            <Border.Background>
+              <ImageBrush ImageSource="/NDZ_PBOGPacker;component/Assets/Photos/dlg_ok.jpg" Stretch="UniformToFill"/>
+            </Border.Background>
+          </Border>
+          <Border Visibility="{Binding Result.Ok, Converter={StaticResource Vis}, ConverterParameter=!}">
+            <Border.Background>
+              <ImageBrush ImageSource="/NDZ_PBOGPacker;component/Assets/Photos/dlg_err.jpg" Stretch="UniformToFill"/>
+            </Border.Background>
+          </Border>
+          <Rectangle>
+            <Rectangle.Fill>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#330A0B0B" Offset="0"/>
+                <GradientStop Color="#990A0B0B" Offset="0.7"/>
+                <GradientStop Color="#F20A0B0B" Offset="1"/>
+              </LinearGradientBrush>
+            </Rectangle.Fill>
+          </Rectangle>
+          <Rectangle Fill="{StaticResource B.Scan}"/>
+          <Grid Width="96" Height="96" VerticalAlignment="Top" Margin="0,70,0,0">
+            <Rectangle Width="62" Height="62" Fill="#E60E0F0F" StrokeThickness="1.5" RenderTransformOrigin="0.5,0.5"
+                       Stroke="{Binding Result.Ok, Converter={StaticResource OkBrush}}">
+              <Rectangle.RenderTransform><RotateTransform Angle="45"/></Rectangle.RenderTransform>
+            </Rectangle>
+            <Rectangle x:Name="Ping" Width="62" Height="62" StrokeThickness="1" RenderTransformOrigin="0.5,0.5" Opacity="0"
+                       Stroke="{Binding Result.Ok, Converter={StaticResource OkBrush}}">
+              <Rectangle.RenderTransform>
+                <TransformGroup><ScaleTransform/><RotateTransform Angle="45"/></TransformGroup>
+              </Rectangle.RenderTransform>
+            </Rectangle>
+            <c:Ico Size="34" StrokeThickness="2.2" Kind="{Binding Result.Ok, Converter={StaticResource OkIcon}}"
+                   Foreground="{Binding Result.Ok, Converter={StaticResource OkBrush}}"/>
+          </Grid>
+          <Viewbox VerticalAlignment="Bottom" Margin="18,0,18,22" StretchDirection="DownOnly" Height="46">
+            <TextBlock Text="{Binding Result.ModName}" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="46"
+                       Foreground="#D8D3C6" OpacityMask="{StaticResource B.Grunge}"/>
+          </Viewbox>
+        </Grid>
+
+        <Grid Grid.Column="1">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="76"/>
+          </Grid.RowDefinitions>
+          <Border Height="6" VerticalAlignment="Top" Background="{StaticResource B.HazardStrong}"
+                  Visibility="{Binding Result.Ok, Converter={StaticResource Vis}, ConverterParameter=!}"/>
+          <Button ToolTip="{DynamicResource Tip.Close}" Style="{StaticResource Btn.Close}" Command="{Binding CloseResultCmd}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0">
+            <c:Ico Kind="close" Size="12"/>
+          </Button>
+
+          <StackPanel Grid.Row="1" Margin="32,30,32,16" Visibility="{Binding Result.ShowOk, Converter={StaticResource Vis}}">
+            <TextBlock Text="{Binding Result.Title}" FontSize="26"/>
+            <TextBlock Text="{Binding Result.Text}" FontSize="14.5" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="20"/>
+            <TextBlock Text="{DynamicResource Res.Launch}" Style="{StaticResource Sec}"/>
+            <Rectangle Style="{StaticResource Sep}" Fill="{StaticResource B.Line2}"/>
+            <DockPanel Margin="0,10,0,0">
+              <Button ToolTip="{DynamicResource Tip.Copy}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}" Command="{Binding CopyCmd}" CommandParameter="{Binding Result.ModLine}" x:Name="C1"
+                      Visibility="{Binding Result.HasModLine, Converter={StaticResource Vis}}">
+                <StackPanel Orientation="Horizontal"><c:Ico Kind="copy" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=C1}"/><TextBlock Text="{DynamicResource Act.Copy}" FontWeight="Bold"/></StackPanel>
+              </Button>
+              <Grid>
+                <TextBlock Text="{Binding Result.ModLine}" FontFamily="{StaticResource F.Mono}" FontSize="17" Foreground="{StaticResource B.Accent}"/>
+                <TextBlock Text="{DynamicResource Res.NoLaunch}" FontSize="14.5" Foreground="{StaticResource B.Text2}"
+                           Visibility="{Binding Result.HasModLine, Converter={StaticResource Vis}, ConverterParameter=!}"/>
+              </Grid>
+            </DockPanel>
+            <Border Margin="0,14,0,0" Padding="12,9" BorderBrush="{StaticResource B.Warn}" BorderThickness="1"
+                    Visibility="{Binding Result.HasWarning, Converter={StaticResource Vis}}">
+              <DockPanel>
+                <c:Ico Kind="warn" Size="16" Foreground="{StaticResource B.Warn}" Margin="0,1,10,0" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding Result.Warning}" FontSize="13" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" LineHeight="18"/>
+              </DockPanel>
+            </Border>
+            <TextBlock Text="{DynamicResource Res.Full}" Style="{StaticResource Sec}"/>
+            <Rectangle Style="{StaticResource Sep}" Fill="{StaticResource B.Line2}"/>
+            <DockPanel Margin="0,10,0,0">
+              <Button ToolTip="{DynamicResource Tip.Copy}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}" Command="{Binding CopyCmd}" CommandParameter="{Binding Result.CmdLine}" Margin="12,0,0,0" x:Name="C2">
+                <StackPanel Orientation="Horizontal"><c:Ico Kind="copy" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=C2}"/><TextBlock Text="{DynamicResource Act.Copy}" FontWeight="Bold"/></StackPanel>
+              </Button>
+              <TextBlock Text="{Binding Result.CmdLine}" Style="{StaticResource T.Mono}" TextWrapping="Wrap"/>
+            </DockPanel>
+            <TextBlock Text="{Binding Result.Stats}" Style="{StaticResource T.Mono}" FontSize="11.5" Foreground="{StaticResource B.Dim}" Margin="0,16,0,0"/>
+            <CheckBox ToolTip="{DynamicResource Tip.AutoCopy}" Content="{DynamicResource Set.AutoCopy}" IsChecked="{Binding Settings.CopyLaunchLine}" Margin="0,18,0,0" FontSize="14"/>
+          </StackPanel>
+
+          <DockPanel Grid.Row="1" Margin="32,30,32,16" Visibility="{Binding Result.IsBatch, Converter={StaticResource Vis}}">
+            <StackPanel DockPanel.Dock="Top">
+              <TextBlock Text="{Binding Result.Title}" FontSize="26"/>
+              <TextBlock Text="{Binding Result.Text}" FontSize="14.5" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="20"/>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Bottom">
+              <TextBlock Text="{DynamicResource Batch.Launch}" Style="{StaticResource Sec}"/>
+              <Rectangle Style="{StaticResource Sep}" Fill="{StaticResource B.Line2}"/>
+              <DockPanel Margin="0,10,0,0">
+                <Button ToolTip="{DynamicResource Tip.Copy}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}" Command="{Binding CopyCmd}" CommandParameter="{Binding Result.ModLine}" x:Name="C3"
+                        Margin="12,0,0,0" VerticalAlignment="Top" Visibility="{Binding Result.HasModLine, Converter={StaticResource Vis}}">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="copy" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=C3}"/><TextBlock Text="{DynamicResource Act.Copy}" FontWeight="Bold"/></StackPanel>
+                </Button>
+                <Grid>
+                  <TextBlock Text="{Binding Result.ModLine}" FontFamily="{StaticResource F.Mono}" FontSize="14" Foreground="{StaticResource B.Accent}" TextWrapping="Wrap"/>
+                  <TextBlock Text="{DynamicResource Batch.NoLine}" FontSize="14.5" Foreground="{StaticResource B.Text2}"
+                             Visibility="{Binding Result.HasModLine, Converter={StaticResource Vis}, ConverterParameter=!}"/>
+                </Grid>
+              </DockPanel>
+              <TextBlock Text="{Binding Result.Stats}" Style="{StaticResource T.Mono}" FontSize="11.5" Foreground="{StaticResource B.Dim}" Margin="0,14,0,0"/>
+            </StackPanel>
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Top" Text="{DynamicResource Batch.Mods}" Style="{StaticResource Sec}"/>
+              <Rectangle DockPanel.Dock="Top" Style="{StaticResource Sep}" Fill="{StaticResource B.Line2}"/>
+              <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,6,0,0">
+                <ItemsControl ItemsSource="{Binding Result.Rows}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="28"/>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <c:Ico Size="14" StrokeThickness="2.2" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,3,0,0" AnimateIn="False"
+                               Kind="{Binding Kind, Converter={StaticResource KindIcon}}" Foreground="{Binding Kind, Converter={StaticResource KindBrush}}"/>
+                        <StackPanel Grid.Column="1">
+                          <TextBlock Text="{Binding Name}" FontSize="15" Foreground="{StaticResource B.Text}" TextTrimming="CharacterEllipsis"/>
+                          <TextBlock Text="{Binding Text}" Style="{StaticResource T.Mono}" FontSize="11.5" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top" Margin="12,1,0,0">
+                          <Button x:Name="Od" Style="{StaticResource Btn.Link}" FontSize="13" ToolTip="{DynamicResource Tip.OpenModRow}"
+                                  Command="{Binding DataContext.OpenCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Dir}"
+                                  Visibility="{Binding HasDir, Converter={StaticResource Vis}}">
+                            <StackPanel Orientation="Horizontal"><c:Ico Kind="folder" Size="14" Margin="0,0,5,0" Hot="{Binding IsMouseOver, ElementName=Od}"/><TextBlock Text="{DynamicResource Act.OpenMod}"/></StackPanel>
+                          </Button>
+                          <Button x:Name="Dt" Style="{StaticResource Btn.Link}" FontSize="13" ToolTip="{DynamicResource Tip.Details}"
+                                  Command="{Binding DataContext.BatchDetailCmd, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                  Visibility="{Binding HasError, Converter={StaticResource Vis}}">
+                            <StackPanel Orientation="Horizontal"><c:Ico Kind="terminal" Size="14" Margin="0,0,5,0" Hot="{Binding IsMouseOver, ElementName=Dt}"/><TextBlock Text="{DynamicResource Act.Details}"/></StackPanel>
+                          </Button>
+                        </StackPanel>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </DockPanel>
+          </DockPanel>
+
+          <StackPanel Grid.Row="1" Margin="32,30,32,16" Visibility="{Binding Result.ShowErr, Converter={StaticResource Vis}}">
+            <TextBlock Text="{Binding Result.Title}" FontSize="26"/>
+            <TextBlock Text="{Binding Result.StepAt}" FontSize="15" Foreground="{StaticResource B.Orange}" Margin="0,4,0,0"/>
+            <Border Margin="0,14,0,0" Padding="12,10" BorderBrush="{StaticResource B.Err}" BorderThickness="1" Background="{StaticResource B.ErrBg}">
+              <StackPanel>
+                <TextBlock Text="{Binding Result.Message}" FontFamily="{StaticResource F.Mono}" FontSize="12.5" Foreground="{StaticResource B.Err}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Result.Where}" Style="{StaticResource T.Mono}" FontSize="11.5" Margin="0,4,0,0"/>
+              </StackPanel>
+            </Border>
+            <TextBlock Text="{DynamicResource Res.Tail}" Style="{StaticResource Sec}"/>
+            <Border Background="{StaticResource B.Log}" BorderBrush="{StaticResource B.Line}" BorderThickness="1" Padding="10,8" MaxHeight="150">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Result.Tail}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock x:Name="l" Text="{Binding Text}" Style="{StaticResource T.Mono}" FontSize="11.5" TextWrapping="Wrap"/>
+                      <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Level}" Value="err"><Setter TargetName="l" Property="Foreground" Value="{StaticResource B.Err}"/></DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="warn"><Setter TargetName="l" Property="Foreground" Value="{StaticResource B.Warn}"/></DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="cmd"><Setter TargetName="l" Property="Foreground" Value="{StaticResource B.Text}"/></DataTrigger>
+                      </DataTemplate.Triggers>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </Border>
+            <TextBlock Text="{DynamicResource Res.Hint}" Style="{StaticResource Sec}"/>
+            <TextBlock Text="{Binding Result.Hint}" FontSize="14.5" Foreground="{StaticResource B.Text2}" TextWrapping="Wrap" LineHeight="20"/>
+            <DockPanel Margin="0,10,0,0" Visibility="{Binding Result.FixCmd, Converter={StaticResource Vis}}">
+              <Button ToolTip="{DynamicResource Tip.Copy}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}" Command="{Binding CopyCmd}" CommandParameter="{Binding Result.FixCmd}" Margin="12,0,0,0">
+                <StackPanel Orientation="Horizontal"><c:Ico Kind="copy" Size="15" Margin="0,0,6,0"/><TextBlock Text="{DynamicResource Act.Copy}" FontWeight="Bold"/></StackPanel>
+              </Button>
+              <TextBlock Text="{Binding Result.FixCmd}" FontFamily="{StaticResource F.Mono}" FontSize="13" Foreground="{StaticResource B.Accent}"/>
+            </DockPanel>
+          </StackPanel>
+
+          <Border Grid.Row="2" Background="#0C0D0D" BorderBrush="{StaticResource B.Line}" BorderThickness="0,1,0,0">
+            <Grid Margin="32,0,22,0">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="{Binding Result.ShowOk, Converter={StaticResource Vis}}">
+                <Button ToolTip="{DynamicResource Tip.OpenMod}" Style="{StaticResource Btn.Link}" Command="{Binding OpenCmd}" CommandParameter="{Binding Result.ModDir}" x:Name="O1">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="folder" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=O1}"/><TextBlock Text="{DynamicResource Act.OpenMod}"/></StackPanel>
+                </Button>
+                <Button ToolTip="{DynamicResource Tip.OpenServer}" Style="{StaticResource Btn.Link}" Command="{Binding OpenCmd}" CommandParameter="{Binding Result.ServerDir}" Margin="22,0,0,0" x:Name="O2"
+                        Visibility="{Binding Result.Deployed, Converter={StaticResource Vis}}">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="servers" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=O2}"/><TextBlock Text="{DynamicResource Act.OpenServer}"/></StackPanel>
+                </Button>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Visibility="{Binding Result.ShowErr, Converter={StaticResource Vis}}">
+                <Button ToolTip="{DynamicResource Tip.BackBatch}" Style="{StaticResource Btn.Link}" Command="{Binding BatchBackCmd}" x:Name="Bk"
+                        Visibility="{Binding Result.HasBack, Converter={StaticResource Vis}}">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="arrow" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=Bk}">
+                    <c:Ico.LayoutTransform><ScaleTransform ScaleX="-1"/></c:Ico.LayoutTransform></c:Ico><TextBlock Text="{DynamicResource Act.BackBatch}"/></StackPanel>
+                </Button>
+                <Button ToolTip="{DynamicResource Tip.ToJournal}" Style="{StaticResource Btn.Link}" Command="{Binding CloseResultCmd}" x:Name="J1"
+                        Visibility="{Binding Result.HasBack, Converter={StaticResource Vis}, ConverterParameter=!}">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="terminal" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=J1}"/><TextBlock Text="{DynamicResource Act.Journal}"/></StackPanel>
+                </Button>
+                <Button ToolTip="{DynamicResource Tip.ToEnv}" Style="{StaticResource Btn.Link}" Command="{Binding NavCmd}" CommandParameter="env" Margin="22,0,0,0" Click="OnClose" x:Name="J2">
+                  <StackPanel Orientation="Horizontal"><c:Ico Kind="env" Size="16" Margin="0,0,7,0" Hot="{Binding IsMouseOver, ElementName=J2}"/><TextBlock Text="{DynamicResource Act.ToEnv}"/></StackPanel>
+                </Button>
+              </StackPanel>
+              <Button Style="{StaticResource Btn.Sand}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="170" Command="{Binding CloseResultCmd}"
+                      Visibility="{Binding Result.ShowDone, Converter={StaticResource Vis}}">
+                <TextBlock Text="{DynamicResource Act.Done}"/>
+              </Button>
+              <Button ToolTip="{DynamicResource Tip.Retry}" Style="{StaticResource Btn.Sand}" HorizontalAlignment="Right" VerticalAlignment="Center" Command="{Binding RetryCmd}" x:Name="Rt"
+                      Visibility="{Binding Result.ShowErr, Converter={StaticResource Vis}}">
+                <StackPanel Orientation="Horizontal">
+                  <c:Ico Kind="refresh" Size="16" Foreground="{StaticResource B.SandInk}" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Rt}"/>
+                  <TextBlock Text="{Binding Result.RetryText}"/>
+                </StackPanel>
+              </Button>
+            </Grid>
+          </Border>
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

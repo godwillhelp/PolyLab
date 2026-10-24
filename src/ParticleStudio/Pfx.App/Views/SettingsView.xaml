@@ -1,0 +1,73 @@
+<UserControl x:Class="Pfx.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+  </UserControl.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="{StaticResource B.BgPanel}">
+    <Grid Margin="12,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MinWidth="220" />
+        <ColumnDefinition Width="20" />
+        <ColumnDefinition Width="*" MinWidth="260" />
+        <ColumnDefinition Width="20" />
+        <ColumnDefinition Width="Auto" MinWidth="170" />
+      </Grid.ColumnDefinitions>
+      <StackPanel>
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{DynamicResource Lbl.Roots}" ToolTip="{DynamicResource Tip.Roots}" />
+        <TextBlock Style="{StaticResource T.Dim}" TextWrapping="Wrap" Margin="0,2,0,6" Text="{DynamicResource Hint.Roots}" />
+        <ListBox x:Name="RootList" MaxHeight="96" BorderBrush="{StaticResource B.Line}" BorderThickness="1" ToolTip="{DynamicResource Tip.Roots}" />
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <Button Content="{DynamicResource Btn.AddRoot}" ToolTip="{DynamicResource Tip.AddRoot}" Click="OnAddRoot" Margin="0,0,4,0" />
+          <Button x:Name="RemoveRoot" Content="{DynamicResource Btn.RemoveRoot}" ToolTip="{DynamicResource Tip.RemoveRoot}" Click="OnRemoveRoot" />
+        </StackPanel>
+      </StackPanel>
+      <StackPanel Grid.Column="2">
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{DynamicResource Lbl.Tools}" ToolTip="{DynamicResource Tip.Tools}" />
+        <Grid Margin="0,4,0,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.Texconv}" ToolTip="{DynamicResource Tip.Texconv}" VerticalAlignment="Center" Margin="0,0,6,4" />
+          <TextBox x:Name="TexconvBox" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.Texconv}" Tag="texconv" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,0,4,4" />
+          <Button Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="texconv" Click="OnBrowseTool" Margin="0,0,0,4" />
+          <TextBlock Grid.Row="1" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.Python}" ToolTip="{DynamicResource Tip.Python}" VerticalAlignment="Center" Margin="0,0,6,4" />
+          <TextBox x:Name="PythonBox" Grid.Row="1" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.Python}" Tag="python" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,0,4,4" />
+          <TextBlock Grid.Row="2" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.Upscaler}" ToolTip="{DynamicResource Tip.Upscaler}" VerticalAlignment="Center" Margin="0,0,6,4" />
+          <TextBox x:Name="UpscalerBox" Grid.Row="2" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.Upscaler}" Tag="upscaler" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,0,4,4" />
+          <Button Grid.Row="2" Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="upscaler" Click="OnBrowseTool" Margin="0,0,0,4" />
+          <TextBlock Grid.Row="3" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.UpscaleModel}" ToolTip="{DynamicResource Tip.UpscaleModel}" VerticalAlignment="Center" Margin="0,0,6,0" />
+          <TextBox x:Name="ModelBox" Grid.Row="3" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.UpscaleModel}" Tag="model" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,0,4,0" />
+          <Button Grid.Row="3" Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="model" Click="OnBrowseTool" />
+          <TextBlock Grid.Row="4" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.XrayScript}" ToolTip="{DynamicResource Tip.XrayScript}" VerticalAlignment="Center" Margin="0,4,6,0" />
+          <TextBox x:Name="XrayBox" Grid.Row="4" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.XrayScript}" Tag="xray" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,4,4,0" />
+          <Button Grid.Row="4" Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="xray" Click="OnBrowseTool" Margin="0,4,0,0" />
+          <TextBlock Grid.Row="5" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.ImportFolder}" ToolTip="{DynamicResource Tip.ImportFolder}" VerticalAlignment="Center" Margin="0,4,6,0" />
+          <TextBox x:Name="ImportBox" Grid.Row="5" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.ImportFolder}" Tag="import" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,4,4,0" />
+          <Button Grid.Row="5" Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="import" Click="OnBrowseTool" Margin="0,4,0,0" />
+          <TextBlock Grid.Row="6" Style="{StaticResource T.Dim}" Text="{DynamicResource Lbl.XrConverter}" ToolTip="{DynamicResource Tip.XrConverter}" VerticalAlignment="Center" Margin="0,4,6,0" />
+          <TextBox x:Name="ConverterBox" Grid.Row="6" Grid.Column="1" Style="{StaticResource Box.Num}" ToolTip="{DynamicResource Tip.XrConverter}" Tag="converter" LostKeyboardFocus="OnToolLost" KeyDown="OnToolKey" Margin="0,4,4,0" />
+          <Button Grid.Row="6" Grid.Column="2" Content="…" ToolTip="{DynamicResource Tip.Browse}" Tag="converter" Click="OnBrowseTool" Margin="0,4,0,0" />
+        </Grid>
+      </StackPanel>
+      <StackPanel Grid.Column="4">
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{DynamicResource Lbl.Lang}" ToolTip="{DynamicResource Tip.Lang}" />
+        <ComboBox x:Name="LangBox" Width="160" HorizontalAlignment="Left" Margin="0,4,0,10" ToolTip="{DynamicResource Tip.Lang}" SelectionChanged="OnLang" />
+        <TextBlock Style="{StaticResource T.Hi}" FontSize="11" Text="{DynamicResource Lbl.Layout}" ToolTip="{DynamicResource Tip.ResetLayout}" />
+        <Button HorizontalAlignment="Left" Margin="0,4,0,10" Content="{DynamicResource Btn.ResetLayout}" ToolTip="{DynamicResource Tip.ResetLayout}" Click="OnResetLayout" />
+        <TextBlock x:Name="FolderText" Style="{StaticResource T.Dim}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

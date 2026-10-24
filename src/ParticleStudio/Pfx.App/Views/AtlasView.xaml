@@ -1,0 +1,125 @@
+<UserControl x:Class="Pfx.App.Views.AtlasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:tx="clr-namespace:Pfx.App.Textures"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:ThemeBrush x:Key="Brush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="Small" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="Seg" TargetType="ToggleButton" BasedOn="{StaticResource Btn.Seg}">
+      <Setter Property="Margin" Value="0,0,-1,0" />
+    </Style>
+    <Style x:Key="Row" TargetType="StackPanel">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="Margin" Value="0,0,0,5" />
+    </Style>
+    <Style x:Key="Label" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Width" Value="92" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+  </UserControl.Resources>
+
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <Border DockPanel.Dock="Left" Width="196" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,1,0">
+      <DockPanel>
+        <WrapPanel DockPanel.Dock="Top" Margin="6,5,6,4">
+          <Button Content="{DynamicResource Atlas.AddFiles}" ToolTip="{DynamicResource Tip.AtlasAddFiles}" Click="OnAddFiles" Margin="0,0,4,4" />
+          <Button Content="{DynamicResource Atlas.AddFolder}" ToolTip="{DynamicResource Tip.AtlasAddFolder}" Click="OnAddFolder" Margin="0,0,4,4" />
+          <Button x:Name="FromSheetButton" Content="{DynamicResource Atlas.FromSheet}" ToolTip="{DynamicResource Tip.AtlasFromSheet}" Click="OnFromSheet" Margin="0,0,4,4" />
+        </WrapPanel>
+        <DockPanel DockPanel.Dock="Bottom" Margin="6,2,6,5">
+          <Button x:Name="ClearButton" DockPanel.Dock="Right" Content="{DynamicResource Atlas.Clear}" ToolTip="{DynamicResource Tip.AtlasClear}" Click="OnClear" />
+          <Button x:Name="RemoveButton" HorizontalAlignment="Left" Content="{DynamicResource Atlas.Remove}" ToolTip="{DynamicResource Tip.AtlasRemove}" Click="OnRemove" />
+        </DockPanel>
+        <TextBlock x:Name="CountText" DockPanel.Dock="Bottom" Style="{StaticResource Small}" Margin="8,0,6,2" TextTrimming="CharacterEllipsis" />
+        <Grid>
+          <ListBox x:Name="FrameList" BorderThickness="0" Background="{StaticResource B.BgInput}" ToolTip="{DynamicResource Tip.AtlasFrames}" SelectionChanged="OnFramePicked" />
+          <TextBlock x:Name="FramesEmpty" Style="{StaticResource T.Dim}" FontSize="11" TextWrapping="Wrap" Margin="10" VerticalAlignment="Center" TextAlignment="Center"
+                     IsHitTestVisible="False" Text="{DynamicResource Atlas.Empty}" />
+        </Grid>
+      </DockPanel>
+    </Border>
+
+    <Border DockPanel.Dock="Left" Width="318" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,1,0">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="8,6,8,6">
+          <StackPanel Style="{StaticResource Row}">
+            <TextBlock Style="{StaticResource Label}" Text="{DynamicResource Atlas.Format}" ToolTip="{DynamicResource Tip.AtlasFormat}" />
+            <ToggleButton x:Name="Dxt1Button" Style="{StaticResource Seg}" Content="DXT1" ToolTip="{DynamicResource Tip.AtlasDxt1}" Tag="Dxt1" Click="OnFormat" />
+            <ToggleButton x:Name="Dxt5Button" Style="{StaticResource Seg}" Content="DXT5" ToolTip="{DynamicResource Tip.AtlasDxt5}" Tag="Dxt5" Click="OnFormat" />
+            <ToggleButton x:Name="RgbaButton" Style="{StaticResource Seg}" Content="RGBA8" ToolTip="{DynamicResource Tip.AtlasRgba8}" Tag="Rgba8" Click="OnFormat" />
+          </StackPanel>
+          <StackPanel Style="{StaticResource Row}">
+            <TextBlock Style="{StaticResource Label}" Text="{DynamicResource Atlas.Size}" ToolTip="{DynamicResource Tip.AtlasSize}" />
+            <ComboBox x:Name="WidthBox" Width="72" ToolTip="{DynamicResource Tip.AtlasWidth}" SelectionChanged="OnSize" />
+            <TextBlock Style="{StaticResource Small}" Text=" × " ToolTip="{DynamicResource Tip.AtlasSize}" />
+            <ComboBox x:Name="HeightBox" Width="72" ToolTip="{DynamicResource Tip.AtlasHeight}" SelectionChanged="OnSize" />
+          </StackPanel>
+          <StackPanel Style="{StaticResource Row}">
+            <TextBlock Style="{StaticResource Label}" Text="{DynamicResource Atlas.MaxSide}" ToolTip="{DynamicResource Tip.AtlasMaxSide}" />
+            <ComboBox x:Name="MaxBox" Width="72" ToolTip="{DynamicResource Tip.AtlasMaxSide}" SelectionChanged="OnMax" />
+          </StackPanel>
+          <StackPanel Style="{StaticResource Row}">
+            <TextBlock Style="{StaticResource Label}" Text="{DynamicResource Atlas.Gamma}" ToolTip="{DynamicResource Tip.AtlasGamma}" />
+            <TextBox x:Name="GammaBox" Style="{StaticResource Box.Num}" Width="56" ToolTip="{DynamicResource Tip.AtlasGamma}" KeyDown="OnBoxKey" LostKeyboardFocus="OnBoxLost" />
+          </StackPanel>
+          <WrapPanel Margin="0,0,0,5">
+            <ToggleButton x:Name="BleedButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Atlas.Bleed}" ToolTip="{DynamicResource Tip.AtlasBleed}" Click="OnStep" Margin="0,0,4,4" />
+            <ToggleButton x:Name="PackButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Atlas.Pack}" ToolTip="{DynamicResource Tip.AtlasPack}" Click="OnStep" Margin="0,0,4,4" />
+            <ToggleButton x:Name="MatchButton" Style="{StaticResource Btn.Seg}" Content="{DynamicResource Atlas.Match}" ToolTip="{DynamicResource Tip.AtlasMatch}" Click="OnStep" Margin="0,0,4,4" />
+          </WrapPanel>
+          <StackPanel Style="{StaticResource Row}">
+            <Button x:Name="UpscaleButton" Content="{DynamicResource Atlas.Upscale}" ToolTip="{DynamicResource Tip.AtlasUpscale}" Click="OnUpscale" Margin="0,0,4,0" />
+            <Button x:Name="DropUpscaleButton" Content="{DynamicResource Atlas.DropUpscale}" ToolTip="{DynamicResource Tip.AtlasDropUpscale}" Click="OnDropUpscale" />
+          </StackPanel>
+          <TextBlock x:Name="UpscaleText" Style="{StaticResource Small}" TextWrapping="Wrap" Margin="0,0,0,5" />
+          <StackPanel Style="{StaticResource Row}">
+            <TextBlock Style="{StaticResource Label}" Text="{DynamicResource Atlas.Fps}" ToolTip="{DynamicResource Tip.AtlasFps}" />
+            <TextBox x:Name="FpsBox" Style="{StaticResource Box.Num}" Width="56" ToolTip="{DynamicResource Tip.AtlasFps}" KeyDown="OnBoxKey" LostKeyboardFocus="OnBoxLost" />
+          </StackPanel>
+          <WrapPanel>
+            <Button x:Name="ExportButton" Style="{StaticResource Btn.Accent}" Content="{DynamicResource Atlas.Export}" ToolTip="{DynamicResource Tip.AtlasExport}" Click="OnExport" Margin="0,0,4,4" />
+            <Button x:Name="ApplyButton" Content="{DynamicResource Atlas.Apply}" Click="OnApply" Margin="0,0,4,4" />
+          </WrapPanel>
+          <TextBlock x:Name="ExportText" Style="{StaticResource Small}" TextWrapping="Wrap" />
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <DockPanel>
+      <Border DockPanel.Dock="Top" Background="{StaticResource B.BgRaised}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Padding="6,3">
+        <WrapPanel VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+            <ToggleButton x:Name="ViewChecker" Style="{StaticResource Seg}" Content="{DynamicResource Slicer.ViewChecker}" ToolTip="{DynamicResource Tip.SlicerViewChecker}" Tag="Checker" Click="OnView" />
+            <ToggleButton x:Name="ViewBlack" Style="{StaticResource Seg}" Content="{DynamicResource Slicer.ViewBlack}" ToolTip="{DynamicResource Tip.SlicerViewBlack}" Tag="Black" Click="OnView" />
+            <ToggleButton x:Name="ViewAlpha" Style="{StaticResource Seg}" Content="{DynamicResource Slicer.ViewAlpha}" ToolTip="{DynamicResource Tip.SlicerViewAlpha}" Tag="Alpha" Click="OnView" />
+          </StackPanel>
+          <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Slicer.Mip}" ToolTip="{DynamicResource Tip.AtlasMip}" Margin="0,0,4,0" />
+          <ComboBox x:Name="MipBox" Width="96" ToolTip="{DynamicResource Tip.AtlasMip}" SelectionChanged="OnMip" Margin="0,0,8,0" />
+          <TextBlock x:Name="MemoryText" Style="{StaticResource Small}" FontFamily="{StaticResource Font.Mono}" ToolTip="{DynamicResource Tip.AtlasMemory}" />
+        </WrapPanel>
+      </Border>
+      <ItemsControl x:Name="NoteList" DockPanel.Dock="Bottom" Margin="6,2,6,4" Focusable="False">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type tx:AtlasNote}">
+            <DockPanel Margin="0,1">
+              <Ellipse DockPanel.Dock="Left" Width="7" Height="7" Margin="0,4,6,0" VerticalAlignment="Top" Fill="{Binding Brush, Converter={StaticResource Brush}}" />
+              <TextBlock Text="{Binding Text}" FontSize="11" TextWrapping="Wrap" ToolTip="{Binding Text}" />
+            </DockPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Grid>
+        <tx:SheetCanvas x:Name="Preview" ToolTip="{DynamicResource Tip.AtlasPreview}" />
+        <TextBlock x:Name="PreviewText" Style="{StaticResource T.Dim}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                   Margin="12" IsHitTestVisible="False" />
+      </Grid>
+    </DockPanel>
+  </DockPanel>
+</UserControl>

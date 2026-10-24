@@ -1,0 +1,62 @@
+<UserControl x:Class="Pfx.App.Views.AbView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Pfx.App.Views"
+             xmlns:c="clr-namespace:Pfx.App.Controls">
+  <UserControl.Resources>
+    <c:ThemeBrush x:Key="Brush" />
+    <Style TargetType="TextBlock" BasedOn="{StaticResource T.Base}" />
+    <Style x:Key="Small" TargetType="TextBlock" BasedOn="{StaticResource T.Dim}">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="Seg" TargetType="ToggleButton" BasedOn="{StaticResource Btn.Seg}">
+      <Setter Property="Margin" Value="0,0,-1,0" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel Background="{StaticResource B.BgPanel}">
+    <WrapPanel DockPanel.Dock="Top" Margin="8,5,8,3">
+      <ToggleButton x:Name="SideButton" Style="{StaticResource Seg}" Content="{DynamicResource Ab.Side}" ToolTip="{DynamicResource Tip.Ab.Side}" Tag="Side" Click="OnMode" />
+      <ToggleButton x:Name="OverButton" Style="{StaticResource Seg}" Content="{DynamicResource Ab.Over}" ToolTip="{DynamicResource Tip.Ab.Over}" Tag="Over" Click="OnMode" />
+      <ToggleButton x:Name="OffButton" Style="{StaticResource Seg}" Content="{DynamicResource Ab.Off}" ToolTip="{DynamicResource Tip.Ab.Off}" Tag="Off" Click="OnMode" Margin="0,0,10,0" />
+      <TextBlock Style="{StaticResource Small}" Text="{DynamicResource Ab.Distance}" Margin="0,0,4,0" ToolTip="{DynamicResource Tip.Ab.Distance}" />
+      <TextBox x:Name="DistanceBox" Style="{StaticResource Box.Num}" Width="52" ToolTip="{DynamicResource Tip.Ab.Distance}" LostKeyboardFocus="OnDistance" KeyDown="OnDistanceKey" Margin="0,0,10,0" />
+      <TextBlock x:Name="LiveText" Style="{StaticResource Small}" FontFamily="{StaticResource Font.Mono}" ToolTip="{DynamicResource Tip.Ab.Live}" />
+    </WrapPanel>
+    <TextBlock x:Name="SubjectText" DockPanel.Dock="Top" Style="{StaticResource T.Dim}" FontSize="11" TextWrapping="Wrap" Margin="10,2,10,4" />
+    <WrapPanel DockPanel.Dock="Top" Margin="10,0,10,4">
+      <TextBlock Style="{StaticResource Small}" Foreground="{StaticResource B.Ok}" Text="{DynamicResource Ab.Fitted}" Margin="0,0,10,0" ToolTip="{DynamicResource Tip.Ab.Fitted}" />
+      <TextBlock Style="{StaticResource Small}" Foreground="{StaticResource B.Warn}" Text="{DynamicResource Ab.Approx}" Margin="0,0,10,0" ToolTip="{DynamicResource Tip.Ab.Approx}" />
+      <TextBlock Style="{StaticResource Small}" Foreground="{StaticResource B.Err}" Text="{DynamicResource Ab.Dropped}" Margin="0,0,10,0" ToolTip="{DynamicResource Tip.Ab.Dropped}" />
+      <TextBlock Style="{StaticResource Small}" Foreground="{StaticResource B.TextOff}" Text="{DynamicResource Ab.NotInAb}" ToolTip="{DynamicResource Tip.Ab.NotInAb}" />
+    </WrapPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <ItemsControl x:Name="EmitterList" Focusable="False" Margin="0,0,0,6">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type v:AbEmitterRow}">
+            <Border BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,1,0,0" Padding="10,4" ToolTip="{Binding Tip}" Background="Transparent">
+              <StackPanel>
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right" Text="{Binding Kind}" FontSize="10.5" Foreground="{Binding KindBrush, Converter={StaticResource Brush}}" Margin="6,0,0,0" />
+                  <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource B.TextHi}" TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+                <ItemsControl ItemsSource="{Binding Chips}" Focusable="False" Margin="0,3,0,0">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type v:AbChip}">
+                      <Border BorderBrush="{Binding Brush, Converter={StaticResource Brush}}" BorderThickness="1" CornerRadius="3" Padding="5,0" Margin="0,0,4,3" ToolTip="{Binding Tip}"
+                              Background="Transparent">
+                        <TextBlock Text="{Binding Text}" FontSize="10.5" Foreground="{Binding Brush, Converter={StaticResource Brush}}" />
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="{Binding Summary}" Style="{StaticResource T.Dim}" FontSize="10.5" TextWrapping="Wrap" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>
