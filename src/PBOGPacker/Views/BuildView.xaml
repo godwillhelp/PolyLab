@@ -75,7 +75,7 @@
       </Grid>
     </Border>
 
-    <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Top">
+    <UniformGrid Grid.Row="1" Columns="3" VerticalAlignment="Top" Grid.IsSharedSizeScope="True">
       <UniformGrid.Visibility>
         <MultiBinding Converter="{StaticResource AllVis}">
           <Binding Path="ShowTiles"/>
@@ -86,8 +86,8 @@
       <ContentControl Style="{StaticResource Hud}" Margin="0,0,10,0" x:Name="T1">
         <Grid>
           <Grid.RowDefinitions>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" MinHeight="60" MaxHeight="150"/>
+            <RowDefinition Height="Auto" SharedSizeGroup="TileText"/>
           </Grid.RowDefinitions>
           <Grid Margin="1">
             <Image Source="/PBOG_Packer;component/Assets/Photos/st_build.jpg" Stretch="UniformToFill"/>
@@ -123,8 +123,8 @@
       <ContentControl Style="{StaticResource Hud}" Margin="5,0" x:Name="T2">
         <Grid>
           <Grid.RowDefinitions>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" MinHeight="60" MaxHeight="150"/>
+            <RowDefinition Height="Auto" SharedSizeGroup="TileText"/>
           </Grid.RowDefinitions>
           <Grid Margin="1">
             <Image Source="/PBOG_Packer;component/Assets/Photos/st_sign.jpg" Stretch="UniformToFill"/>
@@ -160,8 +160,8 @@
       <ContentControl Style="{StaticResource Hud}" Margin="10,0,0,0" x:Name="T3">
         <Grid>
           <Grid.RowDefinitions>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" MinHeight="60" MaxHeight="150"/>
+            <RowDefinition Height="Auto" SharedSizeGroup="TileText"/>
           </Grid.RowDefinitions>
           <Grid Margin="1">
             <Image Source="/PBOG_Packer;component/Assets/Photos/st_deploy.jpg" Stretch="UniformToFill"/>

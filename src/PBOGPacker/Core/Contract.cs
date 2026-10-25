@@ -77,7 +77,7 @@ public sealed class AppSettings
     public BuildDefaults Defaults { get; set; } = new();
     public PackSettings Pack { get; set; } = new();
     public string WorkshopDir { get; set; } = "";
-    public string Language { get; set; } = "ru";
+    public string Language { get; set; } = PolyLab.Ui.Core.UiLanguage.Default;
     public bool CopyLaunchLine { get; set; } = true;
 }
 

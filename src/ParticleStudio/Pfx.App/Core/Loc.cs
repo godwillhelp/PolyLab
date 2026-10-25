@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.Windows;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.Core;
 
 // The localisation pattern of PolyLab.Ui (Core/Loc.cs: Lang/<lang>.xaml merged into the application resources,
-// controls bind with DynamicResource) with English added; PolyLab.Ui's copy accepts only ru and uk (owner decision
-// 2026-10-15: a local copy, PolyLab.Ui unchanged).
+// controls bind with DynamicResource) in a local copy (owner decision 2026-10-15): assembly-qualified pack-URI, a
+// lookup that works without a WPF application (unit tests) and the UI culture for AvalonDock.
 public static class Loc
 {
     public static readonly string[] Languages = { "ru", "en", "uk" };
@@ -18,7 +19,7 @@ public static class Loc
     public static void Set(string lang)
     {
         if (!Languages.Contains(lang))
-            lang = "ru";
+            lang = UiLanguage.Default;
         var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/Particle_Studio;component/Lang/{lang}.xaml") };
         var merged = Application.Current.Resources.MergedDictionaries;
         if (_dict != null)
@@ -26,7 +27,7 @@ public static class Loc
         merged.Add(d);
         _dict = d;
         Lang = lang;
-        Culture = new CultureInfo(lang switch { "uk" => "uk-UA", "en" => "en-GB", _ => "ru-RU" });
+        Culture = UiLanguage.Culture(lang);
         // AvalonDock's own button hints follow the UI culture (it ships ru, not uk: Ukrainian falls back to English).
         CultureInfo.CurrentUICulture = Culture;
         Thread.CurrentThread.CurrentUICulture = Culture;

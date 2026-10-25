@@ -13,14 +13,14 @@ public static class Loc
 
     public static void Set(string lang)
     {
-        if (lang != "ru" && lang != "uk") lang = "ru";
+        if (!UiLanguage.All.Contains(lang)) lang = UiLanguage.Default;
         var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/Lang/{lang}.xaml") };
         var merged = Application.Current.Resources.MergedDictionaries;
         if (_dict != null) merged.Remove(_dict);
         merged.Add(d);
         _dict = d;
         Lang = lang;
-        Culture = new CultureInfo(lang == "uk" ? "uk-UA" : "ru-RU");
+        Culture = UiLanguage.Culture(lang);
         Changed?.Invoke();
     }
 

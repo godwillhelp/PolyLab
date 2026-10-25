@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.Json;
+using PolyLab.Ui.Core;
 
 namespace PolyLab.Launcher.Core;
 
@@ -15,7 +16,7 @@ public static class Paths
 
 public sealed class Settings
 {
-    public string Lang { get; set; } = "ru";
+    public string Lang { get; set; } = UiLanguage.Default;
     public DateTimeOffset? NewsReadAt { get; set; }
     public double[]? Bounds { get; set; }
     public bool Maximized { get; set; } = true;

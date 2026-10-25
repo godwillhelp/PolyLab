@@ -69,6 +69,21 @@ public class AppTests
         }
     }
 
+    [Theory]
+    [InlineData("uk-UA", "uk")]
+    [InlineData("ru-RU", "ru")]
+    [InlineData("en-US", "en")]
+    public void New_settings_take_the_display_language(string culture, string lang)
+    {
+        var was = System.Globalization.CultureInfo.CurrentUICulture;
+        try
+        {
+            System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo(culture);
+            Assert.Equal(lang, new AppSettings().Lang);
+        }
+        finally { System.Globalization.CultureInfo.CurrentUICulture = was; }
+    }
+
     [Fact]
     public void Every_schema_key_has_a_plain_name_in_every_language()
     {

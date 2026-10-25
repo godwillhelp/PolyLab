@@ -18,7 +18,7 @@ public partial class App : Application
 
     // --root <dir>     install root (tools\, graft\) instead of the exe folder
     // --data <dir>     launcher data instead of %LOCALAPPDATA%\PolyLab\Launcher
-    // --shot <png>     render the window and exit; --size WxH, --lang ru|uk, --delay ms
+    // --shot <png>     render the window and exit; --size WxH, --lang en|ru|uk, --delay ms
     //   --state empty|installed|update|beta|offline   demo data; --news open|badge
     //   --live         real data instead of a demo state; then --install id,id and --launch id [-- tool args]
     protected override async void OnStartup(StartupEventArgs e)

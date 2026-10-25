@@ -49,7 +49,7 @@ public sealed class MainViewModel : ObservableObject
         DismissCmd = new RelayCommand(_ => BannerKind = "");
         NewsCmd = new RelayCommand(_ => NewsOpen = !NewsOpen);
         NewsCloseCmd = new RelayCommand(_ => NewsOpen = false);
-        LangCmd = new RelayCommand(_ => SetLang(Loc.Lang == "ru" ? "uk" : "ru"));
+        LangCmd = new RelayCommand(_ => SetLang(UiLanguage.Next(Loc.Lang)));
     }
 
     public ICommand LaunchCmd { get; }

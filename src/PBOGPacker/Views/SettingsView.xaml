@@ -40,6 +40,7 @@
 
         <TextBlock Text="{DynamicResource Set.Lang}" Style="{StaticResource SecLabel}"/>
         <ComboBox Width="220" HorizontalAlignment="Left" SelectedValuePath="Tag" SelectedValue="{Binding LangCode}">
+          <ComboBoxItem Tag="en" Content="English"/>
           <ComboBoxItem Tag="ru" Content="Русский"/>
           <ComboBoxItem Tag="uk" Content="Українська"/>
         </ComboBox>

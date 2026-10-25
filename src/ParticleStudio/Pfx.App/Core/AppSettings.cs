@@ -11,7 +11,7 @@ public sealed class AppSettings
     public const int RecentMax = 12;
 
     public List<string> Roots { get; set; } = new();
-    public string Lang { get; set; } = "ru";
+    public string Lang { get; set; } = UiLanguage.Default;
     public List<string> Recent { get; set; } = new();
     public string Workspace { get; set; } = "emitters";
     // Tools the texture workspace runs (spec 3.2), all chosen by the user (O2′: nothing bound to one PC): texconv.exe for

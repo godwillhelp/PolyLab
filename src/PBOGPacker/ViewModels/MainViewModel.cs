@@ -6,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using PolyLab.PBOGPacker.Core;
+using PolyLab.Ui.Core;
 
 namespace PolyLab.PBOGPacker.ViewModels;
 
@@ -122,7 +123,7 @@ public sealed class MainViewModel : ObservableObject
             _ => HasOutOverride && IsIdle);
         LangCmd = new RelayCommand(p =>
         {
-            var lang = p as string ?? (Loc.Lang == "ru" ? "uk" : "ru");
+            var lang = p as string ?? UiLanguage.Next(Loc.Lang);
             _settings.Language = lang;
             Loc.Set(lang);
             MenuOpen = false;

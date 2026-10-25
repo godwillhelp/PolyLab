@@ -311,7 +311,7 @@ public static class ServerMods
         }
         if (launches.Count == 0)
         {
-            s.Error = "в батнике нет строки, которая запускает DayZServer_x64.exe";
+            s.Error = Loc.T("Be.BatNoLaunch");
             return;
         }
 
@@ -322,12 +322,12 @@ public static class ServerMods
         s.LineEnd = launch.End;
         s.ExeEnd = launch.Exe;
         if (withMod.Count > 1 || (withMod.Count == 1 && launches.Count > 1))
-            s.Warning = "в батнике несколько строк запуска сервера — меняется " + (Array.IndexOf(lines.ToArray(), (launch.Start, launch.End)) + 1) + "-я";
+            s.Warning = Loc.F("Be.BatManyLaunch", Array.IndexOf(lines.ToArray(), (launch.Start, launch.End)) + 1);
 
         // A list hidden in a variable on the launch line (set ARGS=... -mod=...): not ours to rewrite.
         foreach (Match v in Regex.Matches(t[launch.Start..launch.End], @"%([A-Za-z0-9_]+)%"))
             if (Regex.IsMatch(t, @"^\s*set\s+""?" + Regex.Escape(v.Groups[1].Value) + @"=.*-(server)?mod=", RegexOptions.IgnoreCase | RegexOptions.Multiline))
-                s.Error ??= "список модов задан внутри переменной %" + v.Groups[1].Value + "% — поправьте батник вручную";
+                s.Error ??= Loc.F("Be.BatModsInVar", v.Groups[1].Value);
 
         Parse(s, s.Mod, lines, launch.Start, launch.End);
         Parse(s, s.Srv, lines, launch.Start, launch.End);
@@ -374,7 +374,7 @@ public static class ServerMods
         var vm = Regex.Match(sl.Value.Trim().Trim('"'), @"^%([A-Za-z0-9_]+)%$");
         if (!vm.Success)
         {
-            s.Error ??= "строка " + sl.Key + " собрана из переменных: " + sl.Value + " — поправьте батник вручную";
+            s.Error ??= Loc.F("Be.BatLineVars", sl.Key, sl.Value);
             return;
         }
         sl.Var = vm.Groups[1].Value;
@@ -391,8 +391,8 @@ public static class ServerMods
             sl.SetEnd = b;
             sl.Value = t[vs..ve].Trim('"');
         }
-        if (sl.SetStart < 0) s.Error ??= "переменная %" + sl.Var + "% из строки " + sl.Key + " не задана выше строки запуска — поправьте батник вручную";
-        else if (HasVariable(sl.Value)) s.Error ??= "список модов в %" + sl.Var + "% собран из других переменных — поправьте батник вручную";
+        if (sl.SetStart < 0) s.Error ??= Loc.F("Be.BatVarUnset", sl.Var, sl.Key);
+        else if (HasVariable(sl.Value)) s.Error ??= Loc.F("Be.BatVarNested", sl.Var);
     }
 
     // %% is a literal percent sign in a batch file, not a variable.
@@ -406,9 +406,8 @@ public static class ServerMods
         var local = ListLocal(serverDir, issues);
         var path = System.IO.Path.Combine(serverDir, System.IO.Path.GetFileName(bat));
         var unread = issues.Count == 0 ? null
-            : $"не удалось открыть папки модов ({issues.Count}), поэтому у них не видно ключей и id: " + string.Join("; ", issues.Take(3))
-              + (issues.Count > 3 ? "; …" : "") + ". Нажмите «Обновить», когда папки станут доступны.";
-        if (!File.Exists(path)) return new(path, dir, available, Array.Empty<ModEntry>(), "батник не найден: " + path, unread, Local: local);
+            : Loc.F("Be.ModDirsUnread", issues.Count, string.Join("; ", issues.Take(3)) + (issues.Count > 3 ? "; …" : ""));
+        if (!File.Exists(path)) return new(path, dir, available, Array.Empty<ModEntry>(), Loc.F("Be.BatMissing", path), unread, Local: local);
         Script s;
         try { s = Load(path); }
         catch (Exception e) { return new(path, dir, available, Array.Empty<ModEntry>(), e.Message, unread, Local: local); }
@@ -423,7 +422,7 @@ public static class ServerMods
     public static LaunchArgs Launch(string serverDir, string bat)
     {
         var path = System.IO.Path.Combine(serverDir, System.IO.Path.GetFileName(bat));
-        if (!File.Exists(path)) return new(path, [], [], [], null, "батник не найден: " + path);
+        if (!File.Exists(path)) return new(path, [], [], [], null, Loc.F("Be.BatMissing", path));
         Script s;
         try { s = Load(path); }
         catch (Exception e) { return new(path, [], [], [], null, e.Message); }
@@ -479,7 +478,7 @@ public static class ServerMods
         // cmd re-reads a running script from a byte offset after every command: a rewrite under a live
         // restart loop makes it jump into the middle of a line.
         if (ServerLaunch.ScriptRunning(path))
-            throw new InvalidOperationException("батник сейчас выполняется — закройте его окно и сохраните снова");
+            throw new InvalidOperationException(Loc.T("Be.BatRunning"));
         var s = Load(path);
         if (s.Error != null) throw new InvalidOperationException(s.Error);
         if (serverPicks == null)
@@ -488,9 +487,9 @@ public static class ServerMods
         var (texts, names) = Spelled(s, picks);
         var (stexts, _) = Spelled(s, serverPicks);
         if (texts.FirstOrDefault(x => stexts.Any(y => Same(x, y))) is { } both)
-            throw new InvalidOperationException("мод указан и в -mod, и в -serverMod — оставьте его в одном списке: " + both);
+            throw new InvalidOperationException(Loc.F("Be.ModBothLists", both));
         if (s.Mod.Var != null && s.Mod.Var.Equals(s.Srv.Var, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException("-mod и -serverMod берут список из одной переменной %" + s.Mod.Var + "% — поправьте батник вручную");
+            throw new InvalidOperationException(Loc.F("Be.ListsOneVar", s.Mod.Var));
 
         var t = s.Text;
         var edits = new List<(int At, int End, string Text)>();
@@ -527,7 +526,7 @@ public static class ServerMods
             t = t[..e.At] + e.Text + t[e.End..];
         }
         if (launchLen > CmdLineLimit)
-            throw new InvalidOperationException($"строка запуска получится длиной {launchLen} символов, а cmd режет строки после 8191 — уберите часть модов");
+            throw new InvalidOperationException(Loc.F("Be.LineTooLong", launchLen));
 
         string? backup = null;
         if (t != s.Text)
@@ -595,12 +594,12 @@ public static class ServerMods
             {
                 var ascii = p.Text.All(ch => ch < 0x80);
                 if (s.Delayed && p.Text.Contains('!'))
-                    throw new InvalidOperationException("в батнике включён EnableDelayedExpansion, а в пути мода есть «!»: " + p.Text);
+                    throw new InvalidOperationException(Loc.F("Be.PathBang", p.Text));
                 if (!ascii && (s.Enc is UTF8Encoding ? !s.Chcp65001 : !Encodable(s.Enc, p.Text)))
-                    throw new InvalidOperationException("путь мода нельзя записать так, чтобы cmd его прочитал (" + s.Enc.WebName + "): " + p.Text);
+                    throw new InvalidOperationException(Loc.F("Be.PathEncoding", s.Enc.WebName, p.Text));
                 text = p.Text;
             }
-            if (text.Contains(';') || text.Contains('"')) throw new InvalidOperationException("в пути мода есть ; или кавычка: " + text);
+            if (text.Contains(';') || text.Contains('"')) throw new InvalidOperationException(Loc.F("Be.PathChars", text));
             text = Written(serverDir, text);
             if (texts.Any(x => Same(x, text))) continue;
             texts.Add(text);

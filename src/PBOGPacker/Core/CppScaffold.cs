@@ -26,20 +26,20 @@ public static class CppScaffold
         dir ??= DefaultDir(m);
         if (Directory.Exists(dir) && IsProject(dir)) return dir;
         if (Directory.Exists(dir) && Directory.EnumerateFileSystemEntries(dir).Any())
-            throw new InvalidOperationException("папка " + dir + " уже занята и это не C++-проект GRAFT");
+            throw new InvalidOperationException(Loc.F("Be.CppDirTaken", dir));
         if (PackLayout.IsUnder(dir, m.Path))
-            throw new InvalidOperationException("C++-проект не может лежать внутри мода — он попал бы в PBO");
+            throw new InvalidOperationException(Loc.T("Be.CppInsideMod"));
         if (!System.Text.RegularExpressions.Regex.IsMatch(m.Name, "^[A-Za-z_][A-Za-z0-9_]*$"))
-            throw new InvalidOperationException("имя мода «" + m.Name + "» не годится для имени плагина: нужны латиница, цифры и _");
+            throw new InvalidOperationException(Loc.F("Be.CppBadName", m.Name));
 
         var scripts = Directory.Exists(m.Path)
             ? Directory.GetDirectories(m.Path).FirstOrDefault(d => Path.GetFileName(d).Equals("scripts", StringComparison.OrdinalIgnoreCase))
             : null;
-        if (scripts == null) throw new InvalidOperationException("в моде нет папки Scripts — объявлениям плагина некуда лечь");
+        if (scripts == null) throw new InvalidOperationException(Loc.T("Be.CppNoScripts"));
         // 3_Game when the mod has it: a native declared there is seen from 4_World and 5_Mission too.
         // 1_Core is never used: the engine compiles it without defines, #ifdef GRAFTED_ does not work there.
         var module = new[] { "3_Game", "4_World", "5_Mission" }.FirstOrDefault(n => Directory.Exists(Path.Combine(scripts, n)))
-                     ?? throw new InvalidOperationException("в " + scripts + " нет ни 3_Game, ни 4_World, ни 5_Mission");
+                     ?? throw new InvalidOperationException(Loc.F("Be.CppNoModule", scripts));
         var rel = Path.GetRelativePath(dir, scripts).Replace('\\', '/');
 
         Directory.CreateDirectory(Path.Combine(dir, "src"));
@@ -59,8 +59,8 @@ public static class CppScaffold
         set(CMAKE_CXX_STANDARD 23)
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
         if(MSVC)
-            # Статический рантайм: MSVC-редиста на хостингах нет. Форма с $<CONFIG:Debug> обязательна:
-            # graft наследует это значение, и обе половины должны совпасть.
+            # Static runtime: server hosts have no MSVC redistributable. The $<CONFIG:Debug> form is required:
+            # graft inherits this value, and both halves must match.
             set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif()
 
@@ -69,11 +69,11 @@ public static class CppScaffold
             file(DOWNLOAD https://raw.githubusercontent.com/KRdayzmodding/KR_GRAFTED/{{GraftDoctor.Release}}/cmake/graft.boot.cmake "${GRAFT_BOOT_FILE}")
         endif()
         include("${GRAFT_BOOT_FILE}")
-        # Та же версия GRAFT, что у хоста на сервере: плагин под другой ABI хост не загрузит.
+        # The same GRAFT version as the host on the server: the host does not load a plugin built for another ABI.
         graft_import(graft https://github.com/KRdayzmodding/KR_GRAFTED TAG {{GraftDoctor.Release}})
 
-        # NAME = имя мода: по нему PBOG Packer ищет {{name}}.grafted.dll и grafted_natives_{{name}}.c.
-        # SCRIPTS_DIR = скрипты самого мода: сборка печатает объявления прямо в мод, откуда пакуется PBO.
+        # NAME = the mod name: PBOG Packer finds {{name}}.grafted.dll and grafted_natives_{{name}}.c by it.
+        # SCRIPTS_DIR = the mod's own scripts: the build writes the declarations straight into the mod the PBO is packed from.
         graft_plugin({{name.ToLowerInvariant()}}
             NAME        {{name}}
             VERSION     1
@@ -84,9 +84,9 @@ public static class CppScaffold
         """;
 
     private static string Plugin(string name, string module) => $$"""
-        // {{name}}: функции на C++, которые скрипты мода зовут как обычные нативы.
+        // {{name}}: C++ functions that the mod's scripts call like ordinary natives.
         //
-        // В скриптах каждый вызов оборачивай, чтобы мод компилировался и без DLL:
+        // Wrap every call in the scripts, so that the mod also compiles without the DLL:
         //     #ifdef GRAFTED_{{name}}
         //         int n = {{name}}_Ping(1);
         //     #endif
@@ -105,8 +105,8 @@ public static class CppScaffold
 
         }  // namespace
 
-        // По строке на функцию: функция C++ и её имя в скриптах. "{{module}}" — модуль, куда ляжет
-        // объявление; из модулей выше по номеру натив тоже виден.
+        // One line per function: the C++ function and its name in the scripts. "{{module}}" is the module that gets
+        // the declaration; modules with a higher number see the native too.
         GRAFT_BINDINGS("{{module}}") {
             bind.global<&Ping>("{{name}}_Ping");
         }

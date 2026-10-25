@@ -41,7 +41,7 @@ public static class ProcRunner
             }
         }
 
-        if (!proc.Start()) return new ProcResult(-1, new[] { "не удалось запустить: " + exe });
+        if (!proc.Start()) return new ProcResult(-1, new[] { Loc.F("Be.StartFailed", exe) });
 
         var pump = new[]
         {

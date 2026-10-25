@@ -125,7 +125,7 @@ public static class Pbo
             while (count > 0)
             {
                 var n = from.Read(_buf, 0, (int)Math.Min(_buf.Length, count));
-                if (n <= 0) throw new EndOfStreamException("PBO обрезан");
+                if (n <= 0) throw new EndOfStreamException(Loc.T("Be.PboTruncated"));
                 Put(_buf.AsSpan(0, n));
                 count -= n;
             }

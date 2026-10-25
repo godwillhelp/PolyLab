@@ -445,9 +445,10 @@ public partial class MainWindow
         SubstitutesPanel.Show();
         ComposePanel.Show();
         RecipesPanel.Show();
-        LibraryPanel.Refresh();
+        LibraryPanel.Rescan();
         ExportPanel.Invalidate();
         CheckPanel.Refresh();
+        ShowLinkState();
         UpdateTitle();
         UpdateButtons();
         UpdateStatus();

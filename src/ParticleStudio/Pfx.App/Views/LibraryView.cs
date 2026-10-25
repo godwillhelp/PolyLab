@@ -106,6 +106,9 @@ public sealed class LibraryView : UserControl
             if (cancel.IsCancellationRequested || t.Status != TaskStatus.RanToCompletion)
                 return;
             _all = t.Result.OrderBy(e => e.Source).ThenBy(e => e.Folder).ThenBy(e => e.Name).ToList();
+            // A source picked as the filter can be gone or renamed (another language): back to all.
+            if (_all.All(e => e.Source != _source))
+                _source = "";
             _scan = null;
             Refresh();
         }, TaskScheduler.FromCurrentSynchronizationContext());

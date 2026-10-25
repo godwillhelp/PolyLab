@@ -171,7 +171,7 @@ public static class PackLayout
             var rel = Path.GetRelativePath(work, src);
             if (rel != "." && !rel.StartsWith("..") && !Path.IsPathRooted(rel)) return (CleanPrefix(rel), work);
         }
-        return (m.Name, "имя папки");
+        return (m.Name, Loc.T("Pl.PrefixFolder"));
     }
 
     public static bool IsPrefixFile(string fileName) =>

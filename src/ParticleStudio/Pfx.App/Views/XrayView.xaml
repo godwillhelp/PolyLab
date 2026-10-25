@@ -24,7 +24,7 @@
           </DockPanel>
           <WrapPanel x:Name="KindBar" Margin="0,5,0,0" />
         </StackPanel>
-        <TextBlock x:Name="CountText" DockPanel.Dock="Bottom" Style="{StaticResource Small}" Margin="8,2,6,4" TextTrimming="CharacterEllipsis" />
+        <TextBlock x:Name="CountText" DockPanel.Dock="Bottom" Style="{StaticResource Small}" Margin="8,2,6,4" TextWrapping="Wrap" />
         <ListBox x:Name="ResultList" BorderThickness="0" Background="{StaticResource B.BgInput}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  VirtualizingPanel.IsVirtualizing="True" ToolTip="{DynamicResource Tip.Xr.Results}" SelectionChanged="OnPick">
           <ListBox.ItemTemplate>

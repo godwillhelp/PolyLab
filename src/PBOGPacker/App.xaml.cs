@@ -23,6 +23,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
         DispatcherUnhandledException += (_, ex) => { Fail(ex.Exception); ex.Handled = true; };
+        // The command-line modes below never load the settings; the window replaces this with the saved language.
+        Loc.Set(PolyLab.Ui.Core.UiLanguage.Default);
 
         var args = e.Args;
         string? Arg(string name)

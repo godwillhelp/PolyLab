@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PolyLab.PBOGPacker.Core;
 
-// Real environment detection for the "Окружение" tab: probes the actual toolchain on this machine
+// Real environment detection for the Environment tab: probes the actual toolchain on this machine
 // (versions where a tool answers --version, presence otherwise) instead of the mocked list. Pure
 // read-only; never launches builds. Version parsing is best-effort - a present-but-unparsed tool is
 // still reported Ok with "ok", a missing one is Err with a fix hint.

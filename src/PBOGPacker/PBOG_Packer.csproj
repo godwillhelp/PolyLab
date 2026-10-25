@@ -29,6 +29,7 @@
     <Compile Remove="tools\**" />
     <None Remove="tools\**" />
     <Compile Include="..\Ui\Core\DataFolder.cs" Link="Core\DataFolder.cs" />
+    <Compile Include="..\Ui\Core\UiLanguage.cs" Link="Core\UiLanguage.cs" />
     <Resource Include="Assets\Fonts\*.otf" />
     <Resource Include="Assets\Fonts\*.ttf" />
     <Resource Include="Assets\Art\*.png" />

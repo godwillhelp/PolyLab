@@ -99,7 +99,7 @@ public sealed class PackBackend : IGraftBackend
     public Task<ModInfo> AddModAsync(string? path)
     {
         if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
-            throw new InvalidOperationException("папка проекта не найдена");
+            throw new InvalidOperationException(Loc.T("Be.NoProjectDir"));
         if (path.Length > 3) path = path.TrimEnd('\\', '/');
         lock (_gate)
         {
@@ -119,7 +119,7 @@ public sealed class PackBackend : IGraftBackend
             name = Path.GetFileName(path);
             kind = GuessKind(name);
         }
-        else throw new InvalidOperationException("в папке нет config.cpp: ни в корне, ни в mod\\<Имя>\\");
+        else throw new InvalidOperationException(Loc.T("Be.NoConfig"));
 
         var mod = new ModInfo("m" + Guid.NewGuid().ToString("N")[..8], name, "", path, Array.Empty<string>(), _s.Settings.Defaults.Key,
             new("none"), new("none"), new("none", Array.Empty<string>()), FindLogo(path, name), kind);
@@ -156,7 +156,7 @@ public sealed class PackBackend : IGraftBackend
         lock (_gate)
         {
             var i = _s.Mods.FindIndex(m => m.Id == id);
-            if (i < 0) throw new InvalidOperationException("мод не найден");
+            if (i < 0) throw new InvalidOperationException(Loc.T("Be.NoMod"));
             result = _s.Mods[i] = _s.Mods[i] with { Logo = stored };
         }
         Save();
@@ -170,8 +170,8 @@ public sealed class PackBackend : IGraftBackend
     public Task<ModInfo> CreateCppProjectAsync(string id)
     {
         ModInfo m;
-        lock (_gate) m = _s.Mods.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException("мод не найден");
-        if (PackLayout.IsGraftProject(m.Path)) throw new InvalidOperationException("мод уже лежит внутри C++-проекта");
+        lock (_gate) m = _s.Mods.FirstOrDefault(x => x.Id == id) ?? throw new InvalidOperationException(Loc.T("Be.NoMod"));
+        if (PackLayout.IsGraftProject(m.Path)) throw new InvalidOperationException(Loc.T("Be.ModInCpp"));
         var dir = CppScaffold.Create(m);
         ModInfo result;
         lock (_gate)
@@ -190,12 +190,12 @@ public sealed class PackBackend : IGraftBackend
     public Task<ModInfo> SetModPackAsync(string id, string kind, string key, string? outDir)
     {
         if (kind is not (ModKinds.Client or ModKinds.Server or ModKinds.Grafted))
-            throw new InvalidOperationException("неизвестный тип мода: " + kind);
+            throw new InvalidOperationException(Loc.F("Be.BadKind", kind));
         ModInfo result;
         lock (_gate)
         {
             var i = _s.Mods.FindIndex(m => m.Id == id);
-            if (i < 0) throw new InvalidOperationException("мод не найден");
+            if (i < 0) throw new InvalidOperationException(Loc.T("Be.NoMod"));
             var m = _s.Mods[i];
             var next = m with
             {
@@ -240,7 +240,7 @@ public sealed class PackBackend : IGraftBackend
 
     public Task<ServerInfo?> AddServerAsync(string path)
     {
-        if (!Directory.Exists(path)) throw new InvalidOperationException("папка сервера не найдена");
+        if (!Directory.Exists(path)) throw new InvalidOperationException(Loc.T("Be.NoServerDir"));
         if (path.Length > 3) path = path.TrimEnd('\\', '/');
         lock (_gate)
         {
@@ -257,13 +257,13 @@ public sealed class PackBackend : IGraftBackend
     public Task<ServerInfo> InstallHostAsync(string serverId)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
-        var host = Toolchain.HostDll(_s.Settings.Tools) ?? throw new InvalidOperationException("hid.dll не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
+        var host = Toolchain.HostDll(_s.Settings.Tools) ?? throw new InvalidOperationException(Loc.T("Be.NoHostDll"));
         var target = Path.Combine(srv.Path, "hid.dll");
         if (GraftDoctor.Probe(srv.Path, host).State == "foreign")
-            throw new InvalidOperationException("в папке сервера лежит чужая hid.dll (не GRAFT) — тулза её не затирает");
+            throw new InvalidOperationException(Loc.T("Be.HostForeignKeep"));
         if (File.Exists(target) && ServerLaunch.IsRunning(srv.Path))
-            throw new InvalidOperationException("сервер запущен — остановите его, потом меняйте хост");
+            throw new InvalidOperationException(Loc.T("Be.HostRunningChange"));
         File.Copy(host, target, true);
         return Task.FromResult(SetHost(serverId, GraftDoctor.Probe(srv.Path, host)));
     }
@@ -271,7 +271,7 @@ public sealed class PackBackend : IGraftBackend
     public Task<ServerInfo> UninstallHostAsync(string serverId)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
         GraftDoctor.Uninstall(srv.Path);
         return Task.FromResult(SetHost(serverId, GraftDoctor.Probe(srv.Path, Toolchain.HostDll(_s.Settings.Tools))));
     }
@@ -279,7 +279,7 @@ public sealed class PackBackend : IGraftBackend
     public Task<string> InstallPluginAsync(string serverId, string dll)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
         return Task.Run(() => GraftDoctor.InstallPlugin(srv.Path, dll));
     }
 
@@ -289,7 +289,7 @@ public sealed class PackBackend : IGraftBackend
         string? host, graft;
         lock (_gate)
         {
-            srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+            srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
             host = Toolchain.HostDll(_s.Settings.Tools);
             graft = Toolchain.Graft(_s.Settings.Tools);
         }
@@ -314,8 +314,8 @@ public sealed class PackBackend : IGraftBackend
     public Task<ServerLaunched> LaunchServerAsync(string serverId, string? bat)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
-        var name = ServerLaunch.Pick(srv, bat) ?? throw new InvalidOperationException("в папке сервера нет .bat для запуска: " + srv.Path);
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
+        var name = ServerLaunch.Pick(srv, bat) ?? throw new InvalidOperationException(Loc.F("Be.NoBat", srv.Path));
         var pid = ServerLaunch.Start(srv.Path, name);
         if (!string.Equals(srv.StartBat, name, StringComparison.OrdinalIgnoreCase))
         {
@@ -332,7 +332,7 @@ public sealed class PackBackend : IGraftBackend
     public async Task<ServerStopped> StopServerAsync(string serverId, int scriptPid)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
         var (scripts, servers, forced) = await Task.Run(() => ServerLaunch.StopAsync(srv.Path, scriptPid, TimeSpan.FromSeconds(60)));
         return new ServerStopped(srv, scripts, servers, forced);
     }
@@ -340,7 +340,7 @@ public sealed class PackBackend : IGraftBackend
     public Task<ModsSetup> GetServerModsAsync(string serverId, string bat)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
         var dir = _s.Settings.WorkshopDir;
         return Task.Run(() => ServerMods.Setup(srv.Path, bat, dir));
     }
@@ -348,7 +348,7 @@ public sealed class PackBackend : IGraftBackend
     public Task<ModsSaved> SaveServerModsAsync(string serverId, string bat, IReadOnlyList<ModPick> mods, IReadOnlyList<ModPick> serverMods)
     {
         ServerInfo srv;
-        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException("сервер не найден");
+        lock (_gate) srv = _s.Servers.FirstOrDefault(s => s.Id == serverId) ?? throw new InvalidOperationException(Loc.T("Be.NoServer"));
         return Task.Run(() => ServerMods.Save(srv.Path, bat, mods, serverMods));
     }
 
@@ -371,17 +371,17 @@ public sealed class PackBackend : IGraftBackend
         var bikey = Path.Combine(dir, tag + ".bikey");
         // A new pair under an existing tag would orphan every PBO already signed with it.
         if (File.Exists(bikey) || File.Exists(Path.Combine(dir, tag + ".biprivatekey")))
-            throw new InvalidOperationException("ключ " + tag + " уже есть: " + dir);
-        var create = Toolchain.DsCreateKey ?? throw new InvalidOperationException("DSCreateKey не найден (DayZ Tools)");
+            throw new InvalidOperationException(Loc.F("Be.KeyExists", tag, dir));
+        var create = Toolchain.DsCreateKey ?? throw new InvalidOperationException(Loc.T("Be.NoDsCreateKey"));
         var res = await ProcRunner.RunAsync(create, new[] { tag }, dir, (_, _) => { }, CancellationToken.None);
-        if (res.ExitCode != 0 || !File.Exists(bikey)) throw new InvalidOperationException("не удалось создать ключ");
+        if (res.ExitCode != 0 || !File.Exists(bikey)) throw new InvalidOperationException(Loc.T("Be.KeyFailed"));
         return new(tag, Fingerprint(bikey), DateTime.Now.ToString("yyyy-MM-dd"), bikey);
     }
 
     public Task<string> ExportKeyAsync(string tag)
     {
         var p = Path.Combine(_s.Settings.Tools.KeyDir, tag + ".bikey");
-        if (!File.Exists(p)) throw new InvalidOperationException("ключ не найден");
+        if (!File.Exists(p)) throw new InvalidOperationException(Loc.T("Be.NoKey"));
         return Task.FromResult(p);
     }
 
@@ -454,7 +454,7 @@ public sealed class PackBackend : IGraftBackend
         RunCtx? ctx = null;
         try
         {
-            if (mod == null) throw new InvalidOperationException("мод не найден");
+            if (mod == null) throw new InvalidOperationException(Loc.T("Be.NoMod"));
             Started?.Invoke(new PipelineStarted(runId, Steps.Ids));
 
             ctx = new RunCtx(runId, mod, o, srv, _s.Settings);
@@ -597,39 +597,39 @@ public sealed class PackBackend : IGraftBackend
         if (c.O.Sign) need.Add(("DSSignFile (DayZ Tools)", Toolchain.DsSignFile, "Fix.Pbo", null));
         foreach (var (tool, path, fix, cmd) in need)
         {
-            L(c, "env", (path != null ? "ok  " : "нет ") + tool + (path != null ? "  " + path : ""), path != null ? LogLevel.Ok : LogLevel.Err);
-            if (path == null) return Err(c, "env", "не найден: " + tool, null, null, fix, cmd);
+            L(c, "env", path != null ? "ok  " + tool + "  " + path : Loc.F("Pl.ToolNo", tool), path != null ? LogLevel.Ok : LogLevel.Err);
+            if (path == null) return Err(c, "env", Loc.F("Pl.ToolMissing", tool), null, null, fix, cmd);
         }
 
         if (c.Grafted && !c.Project)
-            L(c, "env", "метод Grafted без C++-проекта: мод раскладывается по README GRAFT, плагин не собирается", LogLevel.Info);
+            L(c, "env", Loc.T("Pl.GraftedNoCpp"), LogLevel.Info);
         if (c.Plugin)
         {
             var tag = GraftTag(c.Proj);
             if (tag == null)
-                L(c, "env", "в CMakeLists.txt не найден graft_import(... TAG ...) — совместимость с хостом покажет проверка после сборки", LogLevel.Warn);
+                L(c, "env", Loc.T("Pl.NoTag"), LogLevel.Warn);
             else if (tag != GraftDoctor.Release)
-                L(c, "env", $"CMakeLists.txt: graft_import TAG {tag}, а хост тулзы — {GraftDoctor.Release}. Примет ли хост плагин (ABI), покажет проверка после сборки; чтобы получить правки релиза, закрепите TAG {GraftDoctor.Release}", LogLevel.Warn);
-            else L(c, "env", "graft_import TAG " + tag + " — та же версия, что у хоста", LogLevel.Ok);
+                L(c, "env", Loc.F("Pl.TagDiff", tag, GraftDoctor.Release), LogLevel.Warn);
+            else L(c, "env", Loc.F("Pl.TagSame", tag), LogLevel.Ok);
         }
         if (!File.Exists(Path.Combine(c.Src, "config.cpp")))
-            return Err(c, "env", "нет config.cpp в папке мода", c.Src);
+            return Err(c, "env", Loc.T("Pl.NoConfig"), c.Src);
         var configured = PackLayout.Configured(c.Mod, c.S.Pack);
         if (!string.IsNullOrWhiteSpace(configured) && !PackLayout.IsRooted(configured))
-            return Err(c, "env", "папка вывода задана не полным путём: " + configured, null, null, "Fix.OutRelative");
+            return Err(c, "env", Loc.F("Pl.OutRelative", configured), null, null, "Fix.OutRelative");
         if (PackLayout.IsUnder(c.Root, c.Src))
-            return Err(c, "env", "папка вывода лежит внутри исходников мода: PBO упаковал бы сам себя", c.Root, null, "Fix.OutInside");
+            return Err(c, "env", Loc.T("Pl.OutInside"), c.Root, null, "Fix.OutInside");
         List<ModInfo> mods;
         lock (_gate) mods = _s.Mods.ToList();
         if (PackLayout.SourcesOf(c.Root, mods) is { } owner)
-            return Err(c, "env", "папка вывода — исходники мода " + owner + ": PBO легли бы в чужой мод", c.Root, null, "Fix.OutInside");
+            return Err(c, "env", Loc.F("Pl.OutOtherMod", owner), c.Root, null, "Fix.OutInside");
 
         var (prefix, from) = PackLayout.Prefix(c.Mod);
-        L(c, "env", "исходники: " + c.Src, LogLevel.Info);
+        L(c, "env", Loc.F("Pl.Src", c.Src), LogLevel.Info);
         if (!string.IsNullOrWhiteSpace(configured) && !string.Equals(PackLayout.NormalizeRoot(configured), c.Root, StringComparison.OrdinalIgnoreCase))
-            L(c, "env", "это папка игры — мод получит свою @папку внутри неё, как в README GRAFT", LogLevel.Info);
-        L(c, "env", "куда: " + c.Pbo, LogLevel.Info);
-        L(c, "env", "префикс PBO: " + prefix + " (" + from + ")", LogLevel.Info);
+            L(c, "env", Loc.T("Pl.GameDir"), LogLevel.Info);
+        L(c, "env", Loc.F("Pl.Dest", c.Pbo), LogLevel.Info);
+        L(c, "env", Loc.F("Pl.Prefix", prefix, from), LogLevel.Info);
         return null;
     }
 
@@ -661,13 +661,13 @@ public sealed class PackBackend : IGraftBackend
             var r = await ProcRunner.RunAsync("cmd.exe", new[] { "/c", bat }, c.Proj,
                 (line, err) => L(c, "build", line, err ? LogLevel.Warn : LogLevel.Info), ct);
             if (r.ExitCode != 0)
-                return Err(c, "build", "сборка не удалась (код " + r.ExitCode + ")", null, r.Tail, "Fix.Build");
+                return Err(c, "build", Loc.F("Pl.BuildFailed", r.ExitCode), null, r.Tail, "Fix.Build");
         }
         finally { try { File.Delete(bat); } catch (Exception) { } }
 
         c.Dll = FindDll(c);
         if (c.Dll == null)
-            return Err(c, "build", "не найдена собранная DLL: " + c.DllName);
+            return Err(c, "build", Loc.F("Pl.NoDll", c.DllName));
         L(c, "build", "DLL: " + c.Dll, LogLevel.Ok);
         return await CheckAbi(c, ct);
     }
@@ -679,7 +679,7 @@ public sealed class PackBackend : IGraftBackend
         var graft = Toolchain.Graft(c.S.Tools);
         if (graft == null)
         {
-            L(c, "build", "graft.exe не найден — совместимость плагина с хостом не проверена", LogLevel.Warn);
+            L(c, "build", Loc.T("Pl.NoGraftExe"), LogLevel.Warn);
             return null;
         }
         var game = Path.Combine(c.Tmp, "abi");
@@ -693,10 +693,10 @@ public sealed class PackBackend : IGraftBackend
             if (bad != null)
             {
                 var why = bad[(bad.IndexOf("<-", StringComparison.Ordinal) + 2)..].Trim();
-                return Err(c, "build", $"хост GRAFT {GraftDoctor.Release} не примет плагин: {why}", c.Dll, null, "Fix.GraftAbi");
+                return Err(c, "build", Loc.F("Pl.AbiReject", GraftDoctor.Release, why), c.Dll, null, "Fix.GraftAbi");
             }
             var ok = lines.FirstOrDefault(l => l.Contains(c.DllName));
-            L(c, "build", ok != null ? "хост " + GraftDoctor.Release + " примет плагин: " + ok.Trim() : "graft list не ответил про плагин (код " + r.ExitCode + ")",
+            L(c, "build", ok != null ? Loc.F("Pl.AbiOk", GraftDoctor.Release, ok.Trim()) : Loc.F("Pl.AbiUnknown", r.ExitCode),
                 ok != null ? LogLevel.Ok : LogLevel.Warn);
             return null;
         }
@@ -723,8 +723,8 @@ public sealed class PackBackend : IGraftBackend
             ? Directory.GetFiles(c.Src, "grafted_natives_" + c.Mod.Name + ".c", SearchOption.AllDirectories)
             : Array.Empty<string>();
         if (decls.Length == 0)
-            return Err(c, "protogen", "нет сгенерированных объявлений ни в mod\\...\\scripts, ни рядом с DLL (" + c.Mod.Name + ".scripts)", c.Src, null, "Fix.Decls");
-        foreach (var d in decls) L(c, "protogen", "объявления: " + d.Substring(c.Src.Length).TrimStart('\\'), LogLevel.Ok);
+            return Err(c, "protogen", Loc.F("Pl.NoDecls", c.Mod.Name), c.Src, null, "Fix.Decls");
+        foreach (var d in decls) L(c, "protogen", Loc.F("Pl.Decls", d.Substring(c.Src.Length).TrimStart('\\')), LogLevel.Ok);
         return null;
     }
 
@@ -740,7 +740,7 @@ public sealed class PackBackend : IGraftBackend
             if (File.Exists(dst) && File.ReadAllBytes(dst).AsSpan().SequenceEqual(File.ReadAllBytes(f))) continue;
             Directory.CreateDirectory(Path.GetDirectoryName(dst)!);
             File.Copy(f, dst, true);
-            L(c, "protogen", "объявления из сборки -> " + Path.GetRelativePath(c.Src, dst), LogLevel.Info);
+            L(c, "protogen", Loc.F("Pl.DeclsCopied", Path.GetRelativePath(c.Src, dst)), LogLevel.Info);
         }
     }
 
@@ -770,11 +770,11 @@ public sealed class PackBackend : IGraftBackend
     private async Task<PipelineError?> Pack(RunCtx c, CancellationToken ct)
     {
         var ab = Toolchain.AddonBuilder;
-        if (ab == null) return Err(c, "pack", "AddonBuilder не найден (DayZ Tools)", null, null, "Fix.Pbo");
+        if (ab == null) return Err(c, "pack", Loc.T("Pl.NoAddonBuilder"), null, null, "Fix.Pbo");
         var (prefix, _) = PackLayout.Prefix(c.Mod);
         var segs = prefix.Split('\\');
         if (segs.Any(s => s is "." or ".." || s.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0))
-            return Err(c, "pack", "недопустимый префикс PBO: " + prefix, c.Src);
+            return Err(c, "pack", Loc.F("Pl.BadPrefix", prefix), c.Src);
         var proj = Path.Combine(c.Tmp, "proj");
         var stage = Path.Combine(proj, prefix);
         var abOut = Path.Combine(c.Tmp, "out");
@@ -785,9 +785,9 @@ public sealed class PackBackend : IGraftBackend
 
         var skipped = new List<string>();
         var (files, size) = await Task.Run(() => StageCopy(c.Src, stage, skipped), ct);
-        L(c, "pack", $"исходники: {files} файлов, {size / 1024.0:0.#} КБ", LogLevel.Info);
-        foreach (var s in skipped.Take(8)) L(c, "pack", "не пакуется: " + s, LogLevel.Info);
-        if (skipped.Count > 8) L(c, "pack", "…и ещё " + (skipped.Count - 8), LogLevel.Info);
+        L(c, "pack", Loc.F("Pl.SrcFiles", files, Loc.Kb(size)), LogLevel.Info);
+        foreach (var s in skipped.Take(8)) L(c, "pack", Loc.F("Pl.Skipped", s), LogLevel.Info);
+        if (skipped.Count > 8) L(c, "pack", Loc.F("Pl.SkippedMore", skipped.Count - 8), LogLevel.Info);
 
         var args = new List<string> { stage, abOut, "-clear", "-prefix=" + prefix, "-temp=" + abTemp };
         var odol = new List<(string Name, string File)>();
@@ -808,17 +808,17 @@ public sealed class PackBackend : IGraftBackend
                 File.Move(p, keep);
                 odol.Add((rel, keep));
             }
-            if (odol.Count > 0) L(c, "pack", $"модели ODOL: {odol.Count} — уже бинаризованы, кладутся как есть", LogLevel.Info);
+            if (odol.Count > 0) L(c, "pack", Loc.F("Pl.Odol", odol.Count), LogLevel.Info);
             if (mlod.Count > 0)
             {
-                L(c, "pack", $"модели MLOD: {mlod.Count} — бинаризуются в ODOL (binarize.exe)", LogLevel.Info);
+                L(c, "pack", Loc.F("Pl.Mlod", mlod.Count), LogLevel.Info);
                 await LinkReferences(c, proj, segs[0], mlod, ct);
             }
             var include = Path.Combine(c.Tmp, "include.lst");
             await File.WriteAllTextAsync(include, string.Join(";", DirectCopyPatterns(stage)), ct);
             args.Add("-project=" + proj);
             args.Add("-include=" + include);
-            L(c, "pack", "AddonBuilder -prefix=" + prefix + " (бинаризация)", LogLevel.Cmd);
+            L(c, "pack", Loc.F("Pl.AbBinarize", prefix), LogLevel.Cmd);
         }
         else
         {
@@ -832,19 +832,19 @@ public sealed class PackBackend : IGraftBackend
         // only the PBO on disk counts.
         var built = Path.Combine(abOut, segs[^1] + ".pbo");
         if (r.ExitCode != 0 || !File.Exists(built))
-            return Err(c, "pack", "AddonBuilder не собрал PBO", null, errors.Count > 0 ? errors.TakeLast(12) : r.Tail, "Fix.AddonBuilder");
+            return Err(c, "pack", Loc.T("Pl.AbFailed"), null, errors.Count > 0 ? errors.TakeLast(12) : r.Tail, "Fix.AddonBuilder");
         if (odol.Count > 0) await Task.Run(() => Pbo.AddFiles(built, odol), ct);
 
         var missing = Missing(stage, built, full, odol.Select(o => o.Name));
         if (missing.Count > 0)
-            return Err(c, "pack", $"в PBO не попали файлы мода: {missing.Count}", c.Src, missing.Take(12), "Fix.AddonBuilder");
+            return Err(c, "pack", Loc.F("Pl.AbMissing", missing.Count), c.Src, missing.Take(12), "Fix.AddonBuilder");
 
         Directory.CreateDirectory(c.AddonsDir);
         var err2 = Replace(c, "pack", built, c.Pbo);
         if (err2 != null) return err2;
         // The old signatures describe the old PBO; leaving them would make the server reject the mod.
         RemoveSignatures(c.AddonsDir, c.Mod.Name);
-        L(c, "pack", "PBO: " + c.Pbo + " (" + new FileInfo(c.Pbo).Length + " б)", LogLevel.Ok);
+        L(c, "pack", Loc.F("Pl.Pbo", c.Pbo, new FileInfo(c.Pbo).Length), LogLevel.Ok);
         return null;
     }
 
@@ -862,7 +862,7 @@ public sealed class PackBackend : IGraftBackend
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             try { File.Delete(tmp); } catch (Exception) { }
-            return Err(c, step, "не удалось записать " + Path.GetFileName(to) + ": " + e.Message, to, null, "Fix.Locked");
+            return Err(c, step, Loc.F("Pl.WriteFailed", Path.GetFileName(to), e.Message), to, null, "Fix.Locked");
         }
     }
 
@@ -900,7 +900,7 @@ public sealed class PackBackend : IGraftBackend
     private async Task<PipelineError?> CheckConfigs(RunCtx c, string proj, string stage, CancellationToken ct)
     {
         var cc = Toolchain.CfgConvert;
-        if (cc == null) return Err(c, "pack", "CfgConvert не найден (DayZ Tools)", null, null, "Fix.Pbo");
+        if (cc == null) return Err(c, "pack", Loc.T("Pl.NoCfgConvert"), null, null, "Fix.Pbo");
         var configs = Directory.GetFiles(stage, "config.cpp", SearchOption.AllDirectories);
         var probe = Path.Combine(c.Tmp, "cfgcheck.bin");
         foreach (var cpp in configs)
@@ -910,11 +910,11 @@ public sealed class PackBackend : IGraftBackend
             var r = await ProcRunner.RunAsync(cc, new[] { "-bin", "-dst", probe, cpp }, proj,
                 (line, _) => L(c, "pack", ToSource(c, stage, line), LogLevel.Warn), ct);
             if (r.ExitCode != 0 || !File.Exists(probe))
-                return Err(c, "pack", "config.cpp не бинаризуется: " + rel, Path.Combine(c.Src, rel),
+                return Err(c, "pack", Loc.F("Pl.Rapify", rel), Path.Combine(c.Src, rel),
                     r.Tail.Select(l => ToSource(c, stage, l)), "Fix.Rapify");
             File.Delete(probe);
         }
-        L(c, "pack", "конфиги в порядке: " + configs.Length, LogLevel.Ok);
+        L(c, "pack", Loc.F("Pl.ConfigsOk", configs.Length), LogLevel.Ok);
         return null;
     }
 
@@ -930,11 +930,11 @@ public sealed class PackBackend : IGraftBackend
             var r = await ProcRunner.RunAsync(cc, new[] { "-bin", "-dst", mat, mat }, Path.GetDirectoryName(mat),
                 (line, _) => L(c, "pack", ToSource(c, stage, line), LogLevel.Warn), ct);
             if (r.ExitCode != 0)
-                return Err(c, "pack", "rvmat не бинаризуется: " + rel, Path.Combine(c.Src, rel),
+                return Err(c, "pack", Loc.F("Pl.RvmatFail", rel), Path.Combine(c.Src, rel),
                     r.Tail.Select(l => ToSource(c, stage, l)), "Fix.Rapify");
             done++;
         }
-        if (done > 0) L(c, "pack", "rvmat бинаризованы: " + done, LogLevel.Ok);
+        if (done > 0) L(c, "pack", Loc.F("Pl.RvmatOk", done), LogLevel.Ok);
         return null;
     }
 
@@ -962,12 +962,12 @@ public sealed class PackBackend : IGraftBackend
                 : work != null ? Path.Combine(work, top) : null;
             if (target == null || !Directory.Exists(target))
             {
-                if (top == "DZ") L(c, "pack", "папка DZ не найдена — ссылки моделей на данные игры не проверятся", LogLevel.Warn);
+                if (top == "DZ") L(c, "pack", Loc.T("Pl.NoDz"), LogLevel.Warn);
                 continue;
             }
             var link = Path.Combine(proj, top);
             var mk = await ProcRunner.RunAsync("cmd.exe", new[] { "/c", "mklink", "/J", link, target }, proj, (_, _) => { }, ct);
-            L(c, "pack", mk.ExitCode == 0 ? "для binarize подключено: " + target : "не удалось подключить " + target,
+            L(c, "pack", mk.ExitCode == 0 ? Loc.F("Pl.Linked", target) : Loc.F("Pl.LinkFailed", target),
                 mk.ExitCode == 0 ? LogLevel.Info : LogLevel.Warn);
         }
     }
@@ -1071,26 +1071,26 @@ public sealed class PackBackend : IGraftBackend
     private async Task<PipelineError?> Sign(RunCtx c, CancellationToken ct)
     {
         var sign = Toolchain.DsSignFile;
-        if (sign == null) return Err(c, "sign", "DSSignFile не найден (DayZ Tools)", null, null, "Fix.Pbo");
+        if (sign == null) return Err(c, "sign", Loc.T("Pl.NoDsSign"), null, null, "Fix.Pbo");
         var priv = Path.Combine(c.S.Tools.KeyDir, c.Mod.Key + ".biprivatekey");
         if (!File.Exists(priv))
-            return Err(c, "sign", "нет приватного ключа " + c.Mod.Key + ".biprivatekey — создайте ключ на вкладке «Ключи»", c.S.Tools.KeyDir);
+            return Err(c, "sign", Loc.F("Pl.NoPrivKey", c.Mod.Key), c.S.Tools.KeyDir);
         if (!File.Exists(c.Pbo))
-            return Err(c, "sign", "нет PBO для подписи — повторите с шага «Упаковка PBO»", c.Pbo);
+            return Err(c, "sign", Loc.T("Pl.NoPboSign"), c.Pbo);
         RemoveSignatures(c.AddonsDir, c.Mod.Name);
         L(c, "sign", "DSSignFile " + c.Mod.Key, LogLevel.Cmd);
         var r = await ProcRunner.RunAsync(sign, new[] { priv, c.Pbo }, c.AddonsDir,
             (line, err) => L(c, "sign", line, err ? LogLevel.Warn : LogLevel.Info), ct);
         var bisign = c.Pbo + "." + c.Mod.Key + ".bisign";
         if (r.ExitCode != 0 || !File.Exists(bisign))
-            return Err(c, "sign", "подпись не создана", null, r.Tail);
-        L(c, "sign", "подпись: " + Path.GetFileName(bisign), LogLevel.Ok);
+            return Err(c, "sign", Loc.T("Pl.SignFailed"), null, r.Tail);
+        L(c, "sign", Loc.F("Pl.Signed", Path.GetFileName(bisign)), LogLevel.Ok);
         return null;
     }
 
     private PipelineError? Assemble(RunCtx c)
     {
-        if (!File.Exists(c.Pbo)) return Err(c, "assemble", "нет PBO — повторите с шага «Упаковка PBO»", c.Pbo);
+        if (!File.Exists(c.Pbo)) return Err(c, "assemble", Loc.T("Pl.NoPbo"), c.Pbo);
         var parts = "addons/";
         if (c.O.Sign)
         {
@@ -1101,19 +1101,19 @@ public sealed class PackBackend : IGraftBackend
                 File.Copy(c.BiKey, Path.Combine(keysDir, c.Mod.Key + ".bikey"), true);
                 parts += " + keys/";
             }
-            else L(c, "assemble", "нет " + c.Mod.Key + ".bikey в папке ключей — keys\\ не собран", LogLevel.Warn);
+            else L(c, "assemble", Loc.F("Pl.NoBikey", c.Mod.Key), LogLevel.Warn);
         }
         var graftDir = Path.Combine(c.Root, "grafted");
         if (c.Plugin)
         {
             c.Dll ??= FindDll(c);
-            if (c.Dll == null) return Err(c, "assemble", "не найдена DLL плагина — повторите с шага «Сборка»", c.Proj);
+            if (c.Dll == null) return Err(c, "assemble", Loc.T("Pl.NoPluginDll"), c.Proj);
             Directory.CreateDirectory(graftDir);
             File.Copy(c.Dll, Path.Combine(graftDir, c.DllName), true);
             parts += " + grafted/";
         }
         // Without the Grafted method the plugin must go, or the host keeps loading it from grafted\.
-        else if (!c.Grafted && DropPlugin(graftDir, c.DllName)) L(c, "assemble", "убран старый плагин: grafted\\" + c.DllName, LogLevel.Info);
+        else if (!c.Grafted && DropPlugin(graftDir, c.DllName)) L(c, "assemble", Loc.F("Pl.OldPlugin", c.DllName), LogLevel.Info);
         L(c, "assemble", Path.GetFileName(c.Root) + ": " + parts, LogLevel.Ok);
         L(c, "assemble", c.Root, LogLevel.Info);
         return null;
@@ -1124,16 +1124,16 @@ public sealed class PackBackend : IGraftBackend
     // <server>\keys so verifySignatures accepts the mod.
     private PipelineError? Deploy(RunCtx c)
     {
-        if (c.Srv == null) { L(c, "deploy", "сервер не выбран — деплой пропущен", LogLevel.Warn); return null; }
-        if (!Directory.Exists(c.Srv.Path)) return Err(c, "deploy", "папка сервера не найдена: " + c.Srv.Path);
-        if (!File.Exists(c.Pbo)) return Err(c, "deploy", "PBO ещё не собран", c.Pbo);
+        if (c.Srv == null) { L(c, "deploy", Loc.T("Pl.NoServerDeploy"), LogLevel.Warn); return null; }
+        if (!Directory.Exists(c.Srv.Path)) return Err(c, "deploy", Loc.F("Pl.NoServerDir", c.Srv.Path));
+        if (!File.Exists(c.Pbo)) return Err(c, "deploy", Loc.T("Pl.PboNotBuilt"), c.Pbo);
         var bisign = c.Pbo + "." + c.Mod.Key + ".bisign";
         if (c.O.Sign && !File.Exists(bisign))
-            return Err(c, "deploy", "PBO не подписан ключом " + c.Mod.Key + " — повторите с шага «Подпись»", bisign);
+            return Err(c, "deploy", Loc.F("Pl.NotSigned", c.Mod.Key), bisign);
 
         if (PackLayout.IsUnder(c.Root, c.Srv.Path))
         {
-            L(c, "deploy", "папка мода уже на сервере: " + c.Root, LogLevel.Info);
+            L(c, "deploy", Loc.F("Pl.OnServer", c.Root), LogLevel.Info);
             c.DeployedDir = c.Root;
         }
         else
@@ -1154,7 +1154,7 @@ public sealed class PackBackend : IGraftBackend
                 if (err != null) return err;
             }
             else if (!c.Grafted && DropPlugin(Path.Combine(dst, "grafted"), c.DllName))
-                L(c, "deploy", "убран старый плагин с сервера: grafted\\" + c.DllName, LogLevel.Info);
+                L(c, "deploy", Loc.F("Pl.OldPluginSrv", c.DllName), LogLevel.Info);
             var modKey = Path.Combine(c.Root, "keys", c.Mod.Key + ".bikey");
             if (File.Exists(modKey))
             {
@@ -1170,10 +1170,10 @@ public sealed class PackBackend : IGraftBackend
             var srvKeys = Path.Combine(c.Srv.Path, "keys");
             Directory.CreateDirectory(srvKeys);
             File.Copy(c.BiKey, Path.Combine(srvKeys, c.Mod.Key + ".bikey"), true);
-            L(c, "deploy", "ключ " + c.Mod.Key + ".bikey -> " + srvKeys, LogLevel.Ok);
+            L(c, "deploy", Loc.F("Pl.KeyCopied", c.Mod.Key, srvKeys), LogLevel.Ok);
         }
         if (c.Mod.Kind == ModKinds.Client && !c.O.Sign && c.Srv.VerifySignatures == 2)
-            L(c, "deploy", "сервер проверяет подписи (verifySignatures = 2), а мод не подписан — игроков с ним не пустит", LogLevel.Warn);
+            L(c, "deploy", Loc.T("Pl.Unsigned"), LogLevel.Warn);
         FindDuplicates(c, c.Srv.Path);
         return null;
     }
@@ -1187,19 +1187,19 @@ public sealed class PackBackend : IGraftBackend
         {
             if (!File.Exists(old) || PackLayout.IsUnder(old, mine) || c.Duplicates.Contains(old, StringComparer.OrdinalIgnoreCase)) continue;
             c.Duplicates.Add(old);
-            L(c, "deploy", "на сервере осталась старая копия, она загрузится вместе с новой: " + old, LogLevel.Warn);
+            L(c, "deploy", Loc.F("Pl.OldCopy", old), LogLevel.Warn);
         }
     }
 
     private PipelineError? Host(RunCtx c)
     {
-        if (c.Srv == null) { L(c, "host", "сервер не выбран — хост не ставится", LogLevel.Warn); return null; }
+        if (c.Srv == null) { L(c, "host", Loc.T("Pl.NoServerHost"), LogLevel.Warn); return null; }
         var host = Toolchain.HostDll(c.S.Tools);
-        if (host == null) return Err(c, "host", "hid.dll не найден");
+        if (host == null) return Err(c, "host", Loc.T("Be.NoHostDll"));
         var target = Path.Combine(c.Srv.Path, "hid.dll");
-        if (File.Exists(target)) { L(c, "host", "хост уже на месте: " + target, LogLevel.Warn); return null; }
+        if (File.Exists(target)) { L(c, "host", Loc.F("Pl.HostThere", target), LogLevel.Warn); return null; }
         File.Copy(host, target, true);
-        L(c, "host", "хост установлен: " + target, LogLevel.Ok);
+        L(c, "host", Loc.F("Pl.HostInstalled", target), LogLevel.Ok);
         return null;
     }
 

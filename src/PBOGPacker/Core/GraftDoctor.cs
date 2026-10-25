@@ -241,15 +241,15 @@ public static class GraftDoctor
     // Only a 64-bit DLL with the GRAFT entry point is taken; a running server keeps the old file locked.
     public static string InstallPlugin(string serverDir, string dll)
     {
-        if (!File.Exists(dll)) throw new InvalidOperationException("файл не найден: " + dll);
-        if (!dll.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("плагин GRAFT — это .dll");
-        if (!Contains(dll, PluginMark)) throw new InvalidOperationException("в " + Path.GetFileName(dll) + " нет точки входа graft_plugin_entry — это не плагин GRAFT");
-        if (!IsX64(dll)) throw new InvalidOperationException(Path.GetFileName(dll) + " собран не под x64 — сервер DayZ его не загрузит");
+        if (!File.Exists(dll)) throw new InvalidOperationException(Loc.F("Be.FileMissing", dll));
+        if (!dll.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException(Loc.T("Be.PluginNotDll"));
+        if (!Contains(dll, PluginMark)) throw new InvalidOperationException(Loc.F("Be.PluginNoEntry", Path.GetFileName(dll)));
+        if (!IsX64(dll)) throw new InvalidOperationException(Loc.F("Be.PluginNotX64", Path.GetFileName(dll)));
         var dir = Path.Combine(serverDir, "grafted");
         var target = Path.Combine(dir, Path.GetFileName(dll));
         if (Same(Path.GetFullPath(dll), Path.GetFullPath(target))) return target;
         if (File.Exists(target) && ServerLaunch.IsRunning(serverDir))
-            throw new InvalidOperationException("сервер запущен и держит " + Path.GetFileName(target) + " — остановите его, потом заменяйте плагин");
+            throw new InvalidOperationException(Loc.F("Be.PluginLocked", Path.GetFileName(target)));
         Directory.CreateDirectory(dir);
         File.Copy(dll, target, true);
         return target;
@@ -273,8 +273,8 @@ public static class GraftDoctor
     {
         var dll = Path.Combine(serverDir, Host);
         if (!File.Exists(dll)) return;
-        if (!Contains(dll, HostMark)) throw new InvalidOperationException("hid.dll в папке сервера — не GRAFT, тулза её не трогает");
-        if (ServerLaunch.IsRunning(serverDir)) throw new InvalidOperationException("сервер запущен — остановите его, потом снимайте хост");
+        if (!Contains(dll, HostMark)) throw new InvalidOperationException(Loc.T("Be.HostForeign"));
+        if (ServerLaunch.IsRunning(serverDir)) throw new InvalidOperationException(Loc.T("Be.HostRunningRemove"));
         File.Delete(dll);
         var g = Path.Combine(serverDir, "grafted");
         try { if (Directory.Exists(g) && !Directory.EnumerateFileSystemEntries(g).Any()) Directory.Delete(g); }

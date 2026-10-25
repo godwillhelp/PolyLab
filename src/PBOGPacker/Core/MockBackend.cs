@@ -45,7 +45,7 @@ public sealed class MockBackend : IGraftBackend
         _servers = new()
         {
             new("live", "DayZServer · Steam", ServerLive, "1.29.0.163709", 2, new(true, "v0.4.0")),
-            new("pog", "POG · тест", @"D:\Servers\POG", "1.29.0.163709", 0, new(false, null)),
+            new("pog", "POG · test", @"D:\Servers\POG", "1.29.0.163709", 0, new(false, null)),
         };
         _keys = new()
         {
@@ -330,7 +330,7 @@ public sealed class MockBackend : IGraftBackend
                     {
                         FailNext = false;
                         Replace(m with { Build = new("fail", DateTime.Now, 0, "pack") });
-                        Failed?.Invoke(new PipelineError(runId, id, "config.cpp не бинаризуется: config.cpp", Path.Combine(m.Path, "config.cpp"),
+                        Failed?.Invoke(new PipelineError(runId, id, Loc.F("Pl.Rapify", "config.cpp"), Path.Combine(m.Path, "config.cpp"),
                             lines.TakeLast(4).Select(l => new LogEntry(l.Item1, l.Item2)).ToList(), "Fix.Rapify", null));
                     }
                     else
@@ -394,9 +394,9 @@ public sealed class MockBackend : IGraftBackend
                     (K, @"ok  AddonBuilder (DayZ Tools)  C:\Program Files (x86)\Steam\steamapps\common\DayZ Tools\Bin\AddonBuilder\AddonBuilder.exe"),
                     (K, @"ok  CfgConvert (DayZ Tools)  C:\Program Files (x86)\Steam\steamapps\common\DayZ Tools\Bin\CfgConvert\CfgConvert.exe"),
                     (K, @"ok  DSSignFile (DayZ Tools)  C:\Program Files (x86)\Steam\steamapps\common\DayZ Tools\Bin\DsUtils\DSSignFile.exe"),
-                    (I, "исходники: " + m.Path),
-                    (I, $@"куда: {root}\addons\{m.Name}.pbo"),
-                    (I, "префикс PBO: " + m.Name),
+                    (I, Loc.F("Pl.Src", m.Path)),
+                    (I, Loc.F("Pl.Dest", $@"{root}\addons\{m.Name}.pbo")),
+                    (I, Loc.F("Pl.Prefix", m.Name, Loc.T("Pl.PrefixFolder"))),
                 };
             case "env":
                 return new()
@@ -404,12 +404,12 @@ public sealed class MockBackend : IGraftBackend
                     (C, "[PBOG] doctor"),
                     (I, "clang-cl 23.1.2 · cmake 3.31.6 · ninja 1.12.1 · Windows SDK 10.0.26100"),
                     (I, "AddonBuilder ok · CfgConvert ok · DSSignFile ok · graft v0.4.0 (graft.boot v0.4.0)"),
-                    (I, $@"куда: {root}\addons\{m.Name}.pbo"),
+                    (I, Loc.F("Pl.Dest", $@"{root}\addons\{m.Name}.pbo")),
                 };
             case "pack" when fail:
                 return new()
                 {
-                    (I, "исходники: 23 файлов, 61,4 КБ"),
+                    (I, Loc.F("Pl.SrcFiles", 23, Loc.Kb(62874))),
                     (C, "CfgConvert -bin config.cpp"),
                     (W, $@"File {m.Path}\config.cpp, line 41: /CfgMods/{m.Name}.defs: '}}' encountered instead of ';'"),
                     (W, $@"Error reading config file '{m.Path}\config.cpp'"),
@@ -457,15 +457,15 @@ public sealed class MockBackend : IGraftBackend
             case "pack":
                 return new()
                 {
-                    (I, grafted ? "исходники: 14 файлов, 38,2 КБ" : "исходники: 23 файлов, 61,4 КБ"),
+                    (I, grafted ? Loc.F("Pl.SrcFiles", 14, Loc.Kb(39117)) : Loc.F("Pl.SrcFiles", 23, Loc.Kb(62874))),
                     (C, "CfgConvert -bin config.cpp"),
                     (K, "config.bin: 1"),
                     (C, "AddonBuilder -packonly -prefix=" + m.Name),
                     (I, "Packing... Build Successful"),
-                    (K, $@"PBO: {root}\addons\{m.Name}.pbo ({(grafted ? "39 118" : "18 422")} б)"),
+                    (K, Loc.F("Pl.Pbo", $@"{root}\addons\{m.Name}.pbo", grafted ? 39118 : 18422)),
                 };
             case "sign":
-                return new() { (C, $"DSSignFile {m.Key}"), (K, $"подпись: {m.Name}.pbo.{m.Key}.bisign") };
+                return new() { (C, $"DSSignFile {m.Key}"), (K, Loc.F("Pl.Signed", $"{m.Name}.pbo.{m.Key}.bisign")) };
             case "assemble":
             {
                 var parts = "addons/" + (o.Sign ? " + keys/" : "") + (grafted ? " + grafted/" : "");
@@ -474,9 +474,9 @@ public sealed class MockBackend : IGraftBackend
             case "deploy":
             {
                 var l = new List<(LogLevel, string)>();
-                if (PackLayout.IsUnder(root, srv.Path)) l.Add((I, "папка мода уже на сервере: " + root));
+                if (PackLayout.IsUnder(root, srv.Path)) l.Add((I, Loc.F("Pl.OnServer", root)));
                 else l.Add((K, $@"{leaf} -> {srv.Path}\{leaf}"));
-                if (o.Sign) l.Add((K, $@"ключ {m.Key}.bikey -> {srv.Path}\keys"));
+                if (o.Sign) l.Add((K, Loc.F("Pl.KeyCopied", m.Key, $@"{srv.Path}\keys")));
                 l.Add((srv.VerifySignatures == 2 ? K : W, $"serverDZ.cfg: verifySignatures = {srv.VerifySignatures}"));
                 return l;
             }

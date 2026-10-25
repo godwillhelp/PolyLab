@@ -1,11 +1,14 @@
+using System.Collections;
 using System.Globalization;
 using System.Windows;
+using PolyLab.Ui.Core;
 
 namespace PolyLab.PBOGPacker.Core;
 
 public static class Loc
 {
     private static ResourceDictionary? _dict;
+    private static Dictionary<string, string> _text = new();
 
     public static string Lang { get; private set; } = "ru";
     public static CultureInfo Culture { get; private set; } = new("ru-RU");
@@ -13,18 +16,24 @@ public static class Loc
 
     public static void Set(string lang)
     {
-        if (lang != "ru" && lang != "uk") lang = "ru";
+        if (!UiLanguage.All.Contains(lang)) lang = UiLanguage.Default;
         var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/PBOG_Packer;component/Lang/{lang}.xaml") };
+        var text = new Dictionary<string, string>();
+        foreach (DictionaryEntry e in d)
+            if (e.Key is string k && e.Value is string v) text[k] = v;
         var merged = Application.Current.Resources.MergedDictionaries;
         if (_dict != null) merged.Remove(_dict);
         merged.Add(d);
         _dict = d;
+        _text = text;
         Lang = lang;
-        Culture = new CultureInfo(lang == "uk" ? "uk-UA" : "ru-RU");
+        Culture = UiLanguage.Culture(lang);
         Changed?.Invoke();
     }
 
-    public static string T(string key) => Application.Current.TryFindResource(key) as string ?? key;
+    // The pipeline writes its log lines and errors on worker threads, so texts come from a copy made on the UI thread,
+    // not from the application resources.
+    public static string T(string key) => _text.TryGetValue(key, out var v) ? v : key;
 
     public static string F(string key, params object?[] args) => string.Format(Culture, T(key), args);
 
