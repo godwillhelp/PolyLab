@@ -246,10 +246,17 @@
         </Grid.RowDefinitions>
 
         <Grid Background="Transparent" MouseLeftButtonDown="OnDrag">
-          <Rectangle Style="{StaticResource Sep}" VerticalAlignment="Bottom"/>
-          <StackPanel x:Name="NavBar" Orientation="Horizontal" Margin="16,0,0,0" Height="64" VerticalAlignment="Bottom">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Rectangle Grid.ColumnSpan="2" Style="{StaticResource Sep}" VerticalAlignment="Bottom"/>
+          <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="16,0,16,0">
+          <StackPanel x:Name="NavBar" Orientation="Horizontal" Height="64">
             <RadioButton ToolTip="{DynamicResource Tip.NavBuild}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Build}"
                          IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=build}"/>
+            <RadioButton ToolTip="{DynamicResource Tip.NavModels}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Models}"
+                         IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=models}"/>
             <RadioButton ToolTip="{DynamicResource Tip.NavServers}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Servers}"
                          IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=servers}"/>
             <RadioButton ToolTip="{DynamicResource Tip.NavKeys}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.Keys}"
@@ -267,8 +274,9 @@
             <RadioButton ToolTip="{DynamicResource Tip.NavAbout}" Style="{StaticResource Nav}" GroupName="nav" Content="{DynamicResource Nav.About}"
                          IsChecked="{Binding Page, Converter={StaticResource Eq}, ConverterParameter=about}"/>
           </StackPanel>
+          </Viewbox>
 
-          <Button ToolTip="{DynamicResource Tip.Toolchain}" x:Name="TcBtn" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,34,14" Command="{Binding MenuCmd}"
+          <Button Grid.Column="1" ToolTip="{DynamicResource Tip.Toolchain}" x:Name="TcBtn" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,34,14" Command="{Binding MenuCmd}"
                   Style="{StaticResource Btn.Link}" Foreground="{StaticResource B.Text}">
             <StackPanel Orientation="Horizontal">
               <Grid Width="48" Height="48">
@@ -354,6 +362,7 @@
 
         <Grid Grid.Row="1" x:Name="Pages">
           <v:BuildView x:Name="PgBuild" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=build}"/>
+          <v:ModelsView x:Name="PgModels" DataContext="{Binding Models}" Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqVis}, ConverterParameter=models}"/>
           <v:ServersView x:Name="PgServers" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=servers}"/>
           <v:KeysView x:Name="PgKeys" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=keys}"/>
           <v:EnvView x:Name="PgEnv" Visibility="{Binding Page, Converter={StaticResource EqVis}, ConverterParameter=env}"/>

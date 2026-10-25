@@ -793,7 +793,10 @@ public sealed class PackBackend : IGraftBackend
         var odol = new List<(string Name, string File)>();
         var full = c.S.Pack.Rapify;
         // References are read before the rvmats are rapified (text keeps the lines) and the ODOLs set aside.
-        var check = (full ? await CheckConfigs(c, proj, stage, ct) : null) ?? await CheckReferences(c, stage, prefix, ct);
+        var odolRefs = new Dictionary<string, IReadOnlyList<(string, bool)>>(StringComparer.OrdinalIgnoreCase);
+        var check = full ? await CheckConfigs(c, proj, stage, ct) : null;
+        check ??= await CheckModels(c, stage, odolRefs, ct);
+        check ??= await CheckReferences(c, stage, prefix, odolRefs, ct);
         if (check != null) return check;
         if (full)
         {
@@ -923,14 +926,37 @@ public sealed class PackBackend : IGraftBackend
 
     // A missing texture, model, material, sound or script folder fails the pack here, as under pboProject,
     // instead of showing up as a white texture or a silent script module in game.
-    private async Task<PipelineError?> CheckReferences(RunCtx c, string stage, string prefix, CancellationToken ct)
+    // Every binarized model of the mod is read in full, every LOD up to the end the model's table gives: a cut or damaged
+    // one (a broken download, a half-copied file) would load in the game as a missing or broken model. The files each
+    // model names go to the reference check.
+    private async Task<PipelineError?> CheckModels(RunCtx c, string stage, Dictionary<string, IReadOnlyList<(string, bool)>> refs,
+        CancellationToken ct)
+    {
+        var bad = new List<string>();
+        await Task.Run(() =>
+        {
+            foreach (var p in Directory.GetFiles(stage, "*.p3d", SearchOption.AllDirectories).Where(IsOdol))
+                try { refs[p] = Core.P3d.ModelExport.References(Core.P3d.Odol.Read(p)).ToList(); }
+                catch (InvalidDataException e) { bad.Add(Path.GetRelativePath(stage, p) + ": " + e.Message); }
+        }, ct);
+        if (bad.Count == 0)
+        {
+            if (refs.Count > 0) L(c, "pack", Loc.F("Pl.OdolOk", refs.Count), LogLevel.Ok);
+            return null;
+        }
+        foreach (var b in bad) L(c, "pack", b, LogLevel.Err);
+        return Err(c, "pack", Loc.F("Pl.OdolBroken", bad.Count), c.Src, bad.Take(12), "Fix.Odol");
+    }
+
+    private async Task<PipelineError?> CheckReferences(RunCtx c, string stage, string prefix,
+        IReadOnlyDictionary<string, IReadOnlyList<(string, bool)>> odolRefs, CancellationToken ct)
     {
         if (!c.S.Pack.CheckRefs)
         {
             L(c, "pack", Loc.T("Pl.RefsOff"), LogLevel.Info);
             return null;
         }
-        var r = await Task.Run(() => RefCheck.Scan(stage, prefix, PackLayout.WorkRoot(c.Src), FindGameData(c.Src)), ct);
+        var r = await Task.Run(() => RefCheck.Scan(stage, prefix, PackLayout.WorkRoot(c.Src), FindGameData(c.Src), odolRefs), ct);
         if (r.Unchecked.Count > 0) L(c, "pack", Loc.F("Pl.RefsUnchecked", string.Join(", ", r.Unchecked)), LogLevel.Warn);
         foreach (var (model, count) in r.OdolOther) L(c, "pack", Loc.F("Pl.RefsOdolOther", model, count), LogLevel.Warn);
         if (r.Missing.Count == 0)

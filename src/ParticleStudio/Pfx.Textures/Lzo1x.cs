@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Pfx.Textures;
 
 // LZO1X decompression (the format of compressed PAA mip levels): a port of the decompressor of lzokay (MIT, Copyright (c)

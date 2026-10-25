@@ -1,0 +1,266 @@
+<UserControl x:Class="PolyLab.PBOGPacker.Views.ModelsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:PolyLab.PBOGPacker.Controls">
+  <UserControl.Resources>
+    <Style x:Key="Key" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Margin" Value="0,0,14,6"/>
+    </Style>
+    <Style x:Key="Val" TargetType="TextBlock" BasedOn="{StaticResource T.Mono}">
+      <Setter Property="FontSize" Value="12.5"/>
+      <Setter Property="Foreground" Value="{StaticResource B.Text}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Margin" Value="0,0,0,6"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+    <Style x:Key="Cell" TargetType="TextBlock" BasedOn="{StaticResource T.Mono}">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="{StaticResource B.Text}"/>
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+      <Setter Property="Margin" Value="10,2,0,2"/>
+    </Style>
+    <Style x:Key="HeadCell" TargetType="TextBlock" BasedOn="{StaticResource Cell}">
+      <Setter Property="FontFamily" Value="{StaticResource F.Ui}"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="{StaticResource B.Dim}"/>
+    </Style>
+  </UserControl.Resources>
+  <Grid>
+    <Rectangle Fill="#B30A0B0B"/>
+    <Grid Margin="40,22,40,18">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <StackPanel>
+        <TextBlock Text="{DynamicResource Mdl.Title}" Style="{StaticResource T.H1}"/>
+        <TextBlock Text="{DynamicResource Mdl.Sub}" Style="{StaticResource T.Label}" FontSize="15" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+      </StackPanel>
+
+      <DockPanel Grid.Row="1" Margin="0,16,0,14">
+        <Button ToolTip="{DynamicResource Tip.PickModels}" DockPanel.Dock="Right" Style="{StaticResource Btn.Dark}" Command="{Binding PickFolderCmd}" Margin="10,0,0,0" x:Name="Pf">
+          <StackPanel Orientation="Horizontal">
+            <c:Ico Kind="folder" Size="16" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Pf}"/>
+            <TextBlock Text="{DynamicResource Act.PickModels}" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Button ToolTip="{DynamicResource Tip.PickModel}" DockPanel.Dock="Right" Style="{StaticResource Btn.Dark}" Command="{Binding PickFileCmd}" Margin="10,0,0,0" x:Name="Pm">
+          <StackPanel Orientation="Horizontal">
+            <c:Ico Kind="pack" Size="16" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Pm}"/>
+            <TextBlock Text="{DynamicResource Act.PickModel}" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+        <Button ToolTip="{DynamicResource Tip.OpenSource}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Command="{Binding OpenSourceCmd}" Margin="12,0,4,0" x:Name="Os">
+          <c:Ico Kind="arrow" Size="18" Hot="{Binding IsMouseOver, ElementName=Os}"/>
+        </Button>
+        <TextBox Text="{Binding Source, UpdateSourceTrigger=PropertyChanged}" ToolTip="{DynamicResource Mdl.Source}" Height="40" FontFamily="{StaticResource F.Mono}" FontSize="12.5" VerticalContentAlignment="Center">
+          <TextBox.InputBindings>
+            <KeyBinding Key="Enter" Command="{Binding OpenSourceCmd}"/>
+          </TextBox.InputBindings>
+        </TextBox>
+      </DockPanel>
+
+      <Grid Grid.Row="2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="300"/>
+          <ColumnDefinition Width="16"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ContentControl Style="{StaticResource Hud}">
+          <Grid>
+            <ListBox Style="{StaticResource PlainList}" Foreground="{StaticResource B.Text}" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected, Mode=TwoWay}"
+                     ItemContainerStyle="{StaticResource SideItem}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"
+                     Visibility="{Binding HasItems, Converter={StaticResource Vis}}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Margin="-14,0,0,0">
+                    <DockPanel>
+                      <TextBlock DockPanel.Dock="Right" Text="{Binding Size}" Style="{StaticResource T.Mono}" FontSize="11.5" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                      <TextBlock Text="{Binding Name}" FontSize="15" TextTrimming="CharacterEllipsis"/>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Folder}" Style="{StaticResource T.Mono}" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="22" VerticalAlignment="Center" Visibility="{Binding HasItems, Converter={StaticResource Vis}, ConverterParameter=!}">
+              <TextBlock Text="{DynamicResource Mdl.Empty}" Style="{StaticResource T.H2}" HorizontalAlignment="Center"/>
+              <TextBlock Text="{DynamicResource Mdl.EmptyHint}" Style="{StaticResource T.Label}" FontSize="13.5" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"/>
+            </StackPanel>
+          </Grid>
+        </ContentControl>
+
+        <ContentControl Grid.Column="2" Style="{StaticResource Hud}">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" DataContext="{Binding Selected}" Visibility="{Binding Converter={StaticResource Vis}}">
+            <StackPanel Margin="22,16,22,18">
+              <TextBlock Text="{Binding Name}" Style="{StaticResource T.H2}" TextTrimming="CharacterEllipsis"/>
+              <TextBlock Text="{Binding Head}" Style="{StaticResource T.Mono}" FontSize="12" Margin="0,4,0,0"/>
+              <TextBlock Text="{DynamicResource Mdl.Loading}" Style="{StaticResource T.Label}" Margin="0,14,0,0"
+                         Visibility="{Binding IsRead, Converter={StaticResource Vis}, ConverterParameter=!}"/>
+              <Border BorderBrush="{StaticResource B.Err}" BorderThickness="1" Background="{StaticResource B.ErrBg}" Padding="14,10" Margin="0,14,0,0"
+                      Visibility="{Binding HasError, Converter={StaticResource Vis}}">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <c:Ico Kind="warn" Size="16" Foreground="{StaticResource B.Err}" Margin="0,0,8,0"/>
+                    <TextBlock Text="{DynamicResource Mdl.Broken}" FontSize="15" FontWeight="Bold"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding Error}" TextWrapping="Wrap" FontSize="13.5" Margin="0,6,0,0"/>
+                </StackPanel>
+              </Border>
+              <StackPanel Visibility="{Binding HasModel, Converter={StaticResource Vis}}">
+                <Grid Margin="0,16,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+                  <TextBlock Text="{DynamicResource Mdl.Skeleton}" Style="{StaticResource Key}"/>
+                  <TextBlock Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Skeleton}" ToolTip="{Binding Skeleton}" Style="{StaticResource Val}"/>
+                  <TextBlock Grid.Row="1" Text="{DynamicResource Mdl.Mass}" Style="{StaticResource Key}"/>
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Mass}" Style="{StaticResource Val}" Margin="0,0,18,6"/>
+                  <TextBlock Grid.Row="1" Grid.Column="2" Text="{DynamicResource Mdl.Com}" Style="{StaticResource Key}"/>
+                  <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Com}" Style="{StaticResource Val}"/>
+                </Grid>
+                <Rectangle Style="{StaticResource Sep}" Margin="0,4,0,8"/>
+                <Grid Grid.IsSharedSizeScope="True">
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                  </Grid.RowDefinitions>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" MinWidth="120"/>
+                      <ColumnDefinition SharedSizeGroup="a" Width="Auto"/>
+                      <ColumnDefinition SharedSizeGroup="b" Width="Auto"/>
+                      <ColumnDefinition SharedSizeGroup="c" Width="Auto"/>
+                      <ColumnDefinition SharedSizeGroup="d" Width="Auto"/>
+                      <ColumnDefinition SharedSizeGroup="e" Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{DynamicResource Mdl.Lod}" Style="{StaticResource HeadCell}" HorizontalAlignment="Left" Margin="0,2"/>
+                    <TextBlock Grid.Column="1" Text="{DynamicResource Mdl.Vertices}" Style="{StaticResource HeadCell}"/>
+                    <TextBlock Grid.Column="2" Text="{DynamicResource Mdl.Faces}" Style="{StaticResource HeadCell}"/>
+                    <TextBlock Grid.Column="3" Text="{DynamicResource Mdl.Sections}" Style="{StaticResource HeadCell}"/>
+                    <TextBlock Grid.Column="4" Text="{DynamicResource Mdl.Selections}" Style="{StaticResource HeadCell}"/>
+                    <TextBlock Grid.Column="5" Text="{DynamicResource Mdl.Proxies}" Style="{StaticResource HeadCell}"/>
+                  </Grid>
+                  <ItemsControl Grid.Row="1" ItemsSource="{Binding Lods}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid>
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="120"/>
+                            <ColumnDefinition SharedSizeGroup="a" Width="Auto"/>
+                            <ColumnDefinition SharedSizeGroup="b" Width="Auto"/>
+                            <ColumnDefinition SharedSizeGroup="c" Width="Auto"/>
+                            <ColumnDefinition SharedSizeGroup="d" Width="Auto"/>
+                            <ColumnDefinition SharedSizeGroup="e" Width="Auto"/>
+                          </Grid.ColumnDefinitions>
+                          <TextBlock Text="{Binding Name}" Style="{StaticResource Cell}" HorizontalAlignment="Left" Margin="0,2"/>
+                          <TextBlock Grid.Column="1" Text="{Binding Vertices}" Style="{StaticResource Cell}"/>
+                          <TextBlock Grid.Column="2" Text="{Binding Faces}" Style="{StaticResource Cell}"/>
+                          <TextBlock Grid.Column="3" Text="{Binding Sections}" Style="{StaticResource Cell}"/>
+                          <TextBlock Grid.Column="4" Text="{Binding Selections}" Style="{StaticResource Cell}"/>
+                          <TextBlock Grid.Column="5" Text="{Binding Proxies}" Style="{StaticResource Cell}"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Grid>
+                <Rectangle Style="{StaticResource Sep}" Margin="0,10,0,10"/>
+                <WrapPanel DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                  <RadioButton ToolTip="{DynamicResource Tip.MdlList}" Style="{StaticResource Seg}" GroupName="ml" Content="{DynamicResource Mdl.Textures}"
+                               IsChecked="{Binding ListKind, Converter={StaticResource Eq}, ConverterParameter=tex}"/>
+                  <RadioButton ToolTip="{DynamicResource Tip.MdlList}" Style="{StaticResource Seg}" GroupName="ml" Content="{DynamicResource Mdl.Materials}"
+                               IsChecked="{Binding ListKind, Converter={StaticResource Eq}, ConverterParameter=mat}"/>
+                  <RadioButton ToolTip="{DynamicResource Tip.MdlList}" Style="{StaticResource Seg}" GroupName="ml" Content="{DynamicResource Mdl.Selections}"
+                               IsChecked="{Binding ListKind, Converter={StaticResource Eq}, ConverterParameter=sel}"/>
+                  <RadioButton ToolTip="{DynamicResource Tip.MdlList}" Style="{StaticResource Seg}" GroupName="ml" Content="{DynamicResource Mdl.BonesList}"
+                               IsChecked="{Binding ListKind, Converter={StaticResource Eq}, ConverterParameter=bone}"/>
+                  <RadioButton ToolTip="{DynamicResource Tip.MdlList}" Style="{StaticResource Seg}" GroupName="ml" Content="{DynamicResource Mdl.Anims}"
+                               IsChecked="{Binding ListKind, Converter={StaticResource Eq}, ConverterParameter=anim}"/>
+                </WrapPanel>
+                <ItemsControl DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}" ItemsSource="{Binding CurrentList}" Margin="0,10,0,0">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding}" Style="{StaticResource T.Mono}" FontSize="12" Foreground="{StaticResource B.Text}" TextTrimming="CharacterEllipsis" Margin="0,1"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
+        </ContentControl>
+      </Grid>
+
+      <Grid Grid.Row="3" Margin="0,14,0,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel VerticalAlignment="Center" Margin="0,0,16,0">
+          <TextBlock DockPanel.Dock="Left" Text="{DynamicResource Mdl.Out}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+          <Button ToolTip="{DynamicResource Tip.MdlOutReset}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Command="{Binding ResetOutCmd}" Margin="12,0,0,0" x:Name="Or">
+            <c:Ico Kind="restore" Size="16" Hot="{Binding IsMouseOver, ElementName=Or}"/>
+          </Button>
+          <Button ToolTip="{DynamicResource Tip.OutFolder}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Command="{Binding PickOutCmd}" Margin="12,0,0,0" x:Name="Po">
+            <StackPanel Orientation="Horizontal">
+              <c:Ico Kind="folder" Size="16" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=Po}"/>
+              <TextBlock Text="{DynamicResource Act.OtherFolder}"/>
+            </StackPanel>
+          </Button>
+          <TextBlock Text="{Binding OutText}" ToolTip="{Binding OutText}" Style="{StaticResource T.Mono}" FontSize="12" Foreground="{StaticResource B.Text}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+        </DockPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button ToolTip="{DynamicResource Tip.ToMlod}" Style="{StaticResource Btn.Sand}" Command="{Binding ExportCmd}" CommandParameter="all" x:Name="Tm">
+            <StackPanel Orientation="Horizontal">
+              <c:Ico Kind="download" Size="17" Foreground="{StaticResource B.SandInk}" Margin="0,0,8,0" Hot="{Binding IsMouseOver, ElementName=Tm}"/>
+              <TextBlock Text="{DynamicResource Act.ToMlod}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+          <Button ToolTip="{DynamicResource Tip.ModelCfg}" Style="{StaticResource Btn.Dark}" Command="{Binding ExportCmd}" CommandParameter="cfg" Margin="10,0,0,0"
+                  Content="{DynamicResource Act.ModelCfg}"/>
+          <Button ToolTip="{DynamicResource Tip.Rvmats}" Style="{StaticResource Btn.Dark}" Command="{Binding ExportCmd}" CommandParameter="rvmat" Margin="10,0,0,0"
+                  Content="{DynamicResource Act.Rvmats}"/>
+          <Button ToolTip="{DynamicResource Tip.ConvertAll}" Style="{StaticResource Btn.Dark}" Command="{Binding ExportAllCmd}" Margin="10,0,0,0"
+                  Content="{DynamicResource Act.ConvertAll}"/>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Grid.Row="4" Margin="0,10,0,0">
+        <DockPanel>
+          <Button ToolTip="{DynamicResource Tip.OpenOut}" DockPanel.Dock="Right" Style="{StaticResource Btn.Link}" Command="{Binding OpenOutCmd}" Margin="12,0,0,0" x:Name="Oo"
+                  Visibility="{Binding HasOut, Converter={StaticResource Vis}}">
+            <StackPanel Orientation="Horizontal">
+              <c:Ico Kind="ext" Size="15" Margin="0,0,6,0" Hot="{Binding IsMouseOver, ElementName=Oo}"/>
+              <TextBlock Text="{DynamicResource Act.OpenFolder}"/>
+            </StackPanel>
+          </Button>
+          <TextBlock Text="{Binding Status}" Style="{StaticResource T.Label}" FontSize="13.5" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+        </DockPanel>
+        <ScrollViewer MaxHeight="72" VerticalScrollBarVisibility="Auto" Margin="0,6,0,0" Visibility="{Binding HasNotes, Converter={StaticResource Vis}}">
+          <ItemsControl ItemsSource="{Binding Notes}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <DockPanel Margin="0,1">
+                  <c:Ico Kind="warn" Size="13" Foreground="{StaticResource B.Warn}" Margin="0,2,7,0" VerticalAlignment="Top"/>
+                  <TextBlock Text="{Binding}" FontSize="13" TextWrapping="Wrap" Foreground="{StaticResource B.Text}"/>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</UserControl>

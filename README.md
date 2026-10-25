@@ -7,7 +7,7 @@ Free, open-source tools for DayZ modding, for Windows. The interface is in Engli
 | Program | What it does |
 |---|---|
 | **Poly Lab** (`PolyLab.exe`) | The launcher. Installs, updates and starts the tools from this repository's GitHub releases, and downloads GRAFT for PBOG Packer. |
-| **PBOG Packer** (`PBOG_Packer.exe`) | Packs and signs client and server mods like pboProject (configs, rvmats and models binarized), builds native server plugins on [GRAFT](https://github.com/KRdayzmodding/KR_GRAFTED) from C++, deploys to a local server, edits the server's `-mod` / `-serverMod` lines and starts or stops it. |
+| **PBOG Packer** (`PBOG_Packer.exe`) | Packs and signs client and server mods like pboProject (configs, rvmats and models binarized), builds native server plugins on [GRAFT](https://github.com/KRdayzmodding/KR_GRAFTED) from C++, deploys to a local server, edits the server's `-mod` / `-serverMod` lines and starts or stops it. Reads DayZ 1.30's binarized models (ODOL 54–56): checks them when packing, shows their details and turns them into editable MLOD with `model.cfg` and the rvmats they carry. |
 | **Particle Studio** (`Particle_Studio.exe`) | Editor for DayZ particle effects (`.ptc`): emitters, curves, textures, ready-made recipes, a live viewport, import of X-Ray (S.T.A.L.K.E.R.) effects and a live link that shows the effect in the running game. **In development:** no release builds for now and not offered by the launcher; build it from source. |
 
 ## Install
@@ -82,6 +82,10 @@ Programs can render a window to a PNG without user data, for layout checks:
 `Particle_Studio.exe effect.ptc --checks <out> --settings-dir <tmp>` (its own UI checks: screenshots in the three
 languages at three sizes, clipped text, tooltips).
 
+What the Models page does also runs without a window, on one model or a folder of them:
+`PBOG_Packer.exe --odol <log> --do check|info|mlod|cfg|rvmat --in <p3d or folder> [--out <folder>]` (exit code 0 when no
+model failed). `tests/PBOGPacker.Tests/Models/make_models.py` rebuilds the test models with your DayZ Tools.
+
 ## Releases
 
 Every push and pull request is built and tested by GitHub Actions (`.github/workflows/ci.yml`). A tag `<id>-v<version>`
@@ -119,7 +123,8 @@ Poly Lab — бесплатные инструменты с открытым к�
   GitHub и скачивает GRAFT для PBOG Packer.
 - **PBOG Packer** (`PBOG_Packer.exe`) — упаковка и подпись клиентских и серверных модов как в pboProject (с бинаризацией
   конфигов, rvmat и моделей), сборка нативных серверных плагинов на GRAFT из C++, деплой на локальный сервер, правка
-  строк `-mod` / `-serverMod` в батнике, запуск и остановка сервера.
+  строк `-mod` / `-serverMod` в батнике, запуск и остановка сервера. Читает бинаризованные модели DayZ 1.30 (ODOL 54–56):
+  проверяет их при упаковке, показывает сведения и переводит в редактируемый MLOD с `model.cfg` и вшитыми rvmat.
 - **Particle Studio** (`Particle_Studio.exe`) — редактор частиц DayZ (`.ptc`): эмиттеры, кривые, текстуры, готовые
   решения, живой предпросмотр, импорт эффектов X-Ray (S.T.A.L.K.E.R.) и связь с запущенной игрой. **В разработке:**
   готовых сборок пока нет и лаунчер её не предлагает; можно собрать из исходников.

@@ -19,6 +19,17 @@ public partial class App : Application
         vm?.Toast("err", e.GetType().Name, e.Message);
     }
 
+    private static IEnumerable<string> OdolInfo(Core.P3d.OdolModel m)
+    {
+        yield return $"  skeleton={m.Skeleton} bones={m.Bones.Length} anims={m.Animations.Length} mass={m.Mass} dayz56={m.DayZ56}";
+        foreach (var l in m.Lods)
+        {
+            yield return $"  lod {Core.P3d.Odol.LodName(l.Resolution)} vertices={l.Positions.Length} faces={l.Faces.Length} sections={l.Sections.Length} selections={l.Selections.Length} proxies={l.Proxies.Length}";
+            foreach (var mat in l.Materials)
+                yield return $"    mat {mat.Path} ps={mat.PixelShader} vs={mat.VertexShader} light={mat.MainLight} fog={mat.FogMode} flags={mat.RenderFlags} stages={mat.Stages.Length}";
+        }
+    }
+
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -80,6 +91,48 @@ public partial class App : Application
             catch (Exception ex) { lines.Add("ERROR " + ex.Message); exitCode = 3; }
             File.WriteAllLines(plog, lines);
             Shutdown(exitCode);
+            return;
+        }
+
+        // --odol <log> --do check|info|mlod|cfg|rvmat --in <p3d or folder> [--out <dir>]: what the Models page does,
+        // for every ODOL found. Exit code 0 when no model failed.
+        if (Arg("--odol") is { } olog && Arg("--in") is { } oin)
+        {
+            var lines = new List<string>();
+            var failed = 0;
+            var files = Directory.Exists(oin) ? Directory.GetFiles(oin, "*.p3d", SearchOption.AllDirectories) : [oin];
+            var what = Arg("--do") ?? "check";
+            foreach (var f in files)
+            {
+                try
+                {
+                    var head = new byte[4];
+                    using (var fs = File.OpenRead(f)) fs.ReadExactly(head);
+                    if (!Core.P3d.Odol.IsOdol(head)) continue;
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    if (what is "check" or "info")
+                    {
+                        var m = Core.P3d.Odol.Read(f);
+                        lines.Add($"OK {f} v{m.Version} lods={m.Lods.Length} ms={sw.ElapsedMilliseconds}");
+                        if (what == "info") lines.AddRange(OdolInfo(m));
+                        continue;
+                    }
+                    var parts = what switch { "cfg" => Core.P3d.ModelExport.Parts.Cfg, "rvmat" => Core.P3d.ModelExport.Parts.Rvmats, _ => Core.P3d.ModelExport.Parts.All };
+                    var outDir = Arg("--out") is { } od ? Core.P3d.ModelExport.OutUnder(od, f) : null;
+                    var r = Core.P3d.ModelExport.Export(f, outDir, parts);
+                    lines.Add($"OK {f} ms={sw.ElapsedMilliseconds}");
+                    lines.AddRange(r.Written.Select(w => "  wrote " + w));
+                    lines.AddRange(r.Notes.Select(n => "  note " + n));
+                }
+                catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+                {
+                    failed++;
+                    lines.Add($"ERR {f} {ex.Message}");
+                }
+            }
+            lines.Add($"DONE files={files.Length} failed={failed}");
+            File.WriteAllLines(olog, lines);
+            Shutdown(failed == 0 ? 0 : 1);
             return;
         }
 
@@ -246,6 +299,7 @@ public partial class App : Application
                 break;
         }
         if (Arg("--page") is { } page) vm.Page = page;
+        if (Arg("--models") is { } models) await vm.Models.OpenAsync(models);
         if (args.Contains("--opts")) vm.OptionsOpen = true;
         if (Arg("--srvstate") is { } sst && vm.Servers.FirstOrDefault() is { } ss0)
         {

@@ -49,6 +49,7 @@ public sealed class MainViewModel : ObservableObject
     public MainViewModel(IGraftBackend backend)
     {
         _backend = backend;
+        Models = new ModelsVM(backend);
         Steps = new ObservableCollection<StepVM>(Core.Steps.Ids.Select((id, i) => new StepVM(id, i, this)));
         LogView = CollectionViewSource.GetDefaultView(Log);
         LogView.Filter = o => o is LogLineVM l && (_logFilter == "all" || (_logFilter == "warn" ? l.Level is "warn" or "err" : l.Level == "err"));
@@ -69,6 +70,7 @@ public sealed class MainViewModel : ObservableObject
             foreach (var s in Steps) s.Touch();
             foreach (var s in Servers) s.RaiseAll();
             foreach (var d in Doctor) d.RaiseAll();
+            Models.Refresh();
             RaiseAll();
         };
 
@@ -187,6 +189,7 @@ public sealed class MainViewModel : ObservableObject
     public ObservableCollection<ModVM> Mods { get; } = new();
     public ObservableCollection<ServerVM> Servers { get; } = new();
     public ObservableCollection<KeyVM> Keys { get; } = new();
+    public ModelsVM Models { get; }
     public ObservableCollection<DoctorVM> Doctor { get; } = new();
     public ObservableCollection<StepVM> Steps { get; }
     public ObservableCollection<LogLineVM> Log { get; } = new();
@@ -270,7 +273,8 @@ public sealed class MainViewModel : ObservableObject
     public ICommand PickOutCmd { get; }
     public ICommand ResetOutCmd { get; }
 
-    public string PageBackground => $"pack://application:,,,/PBOG_Packer;component/Assets/Photos/bg_{Page}.jpg";
+    // The Models page shares the build page's photo.
+    public string PageBackground => $"pack://application:,,,/PBOG_Packer;component/Assets/Photos/bg_{(Page == "models" ? "build" : Page)}.jpg";
 
     public IReadOnlyList<PhotoCredit> Credits { get; } = LoadCredits();
 

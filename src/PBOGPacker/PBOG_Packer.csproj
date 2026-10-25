@@ -21,6 +21,7 @@
     <None Remove="tools\**" />
     <Compile Include="..\Ui\Core\DataFolder.cs" Link="Core\DataFolder.cs" />
     <Compile Include="..\Ui\Core\UiLanguage.cs" Link="Core\UiLanguage.cs" />
+    <Compile Include="..\ParticleStudio\Pfx.Textures\Lzo1x.cs" Link="Core\P3d\Lzo1x.cs" />
     <Resource Include="Assets\Fonts\*.otf" />
     <Resource Include="Assets\Fonts\*.ttf" />
     <Resource Include="Assets\Art\*.png" />

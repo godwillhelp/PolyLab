@@ -38,7 +38,8 @@ shared framework (`FrameworkReference Microsoft.AspNetCore.App`, MIT), not a pac
 
 ### lzokay — `src/ParticleStudio/Pfx.Textures/Lzo1x.cs`
 
-The LZO1X decompressor is a C# port of the decompressor of [lzokay](https://github.com/jackoalan/lzokay).
+The LZO1X decompressor is a C# port of the decompressor of [lzokay](https://github.com/jackoalan/lzokay). PBOG Packer
+compiles the same file in (linked, for the arrays of binarized models).
 
 ```
 The MIT License
@@ -159,6 +160,8 @@ byte-identical copies of the PBOG Packer files of the same name.
 - `tests/PolyLab.Launcher.Tests/Golden/github_releases.json`: two entries of the public GitHub API release list of
   GRAFT (KR_GRAFTED), with the author / uploader objects removed and the release notes replaced; it checks that the
   launcher reads GitHub's field names.
+- `tests/PBOGPacker.Tests/Models`: two test models built from scratch by `make_models.py` (MLOD sources, model.cfg,
+  rvmats) and the output of the user's own DayZ Tools binarize for them; the rvmats name only procedural textures.
 
 ## Game knowledge, not game data
 
@@ -171,6 +174,11 @@ with DayZ:
   performs, measured with RenderDoc.
 - `src/ParticleStudio/Pfx.Sim/XRay`, `Pfx.XRay`: readers and a simulator for X-Ray (S.T.A.L.K.E.R.) particle files,
   written from the file formats and observed behaviour.
+- `src/PBOGPacker/Core/P3d`: reader of binarized models (ODOL 54-56) and writer of editable ones (MLOD), written for
+  this repository from the published layout of older ODOL versions (as the MIT-licensed bis-file-formats project
+  describes them), checked byte by byte against DayZ
+  1.30's own models and models built with DayZ Tools' binarize. The shader and render-flag names come from DayZ's own
+  rvmats. DeODOL56 (author unknown, no source) was used only to compare results; nothing of it is in the repository.
 
 ## External tools (not shipped)
 

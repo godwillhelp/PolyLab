@@ -10,9 +10,10 @@ namespace PolyLab.PBOGPacker.Core;
 // A path is a string with a folder separator and a known file extension, as Mikero's tools count it;
 // samples[] (sounds without extension) and files[] (script folders unless the entry has an extension)
 // are checked by their array name.
-// Texts give the line, MLOD models the LOD. Binarized models (ODOL) and rapified rvmats only keep their
-// strings: BI's own ODOLs name files the game never shipped and every ODOL carries its materials inside,
-// so only a missing texture of the mod itself is an error there; the rest is counted.
+// Texts give the line, MLOD models the LOD. Binarized models (ODOL) give the files they name as read by the model
+// check (textures, materials and their stages, surfaces, proxies); rapified rvmats only keep their strings. BI's own
+// ODOLs name files the game never shipped and every ODOL carries its materials inside, so only a missing file of the
+// mod itself other than a material is an error there; the rest is counted.
 public static class RefCheck
 {
     public sealed record Finding(string File, int Line, string? Lod, string Ref)
@@ -43,7 +44,8 @@ public static class RefCheck
         (3e15, "Roadway"), (4e15, "Paths"), (5e15, "HitPoints"), (6e15, "View Geometry"), (7e15, "Fire Geometry"),
     };
 
-    public static Report Scan(string stage, string prefix, string? work, string? game)
+    public static Report Scan(string stage, string prefix, string? work, string? game,
+        IReadOnlyDictionary<string, IReadOnlyList<(string Path, bool Material)>>? odol = null)
     {
         var missing = new List<Finding>();
         var other = new List<(string, int)>();
@@ -122,11 +124,13 @@ public static class RefCheck
             else if (ext == ".p3d" || magic == "\0raP")
             {
                 var foreign = 0;
-                foreach (var r in Asciiz(data).Distinct(StringComparer.OrdinalIgnoreCase))
+                var names = ext == ".p3d" && odol != null && odol.TryGetValue(file, out var exact) ? exact
+                    : Asciiz(data).Select(s => (s, s.EndsWith(".rvmat", StringComparison.OrdinalIgnoreCase))).ToList();
+                foreach (var (r, material) in names.DistinctBy(n => n.Item1, StringComparer.OrdinalIgnoreCase))
                 {
                     if (Normalize(r, Kind.File) is not { } path || Exists(path, Kind.File, out var own) != false) continue;
                     // An ODOL carries its materials inside, so only a missing texture or other file of the mod counts.
-                    if (ext != ".p3d" || own && !path.EndsWith(".rvmat", StringComparison.OrdinalIgnoreCase)) missing.Add(new Finding(rel, 0, null, r));
+                    if (ext != ".p3d" || own && !material) missing.Add(new Finding(rel, 0, null, r));
                     else foreign++;
                 }
                 if (foreign > 0) other.Add((rel, foreign));
