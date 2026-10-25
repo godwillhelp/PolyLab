@@ -186,7 +186,8 @@ public class InstallerTests(RealBuilds real) : IClassFixture<RealBuilds>
             }
         }
 
-        Assert.True(inst.Uninstall(Pbog).Ok);
+        var removed = inst.Uninstall(Pbog);
+        Assert.True(removed.Ok, $"{removed.Error} {removed.Detail}");
         Assert.Null(inst.Installed("pbog"));
         AssertOnlyInstalled(root);
     }

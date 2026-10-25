@@ -42,12 +42,11 @@
     <ProjectReference Include="..\..\Ui\PolyLab.Ui.csproj" />
   </ItemGroup>
 
-  <!-- Written beside the tool on first use (Core/Payload.cs). The link mod's PBO
-       comes from link\pack.ps1 -Out link\dist; a build without it has no link mod to hand out. -->
+  <!-- Written beside the tool on first use (Core/Payload.cs). The link mod's PBO is packed by the build (PfxLink.targets). -->
   <ItemGroup>
     <EmbeddedResource Include="Tools\pfx_upscale.py" LogicalName="pfx_upscale.py" />
-    <EmbeddedResource Include="..\..\..\link\dist\@PolyLab_PfxLink\addons\PolyLab_PfxLink.pbo" LogicalName="PolyLab_PfxLink.pbo"
-                      Condition="Exists('..\..\..\link\dist\@PolyLab_PfxLink\addons\PolyLab_PfxLink.pbo')" />
   </ItemGroup>
+
+  <Import Project="..\..\..\link\PfxLink.targets" />
 
 </Project>

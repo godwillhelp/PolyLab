@@ -1,0 +1,40 @@
+name: Release
+
+# A tag <id>-v<semver> (pbog-v0.2.0, pfx-v0.1.0-beta.1, launcher-v1.0.0) builds that program and attaches its zip, and
+# for the launcher the installer, to the release of that tag. The release is created from the tag's message when it does
+# not exist yet; a version with a "-" suffix is marked as a prerelease (shown as Beta in the launcher).
+on:
+  push:
+    tags: ['pbog-v*', 'pfx-v*', 'launcher-v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - run: dotnet build PolyLab.slnx -c Release
+      - run: dotnet test PolyLab.slnx -c Release --no-build
+      - name: Package and attach
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $id, $version = $env:TAG -split '-v', 2
+          $r = ./tools/release.ps1 -Id $id -Version $version -Out dist
+          gh release view $env:TAG *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $env:TAG @($r.Files) --clobber
+          } else {
+            $pre = if ($r.Prerelease) { @('--prerelease') } else { @() }
+            gh release create $env:TAG @($r.Files) --verify-tag --title $r.Title --notes-from-tag @pre
+          }
+          if ($LASTEXITCODE -ne 0) { exit 1 }

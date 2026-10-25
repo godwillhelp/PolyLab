@@ -46,7 +46,7 @@ public static class Packages
     public const string Config = "Release";
 #endif
 
-    // The tool exe as the solution build left it in this configuration (Release PBOG sits one level deeper, in win-x64).
+    // The tool exe as the solution build left it in this configuration.
     public static string BuildOutput(string project, string exe)
     {
         var bin = Path.Combine(RepoRoot, project, "bin", Config);

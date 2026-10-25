@@ -25,6 +25,16 @@ Restored at build time, not stored in the repository. Licences as stated in each
 The launcher tests also use ASP.NET Core (Kestrel) for a local fake of the GitHub releases API; it is part of the .NET
 shared framework (`FrameworkReference Microsoft.AspNetCore.App`, MIT), not a package, and is not shipped.
 
+## In the release files
+
+- **.NET runtime and WPF** (MIT, © .NET Foundation and contributors; their third-party notices are in the
+  [dotnet/runtime](https://github.com/dotnet/runtime/blob/main/THIRD-PARTY-NOTICES.TXT) and
+  [dotnet/wpf](https://github.com/dotnet/wpf/blob/main/THIRD-PARTY-NOTICES.TXT) repositories): every exe in the release
+  zips is published self-contained, so the runtime is bundled inside it.
+- **Inno Setup** ([Inno Setup License](https://jrsoftware.org/files/is/license.txt), © Jordan Russell and Martijn Laan):
+  `PolyLab-<version>-setup.exe` is built with it from `installer/PolyLab.iss` and contains its setup program and the
+  Russian / Ukrainian message files. Only the script is in the repository.
+
 ## Code ported from other projects
 
 ### lzokay — `src/ParticleStudio/Pfx.Textures/Lzo1x.cs`

@@ -1,0 +1,202 @@
+<Project>
+
+  <!-- Packs link\PolyLab_PfxLink into PolyLab_PfxLink.pbo while Particle Studio builds, so the exe always carries the mod
+       as it is in the source and no DayZ Tools are needed. Layout as MakePbo writes it (prefix and version in the header,
+       files stored, SHA-1 at the end); config.cpp stays text as with AddonBuilder -packonly, the game reads both.
+       Config mistakes fail the build with file and line. PfxLinkSource can point at another folder for a check. -->
+  <UsingTask TaskName="PackPfxLink" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs"><![CDATA[
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+
+public class PackPfxLink : Task
+{
+    [Required] public string Source { get; set; }
+    [Required] public string Prefix { get; set; }
+    [Required] public string Output { get; set; }
+
+    public override bool Execute()
+    {
+        string root = Path.GetFullPath(Source).TrimEnd('\\', '/');
+        string config = Path.Combine(root, "config.cpp");
+        if (!File.Exists(config))
+        {
+            Error(config, 0, "the mod has no config.cpp");
+            return false;
+        }
+        CheckConfig(root, config);
+        if (Log.HasLoggedErrors)
+            return false;
+
+        List<string> files = Directory.GetFiles(root, "*", SearchOption.AllDirectories)
+            .Select(f => f.Substring(root.Length + 1))
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        // Times come from the files, so the same source gives the same bytes and the build stays incremental.
+        DateTime newest = files.Max(f => File.GetLastWriteTimeUtc(Path.Combine(root, f)));
+        var pbo = new MemoryStream();
+        Name(pbo, "");
+        U32(pbo, 0x56657273); U32(pbo, 0); U32(pbo, 0); U32(pbo, 0); U32(pbo, 0);
+        Name(pbo, "prefix"); Name(pbo, Prefix);
+        Name(pbo, "version"); Name(pbo, newest.ToString("yyMMddHH"));
+        Name(pbo, "");
+        foreach (string f in files)
+        {
+            var info = new FileInfo(Path.Combine(root, f));
+            Name(pbo, f.Replace('/', '\\'));
+            U32(pbo, 0); U32(pbo, (uint)info.Length); U32(pbo, 0); U32(pbo, Unix(info.LastWriteTimeUtc)); U32(pbo, (uint)info.Length);
+        }
+        Name(pbo, "");
+        U32(pbo, 0); U32(pbo, 0); U32(pbo, 0); U32(pbo, 0); U32(pbo, 0);
+        foreach (string f in files)
+        {
+            byte[] data = File.ReadAllBytes(Path.Combine(root, f));
+            pbo.Write(data, 0, data.Length);
+        }
+        byte[] hash;
+        using (SHA1 sha = SHA1.Create())
+            hash = sha.ComputeHash(pbo.GetBuffer(), 0, (int)pbo.Length);
+        pbo.WriteByte(0);
+        pbo.Write(hash, 0, hash.Length);
+
+        byte[] bytes = pbo.ToArray();
+        if (File.Exists(Output) && File.ReadAllBytes(Output).SequenceEqual(bytes))
+            return true;
+        Directory.CreateDirectory(Path.GetDirectoryName(Output));
+        File.WriteAllBytes(Output, bytes);
+        Log.LogMessage(MessageImportance.High, "PolyLab_PfxLink -> " + Output);
+        return true;
+    }
+
+    // Enough of the config grammar for the mistakes the game reports late or not at all: unclosed strings and comments,
+    // unbalanced braces, a closing brace without its semicolon, and script folders that are not in the mod.
+    private void CheckConfig(string root, string path)
+    {
+        string text = File.ReadAllText(path);
+        // Line of each open brace, and whether it opened an array (after "=", "," or an array's brace) or a class body.
+        var opened = new Stack<KeyValuePair<int, bool>>();
+        int line = 1;
+        for (int i = 0; i < text.Length; i++)
+        {
+            char c = text[i];
+            if (c == '\n')
+                line++;
+            else if (c == '/' && i + 1 < text.Length && text[i + 1] == '/')
+            {
+                while (i + 1 < text.Length && text[i + 1] != '\n')
+                    i++;
+            }
+            else if (c == '/' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                int end = text.IndexOf("*/", i + 2, StringComparison.Ordinal);
+                if (end < 0)
+                {
+                    Error(path, line, "comment is never closed");
+                    return;
+                }
+                line += text.Substring(i, end - i).Count(ch => ch == '\n');
+                i = end + 1;
+            }
+            else if (c == '"')
+            {
+                // A doubled quote inside a string is an escaped quote.
+                i++;
+                while (i < text.Length && text[i] != '\n')
+                {
+                    if (text[i] == '"')
+                    {
+                        if (i + 1 < text.Length && text[i + 1] == '"')
+                            i++;
+                        else
+                            break;
+                    }
+                    i++;
+                }
+                if (i >= text.Length || text[i] != '"')
+                {
+                    Error(path, line, "string is never closed");
+                    return;
+                }
+            }
+            else if (c == '{')
+            {
+                int prev = i - 1;
+                while (prev >= 0 && char.IsWhiteSpace(text[prev]))
+                    prev--;
+                bool array = prev >= 0 && (text[prev] == '=' || text[prev] == ',' || (text[prev] == '{' && opened.Count > 0 && opened.Peek().Value));
+                opened.Push(new KeyValuePair<int, bool>(line, array));
+            }
+            else if (c == '}')
+            {
+                if (opened.Count == 0)
+                {
+                    Error(path, line, "closing brace without an opening one");
+                    return;
+                }
+                opened.Pop();
+                bool inArray = opened.Count > 0 && opened.Peek().Value;
+                int next = i + 1;
+                while (next < text.Length && char.IsWhiteSpace(text[next]))
+                    next++;
+                if (next >= text.Length || (inArray ? ",}/" : ";/").IndexOf(text[next]) < 0)
+                    Error(path, line, "closing brace is not followed by a semicolon");
+            }
+        }
+        if (opened.Count > 0)
+            Error(path, opened.Peek().Key, "brace opened on this line is never closed");
+
+        foreach (Match m in Regex.Matches(text, @"files\s*\[\s*\]\s*=\s*\{([^}]*)\}"))
+            foreach (Match f in Regex.Matches(m.Groups[1].Value, "\"([^\"]*)\""))
+            {
+                int at = text.Take(m.Groups[1].Index + f.Index).Count(ch => ch == '\n') + 1;
+                string rel = f.Groups[1].Value.Replace('\\', '/').TrimStart('/');
+                if (!rel.StartsWith(Prefix + "/", StringComparison.OrdinalIgnoreCase))
+                    Error(path, at, "script path " + rel + " is outside the mod prefix " + Prefix);
+                else
+                {
+                    string target = Path.Combine(root, rel.Substring(Prefix.Length + 1));
+                    if (!Directory.Exists(target) && !File.Exists(target))
+                        Error(path, at, "script path " + rel + " is not in the mod");
+                }
+            }
+    }
+
+    private void Error(string file, int line, string message) =>
+        Log.LogError(null, "PFXLINK", null, file, line, 0, 0, 0, message);
+
+    private static void Name(Stream s, string name)
+    {
+        byte[] b = Encoding.ASCII.GetBytes(name);
+        s.Write(b, 0, b.Length);
+        s.WriteByte(0);
+    }
+
+    private static void U32(Stream s, uint v) => s.Write(BitConverter.GetBytes(v), 0, 4);
+
+    private static uint Unix(DateTime utc) => (uint)(utc - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="PackPfxLink" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <PfxLinkSource Condition="'$(PfxLinkSource)' == ''">$(MSBuildThisFileDirectory)PolyLab_PfxLink</PfxLinkSource>
+      <PfxLinkPbo>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)PolyLab_PfxLink.pbo</PfxLinkPbo>
+    </PropertyGroup>
+    <PackPfxLink Source="$(PfxLinkSource)" Prefix="PolyLab_PfxLink" Output="$(PfxLinkPbo)" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(PfxLinkPbo)" LogicalName="PolyLab_PfxLink.pbo" />
+      <FileWrites Include="$(PfxLinkPbo)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

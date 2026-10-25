@@ -35,7 +35,8 @@ Packer's settings.
 
 ## Build from source
 
-You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) on Windows.
+You need the [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer on Windows (it reads the `.slnx`
+solution; the programs target .NET 8).
 
 ```
 git clone <this repository>
@@ -50,14 +51,10 @@ dotnet build PolyLab.slnx -c Release
 | `src/ParticleStudio/Pfx.App` | `Particle_Studio.exe` (with `Pfx.Core`, `Pfx.Sim`, `Pfx.Render`, `Pfx.Textures`, `Pfx.XRay`, `Pfx.Link`) |
 | `src/Ui` | `PolyLab.Ui`, the shared theme and controls |
 
-**Live-link mod.** Particle Studio carries the small DayZ mod `@PolyLab_PfxLink` inside its exe and hands it out on
-first use. Pack it before building Particle Studio (needs DayZ Tools):
-
-```
-powershell -File link/pack.ps1 -Out link/dist
-```
-
-A build without `link/dist` works, but has no live-link mod to hand out.
+**Live-link mod.** Particle Studio carries the small DayZ mod `@PolyLab_PfxLink` (`link/PolyLab_PfxLink`) inside its exe
+and hands it out on first use. The build packs it into a PBO itself (`link/PfxLink.targets`, no DayZ Tools needed) and
+stops with file and line on config mistakes: unclosed strings, comments or braces, a missing semicolon after a closing
+brace, script folders that are not in the mod.
 
 **Interface texts** live in `Lang/en.xaml`, `ru.xaml` and `uk.xaml` of each program; all three must have the same keys
 (the tests check it). Particle Studio's tables can be merged with `tools/ParticleStudio/lang/merge_lang.py`.
@@ -83,6 +80,22 @@ Programs can render a window to a PNG without user data, for layout checks:
 `PBOG_Packer.exe --shot out.png --size 1280x720 --lang en` (mock data; set `POLYLAB_STATE_DIR` to an empty folder);
 `Particle_Studio.exe effect.ptc --checks <out> --settings-dir <tmp>` (its own UI checks: screenshots in the three
 languages at three sizes, clipped text, tooltips).
+
+## Releases
+
+Every push and pull request is built and tested by GitHub Actions (`.github/workflows/ci.yml`). A tag `<id>-v<version>`
+publishes one program (`release.yml`): `pbog`, `pfx` or `launcher`, version `x.y.z`, or `x.y.z-beta.1` for a prerelease
+that the launcher marks as Beta. The tag's message becomes the release notes, which the launcher shows as news:
+
+```
+git tag -a pbog-v0.2.1 -m "What changed"
+git push origin pbog-v0.2.1
+```
+
+The workflow builds and tests the solution, then `tools/release.ps1` publishes the program self-contained (no .NET
+needed on the user's machine), writes `tool.json` and attaches `<Exe>-<version>-win-x64.zip`; the launcher's release also
+gets `PolyLab-<version>-setup.exe` (Inno Setup, `installer/PolyLab.iss`, installs per user without admin rights). The
+same script runs locally: `powershell -File tools/release.ps1 -Id pfx -Version 0.1.0 -Out dist`.
 
 ## Licence
 
@@ -119,8 +132,10 @@ Poly Lab — бесплатные инструменты с открытым к�
 **GRAFT** (автор 6wingSeraph, GPL-3.0-or-later с исключением для плагинов) в репозиторий не входит. PBOG Packer
 закрепляет поддерживаемый релиз GRAFT, лаунчер скачивает именно его с GitHub и сверяет контрольную сумму.
 
-**Сборка из исходников.** Нужен .NET 8 SDK: `dotnet build PolyLab.slnx -c Release`. Мод связи с игрой для Particle Studio
-пакуется заранее командой `powershell -File link/pack.ps1 -Out link/dist` (нужны DayZ Tools). Тесты: `dotnet test
+**Сборка из исходников.** Нужен .NET SDK 9.0.200 или новее: `dotnet build PolyLab.slnx -c Release`. Мод связи с игрой
+для Particle Studio сборка пакует сама (DayZ Tools не нужны) и останавливается с файлом и строкой при ошибке в конфиге.
+**Релизы** выпускаются тегом `<id>-v<версия>` (`pbog`, `pfx`, `launcher`; суффикс `-beta.1` — бета), текст тега
+становится заметками релиза; GitHub Actions собирает, тестирует и прикладывает zip (у лаунчера ещё установщик). Тесты: `dotnet test
 PolyLab.slnx`; тесты с сетью, сквозной тест и тесты на корпусе файлов включаются переменными из таблицы выше.
 
 **Лицензия** — MIT, сторонние шрифты, фото и код — в [THIRD_PARTY.md](THIRD_PARTY.md).

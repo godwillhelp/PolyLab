@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v7
+      # The SDK reads PolyLab.slnx; the .NET 8 runtime runs the tests.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - run: dotnet build PolyLab.slnx -c Release
+      - run: dotnet test PolyLab.slnx -c Release --no-build

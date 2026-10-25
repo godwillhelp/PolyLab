@@ -6,10 +6,8 @@ public sealed record ToolInfo(string Id, string Name, string Abbrev, string Exe,
 
 public static class Catalog
 {
-    // owner/repo of the Poly Lab releases. The account is chosen in pipeline phase O5; until then this name cannot
-    // exist on GitHub (no underscores in logins), so the launcher shows "repository not found" instead of reading
-    // a stranger's repo.
-    public const string Repo = "unset_owner/PolyLab";
+    // owner/repo of the Poly Lab releases.
+    public const string Repo = "godwillhelp/PolyLab";
     public const string ReleasesUrl = "https://api.github.com/repos/" + Repo + "/releases?per_page=100";
     public const string GraftApi = "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED";
 

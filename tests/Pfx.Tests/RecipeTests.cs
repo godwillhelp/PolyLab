@@ -556,12 +556,12 @@ public sealed class PayloadTests
     public void Embedded_files_are_written_beside_the_tool()
     {
         string root = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..");
-        string pbo = Path.Combine(root, "link", "dist", "@PolyLab_PfxLink", "addons", "PolyLab_PfxLink.pbo");
-        if (!File.Exists(pbo))
-            return;
         string? written = Pfx.App.Core.Payload.Ensure(Pfx.App.Core.Payload.LinkPbo);
         Assert.Equal(Path.Combine(Pfx.App.Core.Payload.LinkMod, "addons", "PolyLab_PfxLink.pbo"), written);
-        Assert.True(File.ReadAllBytes(pbo).AsSpan().SequenceEqual(File.ReadAllBytes(written!)));
+        byte[] pbo = File.ReadAllBytes(written!);
+        Assert.True(pbo.AsSpan().IndexOf("prefix\0PolyLab_PfxLink\0"u8) > 0);
+        foreach (string file in Directory.GetFiles(Path.Combine(root, "link", "PolyLab_PfxLink"), "*", SearchOption.AllDirectories))
+            Assert.True(pbo.AsSpan().IndexOf(File.ReadAllBytes(file)) > 0, file);
         string? script = Pfx.App.Core.Payload.Ensure(Pfx.App.Core.Payload.Upscale);
         Assert.True(File.ReadAllBytes(Path.Combine(root, "src", "ParticleStudio", "Pfx.App", "Tools", "pfx_upscale.py")).AsSpan().SequenceEqual(File.ReadAllBytes(script!)));
     }
