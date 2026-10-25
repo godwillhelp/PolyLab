@@ -77,6 +77,8 @@ public sealed class MainViewModel : ObservableObject
     public async Task InitAsync()
     {
         SetLang(Settings.Lang);
+        var (cache, cached) = _feed.LoadCache();
+        SetListed(Feed.Latest(cached), cache?.Fetched);
         RefreshLocal();
         await RefreshAsync(false);
         _poll.Start();
@@ -143,10 +145,18 @@ public sealed class MainViewModel : ObservableObject
             c.Offer = latest.GetValueOrDefault(c.Id);
             c.MissingKey = missing;
         }
+        SetListed(latest, r.Fetched);
         SelfUpdate = latest.GetValueOrDefault(Catalog.LauncherId) is { } l && SemVer.TryParse(AppVersion, out var mine)
             && l.Version.CompareTo(mine) > 0 && l.Version.ToString() != _selfDismissed ? l : null;
         RebuildNews(r.Releases);
         RaiseFoot();
+    }
+
+    // A tool without a public release on a known list is hidden for everyone, installed or not (tools/visibility.ps1
+    // turns its releases into drafts); before any list was fetched nothing is known and every tool shows.
+    private void SetListed(Dictionary<string, Offer> latest, DateTimeOffset? fetched)
+    {
+        foreach (var c in Tools) c.Listed = fetched == null || latest.ContainsKey(c.Id);
     }
 
     private void ReportCheck(FeedResult r)

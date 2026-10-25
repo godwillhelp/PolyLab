@@ -31,6 +31,10 @@ public sealed class ToolCard(ToolInfo info) : ObservableObject
     private double _progress;
     public double Progress { get => _progress; set => Set(ref _progress, value); }
 
+    // False hides the card: the known release list has no public release of the tool (tools/visibility.ps1).
+    private bool _listed = true;
+    public bool Listed { get => _listed; set => Set(ref _listed, value); }
+
     public bool IsInstalled => Installed != null;
     public bool HasUpdate => Installed != null && Offer != null && SemVer.TryParse(Installed.Version, out var v) && Offer.Version.CompareTo(v) > 0;
     public bool Beta => Offer?.Beta == true;

@@ -144,7 +144,7 @@ public sealed class ReleasesClient(HttpClient http, string url, string cacheFile
     private static string? Header(HttpResponseMessage resp, string name) =>
         resp.Headers.TryGetValues(name, out var v) ? v.FirstOrDefault() : null;
 
-    private (FeedCache?, IReadOnlyList<GhRelease>) LoadCache()
+    public (FeedCache?, IReadOnlyList<GhRelease>) LoadCache()
     {
         try
         {

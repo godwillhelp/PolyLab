@@ -35,6 +35,8 @@ jobs:
           } else {
             $pre = @()
             if ($r.Prerelease) { $pre = @('--prerelease') }
+            # A tool hidden with tools/visibility.ps1 stays hidden: its new release is a draft too.
+            if (./tools/visibility.ps1 | Where-Object { $_.Id -eq $id -and $_.Hidden }) { $pre += '--draft' }
             # "Latest" stays on the launcher's release, so releases/latest always offers the installer.
             $latest = if ($id -eq 'launcher' -and -not $r.Prerelease) { '--latest' } else { '--latest=false' }
             gh release create $env:TAG @($r.Files) --verify-tag --title $r.Title --notes-from-tag $latest @pre

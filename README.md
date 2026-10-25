@@ -8,7 +8,7 @@ Free, open-source tools for DayZ modding, for Windows. The interface is in Engli
 |---|---|
 | **Poly Lab** (`PolyLab.exe`) | The launcher. Installs, updates and starts the tools from this repository's GitHub releases, and downloads GRAFT for PBOG Packer. |
 | **PBOG Packer** (`PBOG_Packer.exe`) | Packs and signs client and server mods like pboProject (configs, rvmats and models binarized), builds native server plugins on [GRAFT](https://github.com/KRdayzmodding/KR_GRAFTED) from C++, deploys to a local server, edits the server's `-mod` / `-serverMod` lines and starts or stops it. |
-| **Particle Studio** (`Particle_Studio.exe`) | Editor for DayZ particle effects (`.ptc`): emitters, curves, textures, ready-made recipes, a live viewport, import of X-Ray (S.T.A.L.K.E.R.) effects and a live link that shows the effect in the running game. |
+| **Particle Studio** (`Particle_Studio.exe`) | Editor for DayZ particle effects (`.ptc`): emitters, curves, textures, ready-made recipes, a live viewport, import of X-Ray (S.T.A.L.K.E.R.) effects and a live link that shows the effect in the running game. **In development:** no release builds for now and not offered by the launcher; build it from source. |
 
 ## Install
 
@@ -98,6 +98,10 @@ needed on the user's machine), writes `tool.json` and attaches `<Exe>-<version>-
 gets `PolyLab-<version>-setup.exe` (Inno Setup, `installer/PolyLab.iss`, installs per user without admin rights). The
 same script runs locally: `powershell -File tools/release.ps1 -Id pfx -Version 0.1.0 -Out dist`.
 
+A tool can be hidden from every launcher and shown again with `tools/visibility.ps1 -Id pfx -Hide` / `-Show` (needs
+`gh` logged in with write access; without arguments it prints which tools are hidden). Hidden means all its releases
+are drafts: the launcher shows no card for it, and a new tag of a hidden tool is released as a draft as well.
+
 ## Licence
 
 Poly Lab is under the [MIT licence](LICENSE). Fonts, photos, ported code and packages keep their own licences, listed in
@@ -117,7 +121,8 @@ Poly Lab — бесплатные инструменты с открытым к�
   конфигов, rvmat и моделей), сборка нативных серверных плагинов на GRAFT из C++, деплой на локальный сервер, правка
   строк `-mod` / `-serverMod` в батнике, запуск и остановка сервера.
 - **Particle Studio** (`Particle_Studio.exe`) — редактор частиц DayZ (`.ptc`): эмиттеры, кривые, текстуры, готовые
-  решения, живой предпросмотр, импорт эффектов X-Ray (S.T.A.L.K.E.R.) и связь с запущенной игрой.
+  решения, живой предпросмотр, импорт эффектов X-Ray (S.T.A.L.K.E.R.) и связь с запущенной игрой. **В разработке:**
+  готовых сборок пока нет и лаунчер её не предлагает; можно собрать из исходников.
 
 **Установка.** Скачайте установщик `PolyLab-<версия>-setup.exe` из [последнего релиза](../../releases/latest) (ставится
 для текущего пользователя, без прав администратора; файл пока без цифровой подписи, SmartScreen может попросить
