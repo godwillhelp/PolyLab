@@ -12,7 +12,9 @@ Free, open-source tools for DayZ modding, for Windows. The interface is in Engli
 
 ## Install
 
-Download the Poly Lab installer from the [releases](../../releases) page and run it. The launcher lists the tools;
+Download the Poly Lab installer `PolyLab-<version>-setup.exe` from the [latest release](../../releases/latest) and run
+it (it installs for your Windows user, no admin rights; the file is not code-signed yet, so Windows SmartScreen may ask
+you to confirm). The launcher lists the tools;
 **Install** downloads a tool, checks its SHA-256 against the release and unpacks it next to the launcher. Updates and
 release notes appear in the same window. Each tool can also be downloaded as a zip from its release and run without the
 launcher.
@@ -118,7 +120,9 @@ Poly Lab — бесплатные инструменты с открытым к�
 - **Particle Studio** (`Particle_Studio.exe`) — редактор частиц DayZ (`.ptc`): эмиттеры, кривые, текстуры, готовые
   решения, живой предпросмотр, импорт эффектов X-Ray (S.T.A.L.K.E.R.) и связь с запущенной игрой.
 
-**Установка.** Скачайте установщик Poly Lab со страницы [релизов](../../releases). Кнопка «Установить» в лаунчере скачивает
+**Установка.** Скачайте установщик `PolyLab-<версия>-setup.exe` из [последнего релиза](../../releases/latest) (ставится
+для текущего пользователя, без прав администратора; файл пока без цифровой подписи, SmartScreen может попросить
+подтверждение). Кнопка «Установить» в лаунчере скачивает
 программу, сверяет её SHA-256 с релизом и распаковывает рядом с лаунчером; обновления и заметки к релизам видны там же.
 Любую программу можно скачать и zip-архивом из её релиза и запускать без лаунчера.
 

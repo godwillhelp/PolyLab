@@ -2,7 +2,8 @@ name: Release
 
 # A tag <id>-v<semver> (pbog-v0.2.0, pfx-v0.1.0-beta.1, launcher-v1.0.0) builds that program and attaches its zip, and
 # for the launcher the installer, to the release of that tag. The release is created from the tag's message when it does
-# not exist yet; a version with a "-" suffix is marked as a prerelease (shown as Beta in the launcher).
+# not exist yet; a version with a "-" suffix is marked as a prerelease (shown as Beta in the launcher). Only launcher
+# releases become GitHub's "Latest".
 on:
   push:
     tags: ['pbog-v*', 'pfx-v*', 'launcher-v*']
@@ -36,6 +37,8 @@ jobs:
           } else {
             $pre = @()
             if ($r.Prerelease) { $pre = @('--prerelease') }
-            gh release create $env:TAG @($r.Files) --verify-tag --title $r.Title --notes-from-tag @pre
+            # "Latest" stays on the launcher's release, so releases/latest always offers the installer.
+            $latest = if ($id -eq 'launcher' -and -not $r.Prerelease) { '--latest' } else { '--latest=false' }
+            gh release create $env:TAG @($r.Files) --verify-tag --title $r.Title --notes-from-tag $latest @pre
           }
           if ($LASTEXITCODE -ne 0) { exit 1 }
