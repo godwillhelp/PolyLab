@@ -34,7 +34,8 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
             gh release upload $env:TAG @($r.Files) --clobber
           } else {
-            $pre = if ($r.Prerelease) { @('--prerelease') } else { @() }
+            $pre = @()
+            if ($r.Prerelease) { $pre = @('--prerelease') }
             gh release create $env:TAG @($r.Files) --verify-tag --title $r.Title --notes-from-tag @pre
           }
           if ($LASTEXITCODE -ne 0) { exit 1 }
