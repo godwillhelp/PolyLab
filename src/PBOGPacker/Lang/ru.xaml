@@ -296,6 +296,8 @@
   <s:String x:Key="Set.OutEmpty">Пустое поле: Grafted-мод берёт серверную папку, а если пуста и она — у проекта GRAFT папка dist\@Имя внутри проекта, у обычного мода @Имя рядом с его папкой. Общую папку можно задать и в параметрах сборки мода («Общая папка…»), свою для отдельного мода — там же.</s:String>
   <s:String x:Key="Set.Rapify">Бинаризация как в pboProject</s:String>
   <s:String x:Key="Set.RapifyHint">config.cpp → config.bin, rvmat и модели p3d (MLOD → ODOL) через CfgConvert и binarize.exe. Без неё папка пакуется как есть.</s:String>
+  <s:String x:Key="Set.CheckRefs">Проверять ссылки на файлы</s:String>
+  <s:String x:Key="Set.CheckRefsHint">Перед упаковкой каждая текстура, модель, rvmat, звук и папка скриптов, которые называют config.cpp, rvmat, модели, layout и скрипты, должны быть в моде, на P:\ или в данных игры (DZ). Отсутствующий файл останавливает упаковку со списком.</s:String>
   <s:String x:Key="Big.PackSub">PBO и подпись</s:String>
   <s:String x:Key="B.OkTextPack">Прогон занял {0}. Журнал последней упаковки открывается кнопкой в углу.</s:String>
   <s:String x:Key="B.NoneTextPack">Кнопка «Собрать» упакует PBO, подпишет его ключом и положит в папку @мода, как pboProject.</s:String>
@@ -311,6 +313,7 @@
   <s:String x:Key="Fix.CMake">CMake не найден. Поставьте его командой ниже или компонентом «C++ CMake tools» в Visual Studio Installer.</s:String>
   <s:String x:Key="Fix.Vs">Не найдена Visual Studio 2022 с MSVC и Windows SDK. Установите рабочую нагрузку «Разработка классических приложений на C++».</s:String>
   <s:String x:Key="Fix.Rapify">Конфиг не проходит бинаризацию. Исправьте ошибку по строке из лога или выключите «Бинаризацию как в pboProject» в настройках: тогда файлы уйдут в PBO как есть.</s:String>
+  <s:String x:Key="Fix.Refs">Мод называет файлы, которых нет. В каждой строке — файл и строка (или LOD модели) и отсутствующий путь: исправьте путь, добавьте файл или выключите «Проверять ссылки на файлы» в настройках.</s:String>
   <s:String x:Key="Fix.OutInside">Папка вывода лежит внутри папки мода, и PBO упаковал бы сам себя. Выберите папку вне исходников.</s:String>
   <s:String x:Key="Fix.Locked">PBO занят другой программой. Скорее всего, запущены сервер или игра с этим модом: остановите их и повторите шаг.</s:String>
   <s:String x:Key="Fix.AddonBuilder">AddonBuilder не собрал PBO. Ошибки binarize показаны в логе: чаще всего это модель со ссылкой на отсутствующий файл или сломанный model.cfg.</s:String>
@@ -701,6 +704,11 @@
   <s:String x:Key="Pl.ConfigsOk">конфиги в порядке: {0}</s:String>
   <s:String x:Key="Pl.RvmatFail">rvmat не бинаризуется: {0}</s:String>
   <s:String x:Key="Pl.RvmatOk">rvmat бинаризованы: {0}</s:String>
+  <s:String x:Key="Pl.RefsOff">проверка ссылок на файлы выключена (настройки)</s:String>
+  <s:String x:Key="Pl.RefsUnchecked">ссылки не проверены, папка не найдена: {0}</s:String>
+  <s:String x:Key="Pl.RefsOdolOther">{0}: имён без файла в бинаризованной модели: {1} (материалы, встроенные в модель, или остатки исходной модели)</s:String>
+  <s:String x:Key="Pl.RefsOk">ссылки на файлы в порядке: {0}, файлов проверено: {1}</s:String>
+  <s:String x:Key="Pl.RefsMissing">мод ссылается на отсутствующие файлы: {0}</s:String>
   <s:String x:Key="Pl.NoDz">папка DZ не найдена — ссылки моделей на данные игры не проверятся</s:String>
   <s:String x:Key="Pl.Linked">для binarize подключено: {0}</s:String>
   <s:String x:Key="Pl.LinkFailed">не удалось подключить {0}</s:String>

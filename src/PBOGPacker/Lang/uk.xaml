@@ -296,6 +296,8 @@
   <s:String x:Key="Set.OutEmpty">Порожнє поле: Grafted-мод бере серверну теку, а якщо порожня й вона — у проєкту GRAFT тека dist\@Ім’я всередині проєкту, у звичайного моду @Ім’я поруч із його текою. Спільну теку можна задати й у параметрах збірки моду («Спільна тека…»), власну для окремого моду — там само.</s:String>
   <s:String x:Key="Set.Rapify">Бінаризація як у pboProject</s:String>
   <s:String x:Key="Set.RapifyHint">config.cpp → config.bin, rvmat і моделі p3d (MLOD → ODOL) через CfgConvert і binarize.exe. Без неї тека пакується як є.</s:String>
+  <s:String x:Key="Set.CheckRefs">Перевіряти посилання на файли</s:String>
+  <s:String x:Key="Set.CheckRefsHint">Перед пакуванням кожна текстура, модель, rvmat, звук і тека скриптів, які називають config.cpp, rvmat, моделі, layout і скрипти, мають бути в моді, на P:\ або в даних гри (DZ). Відсутній файл зупиняє пакування зі списком.</s:String>
   <s:String x:Key="Big.PackSub">PBO і підпис</s:String>
   <s:String x:Key="B.OkTextPack">Прогін тривав {0}. Журнал останнього пакування відкривається кнопкою в куті.</s:String>
   <s:String x:Key="B.NoneTextPack">Кнопка «Зібрати» запакує PBO, підпише його ключем і покладе в теку @моду, як pboProject.</s:String>
@@ -311,6 +313,7 @@
   <s:String x:Key="Fix.CMake">CMake не знайдено. Поставте його командою нижче або компонентом «C++ CMake tools» у Visual Studio Installer.</s:String>
   <s:String x:Key="Fix.Vs">Не знайдено Visual Studio 2022 з MSVC і Windows SDK. Встановіть робоче навантаження «Розробка класичних застосунків на C++».</s:String>
   <s:String x:Key="Fix.Rapify">Конфіг не проходить бінаризацію. Виправте помилку за рядком із логу або вимкніть «Бінаризацію як у pboProject» у налаштуваннях: тоді файли підуть у PBO як є.</s:String>
+  <s:String x:Key="Fix.Refs">Мод називає файли, яких немає. У кожному рядку — файл і рядок (або LOD моделі) та відсутній шлях: виправте шлях, додайте файл або вимкніть «Перевіряти посилання на файли» в налаштуваннях.</s:String>
   <s:String x:Key="Fix.OutInside">Тека виводу лежить усередині теки моду, і PBO запакував би сам себе. Оберіть теку поза вихідними файлами.</s:String>
   <s:String x:Key="Fix.Locked">PBO зайнятий іншою програмою. Найімовірніше, запущено сервер або гру з цим модом: зупиніть їх і повторіть крок.</s:String>
   <s:String x:Key="Fix.AddonBuilder">AddonBuilder не зібрав PBO. Помилки binarize показано в логу: найчастіше це модель із посиланням на відсутній файл або зламаний model.cfg.</s:String>
@@ -701,6 +704,11 @@
   <s:String x:Key="Pl.ConfigsOk">конфіги в порядку: {0}</s:String>
   <s:String x:Key="Pl.RvmatFail">rvmat не бінаризується: {0}</s:String>
   <s:String x:Key="Pl.RvmatOk">rvmat бінаризовано: {0}</s:String>
+  <s:String x:Key="Pl.RefsOff">перевірку посилань на файли вимкнено (налаштування)</s:String>
+  <s:String x:Key="Pl.RefsUnchecked">посилання не перевірено, теку не знайдено: {0}</s:String>
+  <s:String x:Key="Pl.RefsOdolOther">{0}: імен без файлу в бінаризованій моделі: {1} (матеріали, вбудовані в модель, або залишки вихідної моделі)</s:String>
+  <s:String x:Key="Pl.RefsOk">посилання на файли в порядку: {0}, файлів перевірено: {1}</s:String>
+  <s:String x:Key="Pl.RefsMissing">мод посилається на відсутні файли: {0}</s:String>
   <s:String x:Key="Pl.NoDz">теку DZ не знайдено — посилання моделей на дані гри не перевірятимуться</s:String>
   <s:String x:Key="Pl.Linked">для binarize підключено: {0}</s:String>
   <s:String x:Key="Pl.LinkFailed">не вдалося підключити {0}</s:String>

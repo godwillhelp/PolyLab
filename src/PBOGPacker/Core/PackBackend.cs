@@ -792,9 +792,12 @@ public sealed class PackBackend : IGraftBackend
         var args = new List<string> { stage, abOut, "-clear", "-prefix=" + prefix, "-temp=" + abTemp };
         var odol = new List<(string Name, string File)>();
         var full = c.S.Pack.Rapify;
+        // References are read before the rvmats are rapified (text keeps the lines) and the ODOLs set aside.
+        var check = (full ? await CheckConfigs(c, proj, stage, ct) : null) ?? await CheckReferences(c, stage, prefix, ct);
+        if (check != null) return check;
         if (full)
         {
-            var err = await CheckConfigs(c, proj, stage, ct) ?? await RapifyMaterials(c, stage, ct);
+            var err = await RapifyMaterials(c, stage, ct);
             if (err != null) return err;
             var models = Directory.GetFiles(stage, "*.p3d", SearchOption.AllDirectories);
             var mlod = models.Where(IsMlod).ToList();
@@ -916,6 +919,29 @@ public sealed class PackBackend : IGraftBackend
         }
         L(c, "pack", Loc.F("Pl.ConfigsOk", configs.Length), LogLevel.Ok);
         return null;
+    }
+
+    // A missing texture, model, material, sound or script folder fails the pack here, as under pboProject,
+    // instead of showing up as a white texture or a silent script module in game.
+    private async Task<PipelineError?> CheckReferences(RunCtx c, string stage, string prefix, CancellationToken ct)
+    {
+        if (!c.S.Pack.CheckRefs)
+        {
+            L(c, "pack", Loc.T("Pl.RefsOff"), LogLevel.Info);
+            return null;
+        }
+        var r = await Task.Run(() => RefCheck.Scan(stage, prefix, PackLayout.WorkRoot(c.Src), FindGameData(c.Src)), ct);
+        if (r.Unchecked.Count > 0) L(c, "pack", Loc.F("Pl.RefsUnchecked", string.Join(", ", r.Unchecked)), LogLevel.Warn);
+        foreach (var (model, count) in r.OdolOther) L(c, "pack", Loc.F("Pl.RefsOdolOther", model, count), LogLevel.Warn);
+        if (r.Missing.Count == 0)
+        {
+            L(c, "pack", Loc.F("Pl.RefsOk", r.Refs, r.Files), LogLevel.Ok);
+            return null;
+        }
+        foreach (var f in r.Missing) L(c, "pack", f.ToString(), LogLevel.Err);
+        var tail = r.Missing.Take(12).Select(f => f.ToString());
+        if (r.Missing.Count > 12) tail = tail.Append(Loc.F("Pl.SkippedMore", r.Missing.Count - 12));
+        return Err(c, "pack", Loc.F("Pl.RefsMissing", r.Missing.Count), c.Src, tail, "Fix.Refs");
     }
 
     // pboProject ships every rvmat rapified; binarize only touches the ones a model references.

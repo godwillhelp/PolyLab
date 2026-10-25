@@ -296,6 +296,8 @@
   <s:String x:Key="Set.OutEmpty">Empty field: a Grafted mod takes the server folder; if that is empty too, a GRAFT project uses dist\@Name inside the project and an ordinary mod @Name beside its folder. A common folder can also be set in a mod's build options (“Common folder…”), and so can a mod's own folder.</s:String>
   <s:String x:Key="Set.Rapify">Binarize like pboProject</s:String>
   <s:String x:Key="Set.RapifyHint">config.cpp → config.bin, rvmats and p3d models (MLOD → ODOL) through CfgConvert and binarize.exe. Without it the folder is packed as it is.</s:String>
+  <s:String x:Key="Set.CheckRefs">Check file references</s:String>
+  <s:String x:Key="Set.CheckRefsHint">Before packing, every texture, model, rvmat, sound and script folder named by config.cpp, rvmats, models, layouts and scripts must exist in the mod, on P:\ or in the game data (DZ). A missing file stops the pack with a list.</s:String>
   <s:String x:Key="Big.PackSub">PBO and signature</s:String>
   <s:String x:Key="B.OkTextPack">The run took {0}. The button in the corner opens the log of the last packing.</s:String>
   <s:String x:Key="B.NoneTextPack">“Build” packs the PBO, signs it with the key and puts it into the @mod folder, like pboProject.</s:String>
@@ -311,6 +313,7 @@
   <s:String x:Key="Fix.CMake">CMake not found. Install it with the command below or with the “C++ CMake tools” component in the Visual Studio Installer.</s:String>
   <s:String x:Key="Fix.Vs">Visual Studio 2022 with MSVC and the Windows SDK not found. Install the “Desktop development with C++” workload.</s:String>
   <s:String x:Key="Fix.Rapify">A config does not binarize. Fix the error at the line from the log or turn off “Binarize like pboProject” in the settings: then the files go into the PBO as they are.</s:String>
+  <s:String x:Key="Fix.Refs">The mod names files that do not exist. Each line gives the file and line (or model LOD) and the missing path: fix the path, add the file, or turn off “Check file references” in the settings.</s:String>
   <s:String x:Key="Fix.OutInside">The output folder is inside the mod folder, and the PBO would pack itself. Pick a folder outside the sources.</s:String>
   <s:String x:Key="Fix.Locked">Another program holds the PBO. Most likely a server or the game with this mod is running: stop them and retry the step.</s:String>
   <s:String x:Key="Fix.AddonBuilder">AddonBuilder did not build the PBO. The log shows the binarize errors: most often a model refers to a missing file, or model.cfg is broken.</s:String>
@@ -701,6 +704,11 @@
   <s:String x:Key="Pl.ConfigsOk">configs OK: {0}</s:String>
   <s:String x:Key="Pl.RvmatFail">rvmat does not binarize: {0}</s:String>
   <s:String x:Key="Pl.RvmatOk">rvmat binarized: {0}</s:String>
+  <s:String x:Key="Pl.RefsOff">file reference check is off (settings)</s:String>
+  <s:String x:Key="Pl.RefsUnchecked">references not checked, folder not found: {0}</s:String>
+  <s:String x:Key="Pl.RefsOdolOther">{0}: names in the binarized model without a file: {1} (materials built into the model or leftovers of the original model)</s:String>
+  <s:String x:Key="Pl.RefsOk">file references OK: {0} in {1} files</s:String>
+  <s:String x:Key="Pl.RefsMissing">the mod refers to missing files: {0}</s:String>
   <s:String x:Key="Pl.NoDz">DZ folder not found: model references to game data will not be checked</s:String>
   <s:String x:Key="Pl.Linked">linked for binarize: {0}</s:String>
   <s:String x:Key="Pl.LinkFailed">could not link {0}</s:String>

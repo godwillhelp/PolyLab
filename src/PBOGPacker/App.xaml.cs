@@ -215,6 +215,7 @@ public partial class App : Application
         if (shot == null) return;
 
         if (Arg("--lang") is { } lang) Loc.Set(lang);
+        if (Arg("--mod") is { } modName) vm.SelectedMod = vm.Mods.FirstOrDefault(m => m.Name == modName) ?? vm.SelectedMod;
         var state = Arg("--state") ?? "idle";
         switch (state)
         {
@@ -245,7 +246,6 @@ public partial class App : Application
                 break;
         }
         if (Arg("--page") is { } page) vm.Page = page;
-        if (Arg("--mod") is { } modName) vm.SelectedMod = vm.Mods.FirstOrDefault(m => m.Name == modName) ?? vm.SelectedMod;
         if (args.Contains("--opts")) vm.OptionsOpen = true;
         if (Arg("--srvstate") is { } sst && vm.Servers.FirstOrDefault() is { } ss0)
         {
@@ -294,6 +294,7 @@ public partial class App : Application
             File.WriteAllText(shot + ".txt",
                 $"window px: {tl.X},{tl.Y} - {br.X},{br.Y}{Environment.NewLine}work area px: {wa.Left * k},{wa.Top * k} - {wa.Right * k},{wa.Bottom * k}{Environment.NewLine}");
         }
+        if (args.Contains("--scrollend")) foreach (var sv in Descendants(win).OfType<System.Windows.Controls.ScrollViewer>()) sv.ScrollToEnd();
         await Task.Delay(int.TryParse(Arg("--delay"), out var delay) ? delay : 1500);
         await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
 

@@ -111,6 +111,8 @@
         <TextBlock Text="{DynamicResource Set.OutEmpty}" Style="{StaticResource Hint}" Margin="0,12,0,0" Foreground="{StaticResource B.Text2}"/>
         <CheckBox ToolTip="{DynamicResource Set.RapifyHint}" Content="{DynamicResource Set.Rapify}" IsChecked="{Binding Settings.Pack.Rapify}" Margin="0,16,0,0"/>
         <TextBlock Text="{DynamicResource Set.RapifyHint}" Style="{StaticResource Hint}" Margin="27,4,0,0"/>
+        <CheckBox ToolTip="{DynamicResource Set.CheckRefsHint}" Content="{DynamicResource Set.CheckRefs}" IsChecked="{Binding Settings.Pack.CheckRefs}" Margin="0,12,0,0"/>
+        <TextBlock Text="{DynamicResource Set.CheckRefsHint}" Style="{StaticResource Hint}" Margin="27,4,0,0"/>
         <CheckBox ToolTip="{DynamicResource Set.AutoCppHint}" Content="{DynamicResource Set.AutoCpp}" IsChecked="{Binding Settings.Pack.AutoCpp}" Margin="0,12,0,0"/>
         <TextBlock Text="{DynamicResource Set.AutoCppHint}" Style="{StaticResource Hint}" Margin="27,4,0,0"/>
 

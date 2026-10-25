@@ -67,6 +67,7 @@ public sealed class PackSettings
     public string ServerOut { get; set; } = "";
     public string GraftedOut { get; set; } = "";
     public bool Rapify { get; set; } = true;
+    public bool CheckRefs { get; set; } = true;
     // A server mod that gets added (or switched from client to server) gets its C++ project at once.
     public bool AutoCpp { get; set; } = true;
 }

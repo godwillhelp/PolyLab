@@ -14,6 +14,7 @@
     <Project Path="src/ParticleStudio/Pfx.XRay/Pfx.XRay.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/PBOGPacker.Tests/PBOGPacker.Tests.csproj" />
     <Project Path="tests/Pfx.Tests/Pfx.Tests.csproj" />
     <Project Path="tests/PolyLab.Launcher.Tests/PolyLab.Launcher.Tests.csproj" />
   </Folder>

@@ -330,8 +330,8 @@ public sealed class MockBackend : IGraftBackend
                     {
                         FailNext = false;
                         Replace(m with { Build = new("fail", DateTime.Now, 0, "pack") });
-                        Failed?.Invoke(new PipelineError(runId, id, Loc.F("Pl.Rapify", "config.cpp"), Path.Combine(m.Path, "config.cpp"),
-                            lines.TakeLast(4).Select(l => new LogEntry(l.Item1, l.Item2)).ToList(), "Fix.Rapify", null));
+                        Failed?.Invoke(new PipelineError(runId, id, Loc.F("Pl.RefsMissing", 4), m.Path,
+                            lines.TakeLast(4).Select(l => new LogEntry(l.Item1, l.Item2)).ToList(), "Fix.Refs", null));
                     }
                     else
                     {
@@ -411,8 +411,11 @@ public sealed class MockBackend : IGraftBackend
                 {
                     (I, Loc.F("Pl.SrcFiles", 23, Loc.Kb(62874))),
                     (C, "CfgConvert -bin config.cpp"),
-                    (W, $@"File {m.Path}\config.cpp, line 41: /CfgMods/{m.Name}.defs: '}}' encountered instead of ';'"),
-                    (W, $@"Error reading config file '{m.Path}\config.cpp'"),
+                    (K, Loc.F("Pl.ConfigsOk", 1)),
+                    (E, $@"config.cpp:41  {m.Name}\data\radio_co.paa"),
+                    (E, $@"data\radio.rvmat:12  {m.Name}\data\radio_nohq.paa"),
+                    (E, $@"data\radio.p3d (LOD 0.000)  {m.Name}\data\radio_smdi.paa"),
+                    (E, $@"scripts\5_Mission\radiomenu.c:27  {m.Name}/gui/radio_menu.layout"),
                 };
             case "build" when fail:
                 return new()
@@ -460,6 +463,7 @@ public sealed class MockBackend : IGraftBackend
                     (I, grafted ? Loc.F("Pl.SrcFiles", 14, Loc.Kb(39117)) : Loc.F("Pl.SrcFiles", 23, Loc.Kb(62874))),
                     (C, "CfgConvert -bin config.cpp"),
                     (K, "config.bin: 1"),
+                    (K, Loc.F("Pl.RefsOk", grafted ? 9 : 37, grafted ? 6 : 14)),
                     (C, "AddonBuilder -packonly -prefix=" + m.Name),
                     (I, "Packing... Build Successful"),
                     (K, Loc.F("Pl.Pbo", $@"{root}\addons\{m.Name}.pbo", grafted ? 39118 : 18422)),
