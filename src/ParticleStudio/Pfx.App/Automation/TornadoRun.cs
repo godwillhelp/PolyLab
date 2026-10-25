@@ -110,7 +110,7 @@ public sealed class TornadoRun
             _w.DrawMode = DrawView.Normal;
 
             string bad = Path.Combine(_dir, "missing_material.ptc");
-            File.WriteAllText(bad, "EffectDef {\r\n Emitors {\r\n  EmitorDef lost {\r\n   Material \"ndz_pfx_lint/none.emat\"\r\n  }\r\n }\r\n}\r\n");
+            File.WriteAllText(bad, "EffectDef {\r\n Emitors {\r\n  EmitorDef lost {\r\n   Material \"pfx_lint/none.emat\"\r\n  }\r\n }\r\n}\r\n");
             _w.Open(new[] { bad });
             _w.ShowPane("export");
             await Settle();

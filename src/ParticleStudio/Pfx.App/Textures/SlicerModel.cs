@@ -6,7 +6,7 @@ using Pfx.Core.Schema;
 using Pfx.Render;
 using Pfx.Sim;
 using Pfx.Textures;
-using Suite.Ui.Core;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.Textures;
 

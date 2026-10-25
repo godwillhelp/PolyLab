@@ -3,8 +3,8 @@ using System.Windows;
 
 namespace PfxView;
 
-// The NDZ localisation pattern of Suite.Ui (Core/Loc.cs: Lang/<lang>.xaml merged into the application resources,
-// controls bind with DynamicResource), with English added; Suite.Ui's copy accepts only ru and uk.
+// The localisation pattern of PolyLab.Ui (Core/Loc.cs: Lang/<lang>.xaml merged into the application resources,
+// controls bind with DynamicResource), with English added; PolyLab.Ui's copy accepts only ru and uk.
 public static class Loc
 {
     public static readonly string[] Languages = { "ru", "en", "uk" };

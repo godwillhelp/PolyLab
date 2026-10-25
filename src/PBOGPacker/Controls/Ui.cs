@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace NDZ.PBOGPacker.Controls;
+namespace PolyLab.PBOGPacker.Controls;
 
 public static class Ui
 {

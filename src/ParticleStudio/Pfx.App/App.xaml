@@ -5,9 +5,9 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/NDZ_ParticleStudio;component/Themes/Tokens.xaml" />
-        <ResourceDictionary Source="/NDZ_ParticleStudio;component/Themes/Icons.xaml" />
-        <ResourceDictionary Source="/NDZ_ParticleStudio;component/Themes/Controls.xaml" />
+        <ResourceDictionary Source="/Particle_Studio;component/Themes/Tokens.xaml" />
+        <ResourceDictionary Source="/Particle_Studio;component/Themes/Icons.xaml" />
+        <ResourceDictionary Source="/Particle_Studio;component/Themes/Controls.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

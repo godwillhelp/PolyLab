@@ -139,7 +139,7 @@ public sealed class ComposeRun
             var copies = _sounds.Select(s => Path.Combine(sounds, Path.GetFileName(s))).ToList();
             for (int i = 0; i < 2; i++)
                 File.Copy(_sounds[i], copies[i], true);
-            _w.SaveProjectTo(Path.Combine(_dir, "zharka.ndzpfx"));
+            _w.SaveProjectTo(Path.Combine(_dir, "zharka.plpfx"));
 
             p.Do(f =>
             {

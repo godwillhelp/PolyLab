@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Real environment detection for the "Окружение" tab: probes the actual toolchain on this machine
 // (versions where a tool answers --version, presence otherwise) instead of the mocked list. Pure

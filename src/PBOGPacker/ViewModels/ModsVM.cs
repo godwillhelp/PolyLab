@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Input;
-using NDZ.PBOGPacker.Core;
+using PolyLab.PBOGPacker.Core;
 
-namespace NDZ.PBOGPacker.ViewModels;
+namespace PolyLab.PBOGPacker.ViewModels;
 
 public sealed class WorkshopItemVM : ObservableObject
 {

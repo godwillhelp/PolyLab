@@ -4,7 +4,7 @@
   <!-- AvalonDock's VS2013 dark templates with every brush re-pointed at the palette of spec 5.3. -->
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/DarkTheme.xaml" />
-    <ResourceDictionary Source="/NDZ_ParticleStudio;component/Themes/Tokens.xaml" />
+    <ResourceDictionary Source="/Particle_Studio;component/Themes/Tokens.xaml" />
   </ResourceDictionary.MergedDictionaries>
 
   <SolidColorBrush x:Key="{x:Static vs:ResourceKeys.ControlAccentBrushKey}" Color="{StaticResource C.Accent}" />

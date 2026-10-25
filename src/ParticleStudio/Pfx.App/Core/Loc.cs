@@ -3,9 +3,9 @@ using System.Windows;
 
 namespace Pfx.App.Core;
 
-// The NDZ localisation pattern of Suite.Ui (Core/Loc.cs: Lang/<lang>.xaml merged into the application resources,
-// controls bind with DynamicResource) with English added; Suite.Ui's copy accepts only ru and uk (owner decision
-// 2026-10-15: a local copy, Suite.Ui unchanged).
+// The localisation pattern of PolyLab.Ui (Core/Loc.cs: Lang/<lang>.xaml merged into the application resources,
+// controls bind with DynamicResource) with English added; PolyLab.Ui's copy accepts only ru and uk (owner decision
+// 2026-10-15: a local copy, PolyLab.Ui unchanged).
 public static class Loc
 {
     public static readonly string[] Languages = { "ru", "en", "uk" };
@@ -19,7 +19,7 @@ public static class Loc
     {
         if (!Languages.Contains(lang))
             lang = "ru";
-        var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/NDZ_ParticleStudio;component/Lang/{lang}.xaml") };
+        var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/Particle_Studio;component/Lang/{lang}.xaml") };
         var merged = Application.Current.Resources.MergedDictionaries;
         if (_dict != null)
             merged.Remove(_dict);

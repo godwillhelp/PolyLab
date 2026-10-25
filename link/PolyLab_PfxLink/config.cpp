@@ -1,6 +1,6 @@
 class CfgPatches
 {
-	class NDZ_PfxLink
+	class PolyLab_PfxLink
 	{
 		units[] = {};
 		weapons[] = {};
@@ -14,10 +14,10 @@ class CfgPatches
 
 class CfgMods
 {
-	class NDZ_PfxLink
+	class PolyLab_PfxLink
 	{
-		dir = "NDZ_PfxLink";
-		name = "NDZ Particle Studio link";
+		dir = "PolyLab_PfxLink";
+		name = "Poly Lab Particle Studio link";
 		type = "mod";
 		dependencies[] = {"Mission"};
 		class defs
@@ -25,7 +25,7 @@ class CfgMods
 			class missionScriptModule
 			{
 				value = "";
-				files[] = {"NDZ_PfxLink/Scripts/5_Mission"};
+				files[] = {"PolyLab_PfxLink/Scripts/5_Mission"};
 			};
 		};
 	};

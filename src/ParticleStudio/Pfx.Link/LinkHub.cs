@@ -35,7 +35,7 @@ public sealed class LinkHub : IDisposable
     // The answer when there is nothing to send. Never empty: RestApi reports an answer without data as a timeout
     // (OnTimeout, 3_game/http/restapi.c), which the mod would treat as a lost link. Sequence 0 is never applied.
     public const string Nothing = "0 ok";
-    // The link mod's NDZ_PFXLINK_PORT (a client started with -ndzPfxLink=<port> uses that one).
+    // The link mod's POLYLAB_PFXLINK_PORT (a client started with -polylabPfxLink=<port> uses that one).
     public const int DefaultPort = 18150;
     // A client in use polls again right after each answer; two holds without a poll means it is gone.
     public static readonly TimeSpan LostAfter = Hold + Hold;

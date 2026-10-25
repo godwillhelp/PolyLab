@@ -371,7 +371,7 @@ public sealed class ProofRun
                 file.Parts.Add(new PartEntry { Id = set.Files[i].Id, Path = "parts/" + set.Files[i].Id + ".ptc" });
                 file.States.First(s => s.Name == set.PartState[i]).Items.Add(new StateItem { Ref = set.Files[i].Id });
             }
-            string project = Path.Combine(_dir, set.Project + ".ndzpfx");
+            string project = Path.Combine(_dir, set.Project + ".plpfx");
             SafeFile.Write(project, Composition.Bytes(file));
             _w.OpenProject(project);
             await Settle();

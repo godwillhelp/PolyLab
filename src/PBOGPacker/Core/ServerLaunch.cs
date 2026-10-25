@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Start scripts of a server folder, starting one, and whether its DayZServer_x64.exe is running.
 public static class ServerLaunch
@@ -35,8 +35,8 @@ public static class ServerLaunch
     }
 
     // Runs the script in its own console window with the server folder as working directory. Opened
-    // from the NDZ launcher, this process sits in the launcher's kill-on-close job and so would every
-    // child: the server would die with the launcher. WMI creates the process outside any job (and
+    // from a launcher that keeps its tools in a kill-on-close job, this process sits in that job and so
+    // would every child: the server would die with the launcher. WMI creates the process outside any job (and
     // without the launcher's environment), so that path is used whenever we are inside one.
     // Returns the pid of the script's cmd.exe, 0 when unknown.
     public static int Start(string serverDir, string bat)

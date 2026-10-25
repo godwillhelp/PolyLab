@@ -26,7 +26,7 @@
   <s:String x:Key="Ab.Status.dropped">Відкинуто при перекладі</s:String>
   <s:String x:Key="Ab.Status.fitted">Перенесено в значення DayZ</s:String>
   <s:String x:Key="Ab.Subject">{0} ({1}:{2}) · частин DayZ: {3}</s:String>
-  <s:String x:Key="App.Title">NDZ Particle Studio</s:String>
+  <s:String x:Key="App.Title">Particle Studio</s:String>
   <s:String x:Key="Arch.burn">горить, поки всередині</s:String>
   <s:String x:Key="Arch.burst">удар при вході</s:String>
   <s:String x:Key="Arch.catcher">пастка</s:String>
@@ -480,7 +480,7 @@
   <s:String x:Key="Filter.Ogg">Звук Ogg Vorbis (*.ogg)|*.ogg</s:String>
   <s:String x:Key="Filter.Param">Модель ncnn (*.param)|*.param</s:String>
   <s:String x:Key="Filter.Pictures">Картинки ({0})|{0}</s:String>
-  <s:String x:Key="Filter.Project">Проєкт Particle Studio (*.ndzpfx)|*.ndzpfx</s:String>
+  <s:String x:Key="Filter.Project">Проєкт Particle Studio (*.plpfx)|*.plpfx;*.ndzpfx</s:String>
   <s:String x:Key="Filter.Ptc">Ефект DayZ (*.ptc)|*.ptc</s:String>
   <s:String x:Key="Filter.Py">Скрипт Python (*.py)|*.py</s:String>
   <s:String x:Key="Filter.Script">Скрипт Enforce (*.c)|*.c</s:String>
@@ -1583,7 +1583,7 @@
   <s:String x:Key="Tip.Cmd.NewProject">Новий проєкт аномалії з відкритих частин: стани, світло, звук, експорт</s:String>
   <s:String x:Key="Tip.Cmd.NewTornado">Будує смерч CG цілком: вирва, пасма, шапка, кільця бурі, уламки, блискавки й розряди — звичайні емітери та проєкт у вибраній теці</s:String>
   <s:String x:Key="Tip.Cmd.Open">Відкрити ефекти .ptc; кілька файлів — частини однієї сцени</s:String>
-  <s:String x:Key="Tip.Cmd.OpenProject">Відкрити проєкт (.ndzpfx) з усіма його частинами</s:String>
+  <s:String x:Key="Tip.Cmd.OpenProject">Відкрити проєкт (.plpfx) з усіма його частинами</s:String>
   <s:String x:Key="Tip.Cmd.Play">Пуск або пауза перегляду; правки не зупиняють відтворення</s:String>
   <s:String x:Key="Tip.Cmd.Recent">Нещодавно відкриті файли</s:String>
   <s:String x:Key="Tip.Cmd.Redo">Повернути скасовану правку</s:String>
@@ -1650,7 +1650,7 @@
   <s:String x:Key="Tip.Cmp.New">Новий проєкт з відкритих частин (усі вони потраплять у стан «спокій»)</s:String>
   <s:String x:Key="Tip.Cmp.NoProject">Аномалія збирається в проєкті: «Новий» або «Відкрити»</s:String>
   <s:String x:Key="Tip.Cmp.Offset">Де світло відносно центру аномалії, метри</s:String>
-  <s:String x:Key="Tip.Cmp.Open">Відкрити проєкт (.ndzpfx)</s:String>
+  <s:String x:Key="Tip.Cmp.Open">Відкрити проєкт (.plpfx)</s:String>
   <s:String x:Key="Tip.Cmp.OverIdle">Перший стан (спокій) продовжує грати під цим</s:String>
   <s:String x:Key="Tip.Cmp.PathKeys">Намальований шлях джерела (інструмент «шлях»), грає скрипт</s:String>
   <s:String x:Key="Tip.Cmp.PickItem">Клік — показати властивості елемента</s:String>
@@ -1777,7 +1777,7 @@
   <s:String x:Key="Tip.Game.Log">Скільки правка йшла до гри й назад, перезавантаження, кадри та серії</s:String>
   <s:String x:Key="Tip.Game.Mark">Перенести частини на землю перед поточною камерою гри</s:String>
   <s:String x:Key="Tip.Game.PlayerCamera">Повернути грі камеру гравця</s:String>
-  <s:String x:Key="Tip.Game.Port">Порт, який слухає редактор; у мода зв'язку типово 18150, інший задається грі ключем -ndzPfxLink=порт</s:String>
+  <s:String x:Key="Tip.Game.Port">Порт, який слухає редактор; у мода зв'язку типово 18150, інший задається грі ключем -polylabPfxLink=порт</s:String>
   <s:String x:Key="Tip.Game.Resync">Усі відкриті частини знову з'являються у грі такими, як зараз у редакторі</s:String>
   <s:String x:Key="Tip.Game.Series">Кадри поспіль із камерою редактора й вимір мерехтіння: середня різниця сусідніх кадрів і частка точок, що скачуть</s:String>
   <s:String x:Key="Tip.Game.SeriesCount">Скільки кадрів поспіль зняти, від 2 до 100 (за більшої кількості гра підвисає, поки пише знімки)</s:String>

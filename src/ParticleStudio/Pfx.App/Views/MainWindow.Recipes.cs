@@ -226,7 +226,7 @@ public partial class MainWindow : IRecipesHost
         if (CurrentState is { } state && recipe.Params.Any(p => p.Kind == ParamKind.State))
             node.Params["state"] = state;
         // Material copies would be written by a real run; the dry run resolves materials but writes into a scratch folder.
-        string scratch = Path.Combine(Path.GetTempPath(), "ndz_pfx_dry_" + Environment.ProcessId);
+        string scratch = Path.Combine(Path.GetTempPath(), "pfx_dry_" + Environment.ProcessId);
         var scene = new RecipeScene(copy, Open, Create, g => _roots.Resolve(g), _roots.Tiles(),
             e => Path.Combine(scratch, Path.GetFileName(e.Path)), _ => null, _project?.Folder);
         try

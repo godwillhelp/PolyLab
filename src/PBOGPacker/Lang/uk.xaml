@@ -20,8 +20,8 @@
   <s:String x:Key="Menu.Graft">Релізи GRAFT на GitHub</s:String>
   <s:String x:Key="Menu.Settings">Налаштування</s:String>
   <s:String x:Key="Menu.Lang">Русский язык</s:String>
-  <s:String x:Key="Menu.Quit">Закрити NDZ PBOG Packer</s:String>
-  <s:String x:Key="Menu.Version">версія NDZ PBOG Packer</s:String>
+  <s:String x:Key="Menu.Quit">Закрити PBOG Packer</s:String>
+  <s:String x:Key="Menu.Version">версія PBOG Packer</s:String>
   <s:String x:Key="Demo.Title">Демо-режим · мок-бекенд</s:String>
   <s:String x:Key="Demo.Empty">Порожній список модів</s:String>
   <s:String x:Key="Demo.Env">Зламане оточення</s:String>
@@ -149,7 +149,7 @@
   <s:String x:Key="Env.PDrive">Робочий диск P:</s:String>
   <s:String x:Key="Env.Banner">В оточенні є проблеми ({0}). Збірка зупиниться на першому кроці.</s:String>
   <s:String x:Key="Fix.Clang">Компілятор clang-cl не встановлено. Поставте LLVM або компонент «C++ Clang tools» у Visual Studio Installer, потім натисніть «Перевірити знову».</s:String>
-  <s:String x:Key="Fix.Graft">graft.exe старіший за бібліотеку graft.boot. Запустіть тулзу з лаунчера NDZ: він сам завантажить GRAFT, який виклав власник. Без лаунчера вкажіть graft.exe і hid.dll потрібного релізу KR_GRAFTED вручну.</s:String>
+  <s:String x:Key="Fix.Graft">graft.exe старіший за бібліотеку graft.boot. Запустіть тулзу з лаунчера Poly Lab: він сам завантажить GRAFT, який виклав власник. Без лаунчера вкажіть graft.exe і hid.dll потрібного релізу KR_GRAFTED вручну.</s:String>
   <s:String x:Key="Fix.PDrive">Робочий диск P: потрібен моделям: binarize бере з P:\DZ дані гри. Змонтуйте його на теку проєктів.</s:String>
   <s:String x:Key="Fix.Build">C++-збірка впала: причина — в останніх рядках журналу (помилка компілятора, CMake або завантаження GRAFT). Виправте код або CMakeLists.txt і повторіть із кроку «Збірка».</s:String>
 
@@ -233,7 +233,7 @@
   <s:String x:Key="About.Title">ПРО ПРОГРАМУ</s:String>
   <s:String x:Key="About.Tagline">PBO &amp; GRAFT Packer for DayZ Modifications</s:String>
   <s:String x:Key="About.Version">Версія {0} · GRAFT {1}</s:String>
-  <s:String x:Key="About.Lead">NDZ PBOG Packer пакує і підписує моди DayZ. Клієнтські й серверні моди він пакує як pboProject, а нативні серверні моди на фреймворку GRAFT ще й збирає з C++ і розкладає за README GRAFT. Від вихідного коду до підписаного @моду та готового рядка запуску одна кнопка.</s:String>
+  <s:String x:Key="About.Lead">PBOG Packer пакує і підписує моди DayZ. Клієнтські й серверні моди він пакує як pboProject, а нативні серверні моди на фреймворку GRAFT ще й збирає з C++ і розкладає за README GRAFT. Від вихідного коду до підписаного @моду та готового рядка запуску одна кнопка.</s:String>
   <s:String x:Key="About.Features">Що вміє</s:String>
   <s:String x:Key="F1.T">Мої моди</s:String>
   <s:String x:Key="F1.D">Клієнтські, серверні та GRAFT-моди в одному списку. У кожного свій логотип і статуси: чи зібрано мод, яким ключем підписано й на яких серверах він лежить.</s:String>
@@ -258,7 +258,7 @@
   <s:String x:Key="About.Materials">Матеріали</s:String>
   <s:String x:Key="About.Fonts">Шрифти: JetBrains Mono, Big Shoulders Stencil. Усі поширюються за SIL Open Font License.</s:String>
   <s:String x:Key="About.Photos">Фотографії Зони відчуження, Прип’яті та спорядження взято з Wikimedia Commons. Автор і ліцензія кожної нижче, клік відкриває сторінку знімка.</s:String>
-  <s:String x:Key="About.Legal">DayZ — торгова марка Bohemia Interactive. NDZ PBOG Packer не пов’язаний з Bohemia Interactive. GRAFT поширюється під GPL-3.0-or-later з винятком для плагінів.</s:String>
+  <s:String x:Key="About.Legal">DayZ — торгова марка Bohemia Interactive. PBOG Packer не пов’язаний з Bohemia Interactive. GRAFT поширюється під GPL-3.0-or-later з винятком для плагінів.</s:String>
   <s:String x:Key="About.SeraphRole">автор GRAFT</s:String>
   <s:String x:Key="Sb.Powered">працює на GRAFT</s:String>
   <s:String x:Key="About.LinkDiscord">Discord-сервер</s:String>

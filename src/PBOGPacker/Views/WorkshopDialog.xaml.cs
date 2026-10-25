@@ -3,9 +3,9 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using NDZ.PBOGPacker.ViewModels;
+using PolyLab.PBOGPacker.ViewModels;
 
-namespace NDZ.PBOGPacker.Views;
+namespace PolyLab.PBOGPacker.Views;
 
 // Drag and drop for the load order: the dragged row moves live under the cursor, so there is no
 // separate insertion marker to keep in sync.

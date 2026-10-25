@@ -1,5 +1,5 @@
 using Pfx.XRay;
-using Suite.Ui.Core;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.XRay;
 

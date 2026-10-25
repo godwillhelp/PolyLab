@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Ui/Suite.Ui.csproj" />
-    <Project Path="src/PBOGPacker/NDZ_PBOGPacker.csproj" />
+    <Project Path="src/Ui/PolyLab.Ui.csproj" />
+    <Project Path="src/PBOGPacker/PBOG_Packer.csproj" />
   </Folder>
   <Folder Name="/src/ParticleStudio/">
     <Project Path="src/ParticleStudio/Pfx.App/Pfx.App.csproj" />

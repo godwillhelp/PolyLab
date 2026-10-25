@@ -17,7 +17,7 @@ public partial class App : Application
         }
         catch (Exception ex) when (ex is ArgumentException or FormatException)
         {
-            File.WriteAllText("NDZ_ParticleStudio.error.txt", ex.Message);
+            File.WriteAllText("Particle_Studio.error.txt", ex.Message);
             Shutdown(2);
             return;
         }

@@ -6,12 +6,12 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>NDZ_PBOGPacker</AssemblyName>
-    <RootNamespace>NDZ.PBOGPacker</RootNamespace>
+    <AssemblyName>PBOG_Packer</AssemblyName>
+    <RootNamespace>PolyLab.PBOGPacker</RootNamespace>
     <Version>0.1.2</Version>
-    <Product>NDZ PBOG Packer</Product>
+    <Product>PBOG Packer</Product>
     <Description>PBO &amp; GRAFT Packer for DayZ Modifications</Description>
-    <Company>NDZ</Company>
+    <Company>Poly Lab</Company>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <SatelliteResourceLanguages>ru</SatelliteResourceLanguages>
   </PropertyGroup>
@@ -28,6 +28,7 @@
   <ItemGroup>
     <Compile Remove="tools\**" />
     <None Remove="tools\**" />
+    <Compile Include="..\Ui\Core\DataFolder.cs" Link="Core\DataFolder.cs" />
     <Resource Include="Assets\Fonts\*.otf" />
     <Resource Include="Assets\Fonts\*.ttf" />
     <Resource Include="Assets\Art\*.png" />

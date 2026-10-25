@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
-using NDZ.PBOGPacker.Core;
+using PolyLab.PBOGPacker.Core;
 
-namespace NDZ.PBOGPacker.ViewModels;
+namespace PolyLab.PBOGPacker.ViewModels;
 
 public sealed class ModVM : ObservableObject
 {
@@ -218,7 +218,7 @@ public sealed class StepVM : ObservableObject
     public string Title => Loc.T("Step." + Id);
     public string MsText => Ms > 0 ? Loc.Sec(Ms) : $"{Index + 1:00}/08";
     public string Tool => _root.StepTool(Id);
-    public string Image => $"pack://application:,,,/NDZ_PBOGPacker;component/Assets/Photos/st_{Id}.jpg";
+    public string Image => $"pack://application:,,,/PBOG_Packer;component/Assets/Photos/st_{Id}.jpg";
 
     public string Kind => EffectiveStatus switch
     {

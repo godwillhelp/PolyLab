@@ -1,7 +1,7 @@
-<UserControl x:Class="NDZ.PBOGPacker.Views.AboutView"
+<UserControl x:Class="PolyLab.PBOGPacker.Views.AboutView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+             xmlns:c="clr-namespace:PolyLab.PBOGPacker.Controls">
   <UserControl.Resources>
     <Style x:Key="SecTitle" TargetType="TextBlock">
       <Setter Property="FontSize" Value="22"/>
@@ -26,10 +26,10 @@
       <StackPanel Margin="44,26,44,40" MaxWidth="1000" HorizontalAlignment="Left">
 
         <StackPanel Orientation="Horizontal">
-          <Image Source="/NDZ_PBOGPacker;component/Assets/Brand/pbog.png" Width="104" Height="104" VerticalAlignment="Center" Margin="0,0,20,0"
+          <Image Source="/PBOG_Packer;component/Assets/Brand/logo.png" Width="104" Height="104" VerticalAlignment="Center" Margin="0,0,20,0"
                  RenderOptions.BitmapScalingMode="HighQuality"/>
-          <TextBlock Text="NDZ" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="116" Foreground="#E3DED0"
-                     OpacityMask="{StaticResource B.Grunge}" Margin="0,-20,24,-18" VerticalAlignment="Center"/>
+          <TextBlock Text="POLY LAB" FontFamily="{StaticResource F.Stencil}" FontWeight="Black" FontSize="92" Foreground="#E3DED0"
+                     OpacityMask="{StaticResource B.Grunge}" Margin="0,-16,24,-14" VerticalAlignment="Center"/>
           <StackPanel VerticalAlignment="Center">
             <TextBlock Text="PBOG Packer" FontSize="38" FontWeight="Bold"/>
             <TextBlock Text="{DynamicResource About.Tagline}" FontSize="17" Foreground="{StaticResource B.Accent}" Margin="0,2,0,6"/>

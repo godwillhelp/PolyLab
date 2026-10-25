@@ -6,7 +6,7 @@ using Pfx.Core.Model;
 using Pfx.Core.Schema;
 using Pfx.Core.Text;
 using Pfx.Sim;
-using Suite.Ui.Core;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.Inspector;
 

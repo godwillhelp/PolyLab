@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Suite.Ui.Controls;
+namespace PolyLab.Ui.Controls;
 
 public sealed class KindBrush : IValueConverter
 {

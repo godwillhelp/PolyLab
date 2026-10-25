@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 public abstract class ObservableObject : INotifyPropertyChanged
 {

@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace NDZ.PBOGPacker.Controls;
+namespace PolyLab.PBOGPacker.Controls;
 
 public sealed class KindBrush : IValueConverter
 {

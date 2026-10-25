@@ -3,9 +3,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using NDZ.PBOGPacker.ViewModels;
+using PolyLab.PBOGPacker.ViewModels;
 
-namespace NDZ.PBOGPacker.Views;
+namespace PolyLab.PBOGPacker.Views;
 
 public partial class ResultDialog : UserControl
 {

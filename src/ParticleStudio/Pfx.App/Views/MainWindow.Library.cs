@@ -61,7 +61,7 @@ public partial class MainWindow : ILibraryHost
             list.Add(new LibrarySource(Loc.T("Lib.Import"), Settings.ImportFolder));
         foreach (var f in Settings.LibraryFolders.Where(Directory.Exists))
             list.Add(new LibrarySource(Path.GetFileName(f.TrimEnd(Path.DirectorySeparatorChar)), f));
-        foreach (var p in Settings.Recent.Where(r => r.EndsWith(".ndzpfx", StringComparison.OrdinalIgnoreCase) && File.Exists(r)))
+        foreach (var p in Settings.Recent.Where(r => ProjectFile.IsProject(r) && File.Exists(r)))
             list.Add(new LibrarySource(Loc.T("Lib.Projects"), Path.GetDirectoryName(p)!));
         return list;
     }

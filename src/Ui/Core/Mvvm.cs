@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
-namespace Suite.Ui.Core;
+namespace PolyLab.Ui.Core;
 
 public abstract class ObservableObject : INotifyPropertyChanged
 {

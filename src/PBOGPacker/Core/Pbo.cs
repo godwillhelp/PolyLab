@@ -2,7 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Minimal PBO table access: list what AddonBuilder actually packed, and append files it could not
 // (ODOL models crash binarize). Layout: header properties behind an empty "Vers" entry, entry table
@@ -30,7 +30,7 @@ public static class Pbo
     // byte for byte, the checksum is recomputed (without the 0x00 sentinel, as DSSignFile expects).
     public static void AddFiles(string pbo, IReadOnlyList<(string Name, string File)> extra)
     {
-        var tmp = pbo + ".ndzadd";
+        var tmp = pbo + ".pbogadd";
         using (var src = File.OpenRead(pbo))
         {
             var h = Read(src);

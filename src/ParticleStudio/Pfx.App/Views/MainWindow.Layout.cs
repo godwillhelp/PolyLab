@@ -28,7 +28,7 @@ public partial class MainWindow
 
     private void InitShell()
     {
-        var theme = new ResourceDictionary { Source = new Uri("pack://application:,,,/NDZ_ParticleStudio;component/Themes/Dock.xaml") };
+        var theme = new ResourceDictionary { Source = new Uri("pack://application:,,,/Particle_Studio;component/Themes/Dock.xaml") };
         theme[AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentColorKey] = (Color)FindResource("C.Accent");
         Dock.Theme = new PaletteDockTheme(theme);
         SetPaneTitles();
@@ -105,7 +105,7 @@ public partial class MainWindow
             var r = new MenuItem { Header = Path.GetFileName(path), ToolTip = path, IsEnabled = File.Exists(path) };
             r.Click += (_, _) =>
             {
-                if (path.EndsWith(".ndzpfx", StringComparison.OrdinalIgnoreCase))
+                if (Pfx.Core.Model.ProjectFile.IsProject(path))
                     OpenProject(path);
                 else
                     Open(new[] { path });

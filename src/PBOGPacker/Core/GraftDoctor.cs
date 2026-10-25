@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Is GRAFT really in place on a server: the host, the build it was made for, what the start script
 // lets it see, the plugins it would load, what graft.exe doctor says and what the last start logged.

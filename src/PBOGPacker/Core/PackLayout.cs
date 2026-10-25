@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Where a mod is packed from and where its PBO lands. Shared by the backend and the UI so the build
 // page shows exactly the folders the pipeline writes. A destination is a mod root laid out like

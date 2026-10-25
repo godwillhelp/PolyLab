@@ -4,8 +4,9 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using PolyLab.Ui.Core;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Real backend: drives the actual toolchain (cmake+clang+graft -> CfgConvert -> AddonBuilder -> DSSignFile)
 // and streams each tool's output into the 8 pipeline steps. Replaces MockBackend for real builds.
@@ -45,11 +46,13 @@ public sealed class PackBackend : IGraftBackend
     public event Action<PipelineError>? Failed;
     public event Action<PipelineCancelled>? Cancelled;
 
+    // POLYLAB_STATE_DIR keeps headless test runs away from the real mod list.
+    public static string StateDir => Environment.GetEnvironmentVariable("POLYLAB_STATE_DIR")
+        ?? DataFolder.Resolve(Environment.SpecialFolder.ApplicationData, "PBOGPacker", "NDZ_PBOGPacker");
+
     public PackBackend()
     {
-        // NDZ_STATE_DIR keeps headless test runs away from the real mod list.
-        var dir = Environment.GetEnvironmentVariable("NDZ_STATE_DIR")
-                  ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NDZ_PBOGPacker");
+        var dir = StateDir;
         Directory.CreateDirectory(dir);
         _statePath = Path.Combine(dir, "state.json");
         Load();
@@ -537,7 +540,7 @@ public sealed class PackBackend : IGraftBackend
             Root = PackLayout.OutRoot(mod, s.Pack);
             Project = PackLayout.HasProject(mod);
             Proj = PackLayout.ProjectDir(mod);
-            Tmp = Path.Combine(Path.GetTempPath(), "ndz_" + runId);
+            Tmp = Path.Combine(Path.GetTempPath(), "pbog_" + runId);
         }
         public string RunId { get; }
         public ModInfo Mod { get; }
@@ -638,7 +641,7 @@ public sealed class PackBackend : IGraftBackend
         var clangDir = Toolchain.ClangDir;
         // A temp bat sets MSVC env (vcvars) + clang-cl + ninja on PATH, then runs the preset build.
         // chcp 65001: cmd and vcvars otherwise print in the OEM code page, which reads as garbage.
-        var bat = Path.Combine(Path.GetTempPath(), "ndzbuild_" + c.RunId + ".bat");
+        var bat = Path.Combine(Path.GetTempPath(), "pbogbuild_" + c.RunId + ".bat");
         var extraPath = string.Join(";", new[] { clangDir, ninjaDir }.Where(p => p != null));
         var sb = new StringBuilder();
         sb.AppendLine("@echo off");
@@ -849,7 +852,7 @@ public sealed class PackBackend : IGraftBackend
     // PBO and its signatures exactly as they were.
     private static PipelineError? Replace(RunCtx c, string step, string from, string to)
     {
-        var tmp = to + ".ndztmp";
+        var tmp = to + ".pbogtmp";
         try
         {
             File.Copy(from, tmp, true);
@@ -1059,7 +1062,7 @@ public sealed class PackBackend : IGraftBackend
     {
         try
         {
-            foreach (var d in Directory.GetDirectories(Path.GetTempPath(), "ndz_r*"))
+            foreach (var d in Directory.GetDirectories(Path.GetTempPath(), "pbog_r*"))
                 if (Directory.GetLastWriteTimeUtc(d) < DateTime.UtcNow.AddDays(-1)) DropTmp(d);
         }
         catch (Exception) { }

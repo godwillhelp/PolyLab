@@ -3,16 +3,16 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using NDZ.PBOGPacker.Core;
-using NDZ.PBOGPacker.ViewModels;
+using PolyLab.PBOGPacker.Core;
+using PolyLab.PBOGPacker.ViewModels;
 
-namespace NDZ.PBOGPacker;
+namespace PolyLab.PBOGPacker;
 
 public partial class App : Application
 {
     public static void Fail(Exception e)
     {
-        var diag = Environment.GetEnvironmentVariable("NDZ_DIAG");
+        var diag = Environment.GetEnvironmentVariable("POLYLAB_DIAG");
         if (diag != null)
             try { System.IO.File.AppendAllText(diag, $"{e.GetType().Name}: {e.Message}\n{e}\n\n"); } catch { }
         var vm = (Current?.MainWindow?.DataContext) as MainViewModel;

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Windows;
 
-namespace Suite.Ui.Core;
+namespace PolyLab.Ui.Core;
 
 public static class Loc
 {

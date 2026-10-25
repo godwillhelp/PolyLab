@@ -6,9 +6,9 @@ using System.Windows.Interop;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using NDZ.PBOGPacker.ViewModels;
+using PolyLab.PBOGPacker.ViewModels;
 
-namespace NDZ.PBOGPacker;
+namespace PolyLab.PBOGPacker;
 
 public partial class MainWindow : Window
 {

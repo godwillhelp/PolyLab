@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Resolves the external tools the pipeline drives. CfgConvert + AddonBuilder + DSSignFile (official
 // DayZ Tools) do what pboProject does (rapify, pack, sign): Mikero pboProject is GUI-bound and won't run headless.

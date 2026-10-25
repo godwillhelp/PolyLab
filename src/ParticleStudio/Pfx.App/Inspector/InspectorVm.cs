@@ -5,7 +5,7 @@ using Pfx.App.Model;
 using Pfx.Core.Editing;
 using Pfx.Core.Model;
 using Pfx.Core.Schema;
-using Suite.Ui.Core;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.Inspector;
 

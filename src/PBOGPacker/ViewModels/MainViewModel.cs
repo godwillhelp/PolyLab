@@ -5,9 +5,9 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using NDZ.PBOGPacker.Core;
+using PolyLab.PBOGPacker.Core;
 
-namespace NDZ.PBOGPacker.ViewModels;
+namespace PolyLab.PBOGPacker.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
@@ -269,7 +269,7 @@ public sealed class MainViewModel : ObservableObject
     public ICommand PickOutCmd { get; }
     public ICommand ResetOutCmd { get; }
 
-    public string PageBackground => $"pack://application:,,,/NDZ_PBOGPacker;component/Assets/Photos/bg_{Page}.jpg";
+    public string PageBackground => $"pack://application:,,,/PBOG_Packer;component/Assets/Photos/bg_{Page}.jpg";
 
     public IReadOnlyList<PhotoCredit> Credits { get; } = LoadCredits();
 
@@ -277,7 +277,7 @@ public sealed class MainViewModel : ObservableObject
     {
         try
         {
-            var res = Application.GetResourceStream(new Uri("pack://application:,,,/NDZ_PBOGPacker;component/Assets/Photos/credits.json"));
+            var res = Application.GetResourceStream(new Uri("pack://application:,,,/PBOG_Packer;component/Assets/Photos/credits.json"));
             if (res == null) return Array.Empty<PhotoCredit>();
             using var s = res.Stream;
             return System.Text.Json.JsonSerializer.Deserialize<List<PhotoCredit>>(s) ?? new List<PhotoCredit>();
@@ -679,8 +679,7 @@ public sealed class MainViewModel : ObservableObject
     public string WorkshopAuto => Loc.F("Set.WorkshopHint", ServerMods.DefaultWorkshopDir() ?? "—");
     public string ToolsDir => System.IO.Path.GetDirectoryName(Toolchain.Graft(_settings.Tools) ?? _settings.Tools.Graft) ?? "";
     public string GraftReleases => "https://github.com/KRdayzmodding/KR_GRAFTED/releases";
-    public string ConfigPath => System.IO.Path.Combine(Environment.GetEnvironmentVariable("NDZ_STATE_DIR")
-        ?? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NDZ_PBOGPacker"), "state.json");
+    public string ConfigPath => System.IO.Path.Combine(PackBackend.StateDir, "state.json");
 
     public string AppVersion => "0.1.1";
     public string FooterVersion => "GRAFT " + GraftDoctor.Release + " · DayZ " + GraftDoctor.TargetBuild;

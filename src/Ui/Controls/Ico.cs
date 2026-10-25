@@ -3,7 +3,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace Suite.Ui.Controls;
+namespace PolyLab.Ui.Controls;
 
 public sealed class Ico : FrameworkElement
 {

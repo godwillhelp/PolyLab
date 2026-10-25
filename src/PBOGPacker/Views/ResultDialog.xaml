@@ -1,7 +1,7 @@
-<UserControl x:Class="NDZ.PBOGPacker.Views.ResultDialog"
+<UserControl x:Class="PolyLab.PBOGPacker.Views.ResultDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+             xmlns:c="clr-namespace:PolyLab.PBOGPacker.Controls">
   <UserControl.Resources>
     <Style x:Key="Sec" TargetType="TextBlock">
       <Setter Property="FontSize" Value="17"/>
@@ -26,12 +26,12 @@
         <Grid ClipToBounds="True">
           <Border Visibility="{Binding Result.Ok, Converter={StaticResource Vis}}">
             <Border.Background>
-              <ImageBrush ImageSource="/NDZ_PBOGPacker;component/Assets/Photos/dlg_ok.jpg" Stretch="UniformToFill"/>
+              <ImageBrush ImageSource="/PBOG_Packer;component/Assets/Photos/dlg_ok.jpg" Stretch="UniformToFill"/>
             </Border.Background>
           </Border>
           <Border Visibility="{Binding Result.Ok, Converter={StaticResource Vis}, ConverterParameter=!}">
             <Border.Background>
-              <ImageBrush ImageSource="/NDZ_PBOGPacker;component/Assets/Photos/dlg_err.jpg" Stretch="UniformToFill"/>
+              <ImageBrush ImageSource="/PBOG_Packer;component/Assets/Photos/dlg_err.jpg" Stretch="UniformToFill"/>
             </Border.Background>
           </Border>
           <Rectangle>

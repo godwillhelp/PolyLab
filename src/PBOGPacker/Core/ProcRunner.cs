@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // Streams a child process line by line to a callback. stdout and stderr are read concurrently to
 // avoid the classic pipe-buffer deadlock; both feed the same sink so the UI log stays in order.

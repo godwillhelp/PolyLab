@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 // A C++ project for a mod that stays where it is: <mod>_cpp next to the mod folder, with the GRAFT
 // boilerplate filled in from the mod itself — plugin name = mod name (the DLL and the declarations are

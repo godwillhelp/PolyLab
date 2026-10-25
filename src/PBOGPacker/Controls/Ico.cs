@@ -3,7 +3,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace NDZ.PBOGPacker.Controls;
+namespace PolyLab.PBOGPacker.Controls;
 
 public sealed class Ico : FrameworkElement
 {

@@ -206,18 +206,26 @@ public class EditTests
         try
         {
             File.WriteAllText(Path.Combine(dir, "particles", "a.ptc"), Ptc, Encoding.Latin1);
-            var comp = new Composition(Path.Combine(dir, "a.ndzpfx"), new ProjectFile());
+            var comp = new Composition(Path.Combine(dir, "a.plpfx"), new ProjectFile());
             comp.File.Parts.Add(new PartEntry { Id = "a", Path = comp.Relative(Path.Combine(dir, "particles", "a.ptc")) });
             comp.Save();
             comp.Save();
-            var back = Composition.Open(Path.Combine(dir, "a.ndzpfx"));
+            var back = Composition.Open(Path.Combine(dir, "a.plpfx"));
             Assert.Equal(new[] { "particles/a.ptc" }, back.File.Parts.Select(p => p.Path));
             Assert.Equal(2, back.LoadParts().Single().Doc.Emitters.Count);
-            Assert.False(File.Exists(Path.Combine(dir, "a.ndzpfx.tmp")));
+            Assert.False(File.Exists(Path.Combine(dir, "a.plpfx.tmp")));
         }
         finally
         {
             Directory.Delete(dir, true);
         }
+    }
+
+    [Fact]
+    public void Projects_saved_before_the_rename_still_count_as_projects()
+    {
+        Assert.True(ProjectFile.IsProject(@"D:\fx\a.plpfx"));
+        Assert.True(ProjectFile.IsProject(@"D:\fx\old.NDZPFX"));
+        Assert.False(ProjectFile.IsProject(@"D:\fx\a.ptc"));
     }
 }

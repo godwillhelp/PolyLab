@@ -473,6 +473,6 @@ public sealed class LiveLink : IDisposable
             root = Path.Combine(GameFolder, profiles);
         else
             return null;
-        return Path.Combine(root, "NDZ_PfxLink", "shots");
+        return Path.Combine(root, "PolyLab_PfxLink", "shots");
     }
 }

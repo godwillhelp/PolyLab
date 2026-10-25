@@ -3,7 +3,7 @@ using System.Globalization;
 namespace Pfx.App.Core;
 
 // Command line:
-//   NDZ_ParticleStudio [file.ptc ...]          open these effects as parts of one scene
+//   Particle_Studio [file.ptc ...]          open these effects as parts of one scene
 //   --roots "P:\;D:\mod"                        data roots for this run (else the saved ones)
 //   --lang ru|en|uk                             interface language for this run
 //   --settings-dir <dir>                        settings and layouts folder (automation: never the user's own)

@@ -1,7 +1,7 @@
-<UserControl x:Class="NDZ.PBOGPacker.Views.SettingsView"
+<UserControl x:Class="PolyLab.PBOGPacker.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+             xmlns:c="clr-namespace:PolyLab.PBOGPacker.Controls">
   <UserControl.Resources>
     <Style x:Key="SecLabel" TargetType="TextBlock">
       <Setter Property="FontSize" Value="16"/>

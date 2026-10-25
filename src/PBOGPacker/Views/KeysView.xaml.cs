@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace NDZ.PBOGPacker.Views;
+namespace PolyLab.PBOGPacker.Views;
 
 public partial class KeysView : UserControl
 {

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Windows;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 public static class Loc
 {
@@ -14,7 +14,7 @@ public static class Loc
     public static void Set(string lang)
     {
         if (lang != "ru" && lang != "uk") lang = "ru";
-        var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/NDZ_PBOGPacker;component/Lang/{lang}.xaml") };
+        var d = new ResourceDictionary { Source = new Uri($"pack://application:,,,/PBOG_Packer;component/Lang/{lang}.xaml") };
         var merged = Application.Current.Resources.MergedDictionaries;
         if (_dict != null) merged.Remove(_dict);
         merged.Add(d);

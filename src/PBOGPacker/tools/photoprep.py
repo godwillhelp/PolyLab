@@ -13,7 +13,7 @@ OUT = os.path.join(os.path.dirname(__file__), '..', 'Assets', 'Photos')
 CACHE = os.path.join(os.path.dirname(__file__), '_cache')
 os.makedirs(OUT, exist_ok=True)
 os.makedirs(CACHE, exist_ok=True)
-UA = {'User-Agent': 'NDZPBOGPacker/0.1 (desktop app asset prep; https://github.com/KRdayzmodding/KR_GRAFTED) python-urllib'}
+UA = {'User-Agent': 'PolyLabPBOGPacker/0.1 (desktop app asset prep; https://github.com/KRdayzmodding/KR_GRAFTED) python-urllib'}
 rng = np.random.default_rng(163451)
 
 # role -> (Commons file, output size, focus x, focus y, zoom, grade)

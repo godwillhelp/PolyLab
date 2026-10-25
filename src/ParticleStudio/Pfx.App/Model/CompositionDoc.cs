@@ -5,7 +5,7 @@ using Pfx.Core.Model;
 
 namespace Pfx.App.Model;
 
-// The open project (.ndzpfx): the composition data and its undo history. Every edit replaces the whole ProjectFile
+// The open project (.plpfx): the composition data and its undo history. Every edit replaces the whole ProjectFile
 // object with an edited copy (a snapshot edit), so undo and redo swap complete objects and views find items again by
 // id. Script motion of a part (spin, drawn path) lives in its EffectDoc while the part is open (the path tool edits it
 // there, in the part's own history); Snapshot() takes it from the open parts, Open hands it to them.
@@ -27,7 +27,7 @@ public sealed class CompositionDoc : IUndoOwner
     public string? Path { get; private set; }
     public ProjectFile File { get; private set; }
     public UndoStack Undo { get; } = new();
-    public string Title => Path != null ? System.IO.Path.GetFileName(Path) : (File.Name.Length > 0 ? File.Name : "—") + ".ndzpfx";
+    public string Title => Path != null ? System.IO.Path.GetFileName(Path) : (File.Name.Length > 0 ? File.Name : "—") + ".plpfx";
     public string? Folder => Path != null ? System.IO.Path.GetDirectoryName(Path) : null;
     public int UndoCount => _done.Count;
     public int RedoCount => _undone.Count;

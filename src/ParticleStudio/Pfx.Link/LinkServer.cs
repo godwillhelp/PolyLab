@@ -12,7 +12,7 @@ namespace Pfx.Link;
 // reports, so they do not queue behind its held poll.
 public sealed class LinkServer : IDisposable
 {
-    public const string Route = "/ndzpfx";
+    public const string Route = "/plpfx";
     // A request head is a few hundred bytes; a link message a few kilobytes. Anything larger is not the link mod.
     private const int MaxHead = 16 * 1024;
     private const int MaxBody = 1 << 20;

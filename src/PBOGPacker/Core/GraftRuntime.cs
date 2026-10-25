@@ -1,15 +1,15 @@
 using System.IO;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
-// The GRAFT runtime the NDZ launcher keeps up to date (graft.exe, hid.dll, .version). The launcher
-// passes its folder in NDZ_GRAFT_DIR; a tool installed by the launcher also finds it two levels up
+// The GRAFT runtime the Poly Lab launcher keeps up to date (graft.exe, hid.dll, .version). The launcher
+// passes its folder in POLYLAB_GRAFT_DIR; a tool installed by the launcher also finds it two levels up
 // (<launcher>\tools\pbog\ -> <launcher>\graft). Its version is the one the owner published and tested,
 // so it drives the ABI checks, the TAG of new C++ projects and the texts, instead of a hardcoded pin.
 public static class GraftRuntime
 {
     public const string Pinned = "v0.4.0";
-    public const string DirEnv = "NDZ_GRAFT_DIR";
+    public const string DirEnv = "POLYLAB_GRAFT_DIR";
     private const string VersionFile = ".version";
 
     public static string? Dir

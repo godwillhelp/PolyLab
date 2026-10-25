@@ -1,7 +1,7 @@
 using System.Windows.Controls;
-using NDZ.PBOGPacker.ViewModels;
+using PolyLab.PBOGPacker.ViewModels;
 
-namespace NDZ.PBOGPacker.Views;
+namespace PolyLab.PBOGPacker.Views;
 
 public partial class BuildView : UserControl
 {

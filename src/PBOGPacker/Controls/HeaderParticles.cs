@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
-namespace NDZ.PBOGPacker.Controls;
+namespace PolyLab.PBOGPacker.Controls;
 
 public sealed class HeaderParticles : FrameworkElement
 {

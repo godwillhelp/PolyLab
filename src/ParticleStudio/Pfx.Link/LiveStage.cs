@@ -10,12 +10,12 @@ public sealed record StagedPart(string GamePath, int NewFiles, long NewBytes, IR
 // The reload path of the live link (spec 3.12, P0 facts in 2.12): DayZDiag with -filePatching reads loose files from the
 // game folder, and caches .ptc / .emat / .edds by path, so each version of a part goes under a new path. Every file is
 // named after its bytes (AssetCopy content names): a changed part, material or texture gets a new path, an unchanged
-// one keeps its path and the engine's cached copy. One folder per tool session, `<game>\NDZ_PfxLink\live\<session>`,
+// one keeps its path and the engine's cached copy. One folder per tool session, `<game>\PolyLab_PfxLink\live\<session>`,
 // held by an open lock file and deleted when the session ends; folders of sessions that ended without cleaning up
 // (their lock is free) are deleted at the next start.
 public sealed class LiveStage : IDisposable
 {
-    public const string Root = "NDZ_PfxLink/live";
+    public const string Root = "PolyLab_PfxLink/live";
     private const string LockName = ".lock";
 
     private readonly FileStream _lock;
@@ -141,7 +141,7 @@ public sealed class LiveStage : IDisposable
 }
 
 // Where DayZ is installed: the user's setting, else the Steam library that holds steamapps\common\DayZ with a game exe
-// (Steam's own registry key and library list, as NDZ PBOG finds the workshop folder). Nothing assumes a drive or user.
+// (Steam's own registry key and library list, as PBOG Packer finds the workshop folder). Nothing assumes a drive or user.
 public static class GameFolders
 {
     public static readonly string[] Exes = { "DayZDiag_x64.exe", "DayZ_x64.exe" };

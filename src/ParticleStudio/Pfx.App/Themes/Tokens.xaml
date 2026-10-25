@@ -81,6 +81,6 @@
   <s:Double x:Key="F.Ui">12</s:Double>
   <s:Double x:Key="F.Dense">11</s:Double>
   <FontFamily x:Key="Font.Ui">Segoe UI Variable Text, Segoe UI</FontFamily>
-  <FontFamily x:Key="Font.Mono">pack://application:,,,/Suite.Ui;component/Assets/Fonts/#JetBrains Mono</FontFamily>
+  <FontFamily x:Key="Font.Mono">pack://application:,,,/PolyLab.Ui;component/Assets/Fonts/#JetBrains Mono</FontFamily>
   <DropShadowEffect x:Key="Fx.Popup" BlurRadius="16" ShadowDepth="4" Opacity="0.45" Color="{StaticResource C.Shadow}" />
 </ResourceDictionary>

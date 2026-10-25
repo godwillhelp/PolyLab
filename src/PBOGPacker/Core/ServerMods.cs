@@ -4,7 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 public sealed record WorkshopMod(string Name, string Path, string? Target, string? Id, int Keys);
 

@@ -1,8 +1,9 @@
 using System.Text.Json;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.Core;
 
-// User settings in %APPDATA%\NDZ_ParticleStudio\settings.json (spec 6.3): data roots, language, recent files and the
+// User settings in %APPDATA%\PolyLab\ParticleStudio\settings.json (spec 6.3): data roots, language, recent files and the
 // active workspace. Layouts sit beside it in layouts\<workspace>.xml. Public because System.Text.Json reads it by
 // reflection.
 public sealed class AppSettings
@@ -36,7 +37,7 @@ public sealed class AppSettings
     // at the bounds it had (left, top, width, height in WPF units).
     public bool Maximized { get; set; } = true;
     // The live link (spec 3.12): the DayZ folder (empty = the Steam library that has it), the port the tool listens on
-    // (the link mod's default, or its -ndzPfxLink=<port>) and how far in front of the game camera parts are placed.
+    // (the link mod's default, or its -polylabPfxLink=<port>) and how far in front of the game camera parts are placed.
     public string GameFolder { get; set; } = "";
     public int LinkPort { get; set; } = Pfx.Link.LinkHub.DefaultPort;
     public float LinkMark { get; set; } = 6;
@@ -45,14 +46,23 @@ public sealed class AppSettings
     public List<string> LibraryFolders { get; set; } = new();
     public List<string> LibraryFavourites { get; set; } = new();
 
-    public static string Folder { get; set; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NDZ_ParticleStudio");
+    // Resolved on first use, so a --settings-dir run never reads or copies the user's own folders.
+    private static string? _folder, _cacheFolder;
+
+    public static string Folder
+    {
+        get => _folder ??= DataFolder.Resolve(Environment.SpecialFolder.ApplicationData, "ParticleStudio", "NDZ_ParticleStudio");
+        set => _folder = value;
+    }
 
     private static string FilePath => Path.Combine(Folder, "settings.json");
 
     // Per-user machine data that can be rebuilt (scan caches), spec 6.3.
-    public static string CacheFolder { get; set; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NDZ_ParticleStudio");
+    public static string CacheFolder
+    {
+        get => _cacheFolder ??= DataFolder.Resolve(Environment.SpecialFolder.LocalApplicationData, "ParticleStudio", "NDZ_ParticleStudio");
+        set => _cacheFolder = value;
+    }
 
     public static string LayoutPath(string workspace) => Path.Combine(Folder, "layouts", workspace + ".xml");
 

@@ -1,4 +1,4 @@
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 public enum StepStatus { Idle, Running, Done, Error, Skipped, Off }
 public enum LogLevel { Info, Cmd, Ok, Warn, Err }

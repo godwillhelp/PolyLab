@@ -4,7 +4,7 @@ using Pfx.Core.Export;
 
 namespace Pfx.App.Automation;
 
-// --export <project.ndzpfx> --export-log <file> --profile dayz|cg --to <folder> [--prefix P] [--data-prefix D]
+// --export <project.plpfx> --export-log <file> --profile dayz|cg --to <folder> [--prefix P] [--data-prefix D]
 // [--slot <file>] [--type <word>]: opens the project, sets the export profile through the export panel's own project
 // edit, plans on the panel's worker, writes the plan with the panel's Write and logs every file with its state; then
 // exits. The same steps a user takes on the export panel.

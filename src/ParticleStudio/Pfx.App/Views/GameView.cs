@@ -236,7 +236,7 @@ public sealed class GameView : UserControl
         string folder = _host?.GameFolder ?? "<DayZ>";
         Payload.Ensure(Payload.LinkPbo);
         string mod = Payload.LinkMod;
-        string port = _host == null || _host.Settings.LinkPort == LinkHub.DefaultPort ? "" : " -ndzPfxLink=" + _host.Settings.LinkPort.ToString(CultureInfo.InvariantCulture);
+        string port = _host == null || _host.Settings.LinkPort == LinkHub.DefaultPort ? "" : " -polylabPfxLink=" + _host.Settings.LinkPort.ToString(CultureInfo.InvariantCulture);
         return $"\"{System.IO.Path.Combine(folder, GameFolders.Exes[0])}\" \"-mod={mod}\" -filePatching -autotest -connect=<server> -port=<port>{port}";
     }
 

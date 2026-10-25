@@ -40,7 +40,8 @@
     <!-- Title row: menus, workspace, live link, play. -->
     <Border DockPanel.Dock="Top" Background="{StaticResource B.BgDeep}" BorderBrush="{StaticResource B.LineSubtle}" BorderThickness="0,0,0,1" Height="30">
       <DockPanel Margin="8,0">
-        <Path DockPanel.Dock="Left" Data="{StaticResource Ic.Logo}" Style="{StaticResource Ico}" Stroke="{StaticResource B.Accent}" Margin="0,0,6,0" />
+        <Image DockPanel.Dock="Left" Source="/Particle_Studio;component/Assets/logo.png" Width="18" Height="18" Margin="0,0,6,0"
+               RenderOptions.BitmapScalingMode="HighQuality" />
         <TextBlock DockPanel.Dock="Left" Style="{StaticResource T.Hi}" Text="Particle Studio" Margin="0,0,12,0" />
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
           <TextBlock x:Name="WorkspaceText" Style="{StaticResource T.Dim}" Margin="0,0,12,0" ToolTip="{DynamicResource Tip.Workspace}" />

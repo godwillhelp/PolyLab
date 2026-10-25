@@ -75,7 +75,7 @@ public partial class MainWindow : IComposeHost, IExportHost
     {
     }
 
-    // A zone import as a project next to its parts (<import folder>\cg_xray\<tag>\<zone>.ndzpfx), its sounds copied
+    // A zone import as a project next to its parts (<import folder>\cg_xray\<tag>\<zone>.plpfx), its sounds copied
     // beside them (the X-Ray files stay where the user's install has them).
     public void OpenZoneProject(Pfx.App.XRay.ImportRecord record, string stage)
     {
@@ -105,7 +105,7 @@ public partial class MainWindow : IComposeHost, IExportHost
         file.Export.Cg = new CgProfile { DonorFolder = Settings.CgDonorFolder, SlotFile = Settings.CgSlotFile, Type = record.PType };
         _projectCloseConfirmed = true;
         SetProject(new CompositionDoc(null, file));
-        SaveProjectTo(Path.Combine(folder, file.Name + ".ndzpfx"));
+        SaveProjectTo(Path.Combine(folder, file.Name + ".plpfx"));
         Open(file.Parts.Select(p => Path.GetFullPath(Path.Combine(folder, p.Path))).Where(File.Exists));
         foreach (var part in _project!.File.Parts)
             if (DocOfPart(part) is { } d)
@@ -166,7 +166,7 @@ public partial class MainWindow : IComposeHost, IExportHost
     {
         var settings = new TornadoSettings { BoltDonor = donor };
         string name = ProjectNames.Id(settings.Name);
-        string project = Path.Combine(folder, name + ".ndzpfx");
+        string project = Path.Combine(folder, name + ".plpfx");
         var parts = TornadoGenerator.Generate(settings).Parts.Select(p => Path.Combine(folder, TornadoGenerator.PartsFolder, settings.Name + p.Suffix + ".ptc"));
         if (parts.Append(project).FirstOrDefault(File.Exists) is { } taken)
         {
@@ -255,7 +255,7 @@ public partial class MainWindow : IComposeHost, IExportHost
         string? path = null;
         if (saveAs || _project.Path == null)
         {
-            var dialog = new SaveFileDialog { Filter = Loc.T("Filter.Project"), FileName = _project.File.Name + ".ndzpfx", InitialDirectory = _project.Folder ?? "" };
+            var dialog = new SaveFileDialog { Filter = Loc.T("Filter.Project"), FileName = _project.File.Name + ".plpfx", InitialDirectory = _project.Folder ?? "" };
             if (dialog.ShowDialog(this) != true)
                 return;
             path = dialog.FileName;

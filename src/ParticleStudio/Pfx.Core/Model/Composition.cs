@@ -3,13 +3,17 @@ using System.Text.Json.Serialization;
 
 namespace Pfx.Core.Model;
 
-// The .ndzpfx project (spec 3.8): the parts (.ptc files) of one effect and everything the .ptc cannot hold, run by
+// The .plpfx project (spec 3.8): the parts (.ptc files) of one effect and everything the .ptc cannot hold, run by
 // script in the game (spec 2.7): lights, heat hazes, sounds, screen effects, strikes, per-part script data (turn, path,
 // near radius, hard stop) and the states that start them, with the anomaly settings and the export profile. Times are
 // seconds, distances metres, colours linear 0..1 as the light API takes them.
 public sealed class ProjectFile
 {
     public const int CurrentVersion = 2;
+
+    // Projects saved before the Poly Lab rename are .ndzpfx; they open the same way.
+    public static bool IsProject(string path) =>
+        path.EndsWith(".plpfx", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".ndzpfx", StringComparison.OrdinalIgnoreCase);
 
     [JsonPropertyName("version")] public int Version { get; set; } = CurrentVersion;
     // The effect's id: names of exported files and classes start with it (letters, digits, '_').

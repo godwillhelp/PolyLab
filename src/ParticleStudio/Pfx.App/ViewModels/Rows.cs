@@ -3,7 +3,7 @@ using Pfx.App.Core;
 using Pfx.App.Model;
 using Pfx.Core.Model;
 using Pfx.Core.Text;
-using Suite.Ui.Core;
+using PolyLab.Ui.Core;
 
 namespace Pfx.App.ViewModels;
 

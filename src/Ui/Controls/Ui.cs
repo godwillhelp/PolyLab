@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Suite.Ui.Controls;
+namespace PolyLab.Ui.Controls;
 
 public static class Ui
 {

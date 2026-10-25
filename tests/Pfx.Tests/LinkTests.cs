@@ -211,7 +211,7 @@ public sealed class LinkTests : IDisposable
         {
             folder = stage.Folder;
             var a = stage.Stage("My Part", v1, src);
-            Assert.StartsWith("NDZ_PfxLink/live/" + stage.Session + "/my_part_", a.GamePath);
+            Assert.StartsWith("PolyLab_PfxLink/live/" + stage.Session + "/my_part_", a.GamePath);
             Assert.Equal(3, a.NewFiles);
             Assert.Empty(a.Missing);
             var again = stage.Stage("My Part", v1, src);
@@ -221,7 +221,7 @@ public sealed class LinkTests : IDisposable
             Assert.NotEqual(a.GamePath, b.GamePath);
             Assert.Equal(1, b.NewFiles);
             string staged = File.ReadAllText(Path.Combine(stage.Folder, b.GamePath.Split('/')[^1]), Encoding.Latin1);
-            Assert.Contains("\"NDZ_PfxLink/live/" + stage.Session + "/materials/glow_", staged);
+            Assert.Contains("\"PolyLab_PfxLink/live/" + stage.Session + "/materials/glow_", staged);
             string stamp = LiveStage.Stamp(v2, src);
             File.WriteAllBytes(Path.Combine(data, "mod", "fx", "glow.edds"), new byte[] { 9, 9, 9, 9, 9 });
             Assert.NotEqual(stamp, LiveStage.Stamp(v2, src));
@@ -231,7 +231,7 @@ public sealed class LinkTests : IDisposable
             Assert.Equal(0, LiveStage.RemoveStale(game, null));
         }
         Assert.False(Directory.Exists(folder));
-        Directory.CreateDirectory(Path.Combine(game, "NDZ_PfxLink", "live", "s_old"));
+        Directory.CreateDirectory(Path.Combine(game, "PolyLab_PfxLink", "live", "s_old"));
         Assert.Equal(1, LiveStage.RemoveStale(game));
     }
 }

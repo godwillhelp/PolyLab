@@ -1,7 +1,7 @@
-<UserControl x:Class="NDZ.PBOGPacker.Views.ServersView"
+<UserControl x:Class="PolyLab.PBOGPacker.Views.ServersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:c="clr-namespace:NDZ.PBOGPacker.Controls">
+             xmlns:c="clr-namespace:PolyLab.PBOGPacker.Controls">
   <Grid>
     <Rectangle Fill="#A60A0B0B"/>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -35,7 +35,7 @@
                   </Grid.RowDefinitions>
                   <DockPanel>
                     <Grid Width="44" Height="44" DockPanel.Dock="Left">
-                      <Image Source="/NDZ_PBOGPacker;component/Assets/Photos/st_host.jpg" Stretch="UniformToFill"/>
+                      <Image Source="/PBOG_Packer;component/Assets/Photos/st_host.jpg" Stretch="UniformToFill"/>
                       <Rectangle Fill="#660B0C0C"/>
                       <Border BorderBrush="{StaticResource B.Line2}" BorderThickness="1"/>
                       <c:Ico Kind="servers" Size="22" Foreground="#DCD8CC"/>

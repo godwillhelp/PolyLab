@@ -26,7 +26,7 @@
   <s:String x:Key="Ab.Status.dropped">Dropped by the conversion</s:String>
   <s:String x:Key="Ab.Status.fitted">Carried over into DayZ values</s:String>
   <s:String x:Key="Ab.Subject">{0} ({1}:{2}) · DayZ parts: {3}</s:String>
-  <s:String x:Key="App.Title">NDZ Particle Studio</s:String>
+  <s:String x:Key="App.Title">Particle Studio</s:String>
   <s:String x:Key="Arch.burn">burns while inside</s:String>
   <s:String x:Key="Arch.burst">strike on entry</s:String>
   <s:String x:Key="Arch.catcher">catcher</s:String>
@@ -480,7 +480,7 @@
   <s:String x:Key="Filter.Ogg">Ogg Vorbis sound (*.ogg)|*.ogg</s:String>
   <s:String x:Key="Filter.Param">ncnn model (*.param)|*.param</s:String>
   <s:String x:Key="Filter.Pictures">Pictures ({0})|{0}</s:String>
-  <s:String x:Key="Filter.Project">Particle Studio project (*.ndzpfx)|*.ndzpfx</s:String>
+  <s:String x:Key="Filter.Project">Particle Studio project (*.plpfx)|*.plpfx;*.ndzpfx</s:String>
   <s:String x:Key="Filter.Ptc">DayZ effect (*.ptc)|*.ptc</s:String>
   <s:String x:Key="Filter.Py">Python script (*.py)|*.py</s:String>
   <s:String x:Key="Filter.Script">Enforce script (*.c)|*.c</s:String>
@@ -1583,7 +1583,7 @@
   <s:String x:Key="Tip.Cmd.NewProject">A new anomaly project from the open parts: states, lights, sound, export</s:String>
   <s:String x:Key="Tip.Cmd.NewTornado">Builds the whole CG tornado: funnel, strands, cap, storm rings, debris, bolts and strikes — ordinary emitters and a project in the chosen folder</s:String>
   <s:String x:Key="Tip.Cmd.Open">Open .ptc effects; several files are parts of one scene</s:String>
-  <s:String x:Key="Tip.Cmd.OpenProject">Open a project (.ndzpfx) with all its parts</s:String>
+  <s:String x:Key="Tip.Cmd.OpenProject">Open a project (.plpfx) with all its parts</s:String>
   <s:String x:Key="Tip.Cmd.Play">Start or pause the preview; edits do not stop playback</s:String>
   <s:String x:Key="Tip.Cmd.Recent">Recently opened files</s:String>
   <s:String x:Key="Tip.Cmd.Redo">Redo the undone edit</s:String>
@@ -1650,7 +1650,7 @@
   <s:String x:Key="Tip.Cmp.New">A new project from the open parts (all of them go into the idle state)</s:String>
   <s:String x:Key="Tip.Cmp.NoProject">An anomaly is built in a project: New or Open</s:String>
   <s:String x:Key="Tip.Cmp.Offset">Where the light is relative to the anomaly centre, metres</s:String>
-  <s:String x:Key="Tip.Cmp.Open">Open a project (.ndzpfx)</s:String>
+  <s:String x:Key="Tip.Cmp.Open">Open a project (.plpfx)</s:String>
   <s:String x:Key="Tip.Cmp.OverIdle">The first state (idle) keeps playing underneath this one</s:String>
   <s:String x:Key="Tip.Cmp.PathKeys">The source's drawn path (path tool), played by script</s:String>
   <s:String x:Key="Tip.Cmp.PickItem">Click to show the item's values</s:String>
@@ -1777,7 +1777,7 @@
   <s:String x:Key="Tip.Game.Log">How long an edit took to the game and back, reloads, frames and series</s:String>
   <s:String x:Key="Tip.Game.Mark">Move the parts to the ground in front of the game's current camera</s:String>
   <s:String x:Key="Tip.Game.PlayerCamera">Give the game its player camera back</s:String>
-  <s:String x:Key="Tip.Game.Port">The port the editor listens on; the link mod uses 18150 unless the game is started with -ndzPfxLink=port</s:String>
+  <s:String x:Key="Tip.Game.Port">The port the editor listens on; the link mod uses 18150 unless the game is started with -polylabPfxLink=port</s:String>
   <s:String x:Key="Tip.Game.Resync">Every open part appears in the game again as it is in the editor now</s:String>
   <s:String x:Key="Tip.Game.Series">Frames in a row from the editor camera and the blink measure: mean difference of neighbouring frames and the share of jumping pixels</s:String>
   <s:String x:Key="Tip.Game.SeriesCount">How many frames in a row, 2 to 100 (more stalls the game while the pictures are written)</s:String>

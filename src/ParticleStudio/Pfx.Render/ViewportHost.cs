@@ -30,7 +30,7 @@ public interface IViewportTool
 // everything made from it and building them again; ForceDeviceLoss runs the same path on demand.
 public sealed class ViewportHost : HwndHost
 {
-    private const string ClassName = "NDZ_PfxViewport";
+    private const string ClassName = "PolyLab_PfxViewport";
     private const SwapChainFlags SwapFlags = SwapChainFlags.FrameLatencyWaitableObject;
     private static readonly WndProcDelegate DefProc = Native.DefWindowProc;
     private static bool _classRegistered;

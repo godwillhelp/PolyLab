@@ -7,14 +7,14 @@ namespace PfxView;
 
 public partial class App : Application
 {
-    // Settings of this test app: data roots and language (%APPDATA%\NDZ_ParticleStudio, spec 6.3).
+    // Settings of this test app: data roots and language (%APPDATA%\PolyLab\ParticleStudio, spec 6.3).
     public sealed class Settings
     {
         public string Roots { get; set; } = "";
         public string Lang { get; set; } = "ru";
 
         private static string FilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "NDZ_ParticleStudio", "PfxView.json");
+            "PolyLab", "ParticleStudio", "PfxView.json");
 
         public static Settings Load()
         {

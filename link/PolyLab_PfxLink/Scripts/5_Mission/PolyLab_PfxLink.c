@@ -1,9 +1,9 @@
-class NDZ_PfxLinkRest : RestCallback
+class PolyLab_PfxLinkRest : RestCallback
 {
-	protected NDZ_PfxLink m_Link;
+	protected PolyLab_PfxLink m_Link;
 	protected bool m_Events;
 
-	void NDZ_PfxLinkRest(NDZ_PfxLink link, bool events)
+	void PolyLab_PfxLinkRest(PolyLab_PfxLink link, bool events)
 	{
 		m_Link = link;
 		m_Events = events;
@@ -35,7 +35,7 @@ class NDZ_PfxLinkRest : RestCallback
 	}
 }
 
-class NDZ_PfxLinkShot
+class PolyLab_PfxLinkShot
 {
 	string m_Name;
 	string m_File;
@@ -44,7 +44,7 @@ class NDZ_PfxLinkShot
 	int m_Frames;
 }
 
-class NDZ_PfxLinkSeries
+class PolyLab_PfxLinkSeries
 {
 	string m_Prefix;
 	int m_Count;
@@ -53,18 +53,18 @@ class NDZ_PfxLinkSeries
 	int m_Wait;
 }
 
-class NDZ_PfxLink
+class PolyLab_PfxLink
 {
-	static const int NDZ_PFXLINK_PORT = 18150;
-	static const float NDZ_PFXLINK_RETRY = 2.3;
-	static const float NDZ_PFXLINK_MARK = 6.0;
-	static const int NDZ_PFXLINK_SHOT_FRAMES = 2;
-	static const int NDZ_PFXLINK_EMITTERS = 64;
-	static const string NDZ_PFXLINK_DIR = "$profile:NDZ_PfxLink";
-	static const string NDZ_PFXLINK_SHOTS = "$profile:NDZ_PfxLink/shots";
+	static const int POLYLAB_PFXLINK_PORT = 18150;
+	static const float POLYLAB_PFXLINK_RETRY = 2.3;
+	static const float POLYLAB_PFXLINK_MARK = 6.0;
+	static const int POLYLAB_PFXLINK_SHOT_FRAMES = 2;
+	static const int POLYLAB_PFXLINK_EMITTERS = 64;
+	static const string POLYLAB_PFXLINK_DIR = "$profile:PolyLab_PfxLink";
+	static const string POLYLAB_PFXLINK_SHOTS = "$profile:PolyLab_PfxLink/shots";
 
-	protected ref NDZ_PfxLinkRest m_Rest;
-	protected ref NDZ_PfxLinkRest m_EvRest;
+	protected ref PolyLab_PfxLinkRest m_Rest;
+	protected ref PolyLab_PfxLinkRest m_EvRest;
 	protected RestContext m_Ctx;
 	protected RestContext m_EvCtx;
 	protected bool m_EvBusy;
@@ -83,15 +83,15 @@ class NDZ_PfxLink
 	protected ref array<string> m_Sent = new array<string>();
 	protected ref array<string> m_Cmds = new array<string>();
 	protected ref map<int, ParticleSource> m_Sources = new map<int, ParticleSource>();
-	protected ref array<ref NDZ_PfxLinkShot> m_Pending = new array<ref NDZ_PfxLinkShot>();
+	protected ref array<ref PolyLab_PfxLinkShot> m_Pending = new array<ref PolyLab_PfxLinkShot>();
 	protected ref array<string> m_ShotQueue = new array<string>();
-	protected ref array<ref NDZ_PfxLinkSeries> m_Series = new array<ref NDZ_PfxLinkSeries>();
+	protected ref array<ref PolyLab_PfxLinkSeries> m_Series = new array<ref PolyLab_PfxLinkSeries>();
 
-	void NDZ_PfxLink()
+	void PolyLab_PfxLink()
 	{
-		int port = NDZ_PFXLINK_PORT;
+		int port = POLYLAB_PFXLINK_PORT;
 		string arg;
-		if (GetCLIParam("ndzpfxlink", arg) && arg.ToInt() > 0)
+		if (GetCLIParam("polylabpfxlink", arg) && arg.ToInt() > 0)
 			port = arg.ToInt();
 		RestApi api = GetRestApi();
 		if (!api)
@@ -106,14 +106,14 @@ class NDZ_PfxLink
 			m_Ctx.SetHeader("text/plain");
 		if (m_EvCtx)
 			m_EvCtx.SetHeader("text/plain");
-		m_Rest = new NDZ_PfxLinkRest(this, false);
-		m_EvRest = new NDZ_PfxLinkRest(this, true);
+		m_Rest = new PolyLab_PfxLinkRest(this, false);
+		m_EvRest = new PolyLab_PfxLinkRest(this, true);
 		int a = Math.RandomInt(100000, 999999);
 		m_Session = a.ToString() + "x" + TickCount(0).ToString();
 		QueueHello();
 	}
 
-	void ~NDZ_PfxLink()
+	void ~PolyLab_PfxLink()
 	{
 		if (m_Ctx)
 			m_Ctx.reset();
@@ -150,7 +150,7 @@ class NDZ_PfxLink
 		if (!m_Linked)
 		{
 			m_Linked = true;
-			Print("NDZ_PfxLink: linked, session " + m_Session);
+			Print("PolyLab_PfxLink: linked, session " + m_Session);
 		}
 		array<string> lines = new array<string>();
 		data.Split("\n", lines);
@@ -168,12 +168,12 @@ class NDZ_PfxLink
 		if (m_Linked)
 		{
 			m_Linked = false;
-			Print("NDZ_PfxLink: link lost, code " + code.ToString());
+			Print("PolyLab_PfxLink: link lost, code " + code.ToString());
 		}
 		for (int i = m_Sent.Count() - 1; i >= 0; i--)
 			m_Out.InsertAt(m_Sent[i], 0);
 		m_Sent.Clear();
-		m_Wait = NDZ_PFXLINK_RETRY;
+		m_Wait = POLYLAB_PFXLINK_RETRY;
 	}
 
 	protected void Send()
@@ -186,7 +186,7 @@ class NDZ_PfxLink
 		}
 		m_Out.Clear();
 		m_Busy = true;
-		m_Ctx.POST(m_Rest, "ndzpfx", body);
+		m_Ctx.POST(m_Rest, "plpfx", body);
 	}
 
 	protected void SendEvents()
@@ -199,7 +199,7 @@ class NDZ_PfxLink
 		}
 		m_Out.Clear();
 		m_EvBusy = true;
-		m_EvCtx.POST(m_EvRest, "ndzpfx", body);
+		m_EvCtx.POST(m_EvRest, "plpfx", body);
 	}
 
 	void EventsDelivered()
@@ -329,7 +329,7 @@ class NDZ_PfxLink
 		}
 		if (cmd == "shots" && a.Count() > 4)
 		{
-			NDZ_PfxLinkSeries s = new NDZ_PfxLinkSeries();
+			PolyLab_PfxLinkSeries s = new PolyLab_PfxLinkSeries();
 			s.m_Prefix = a[2];
 			s.m_Count = a[3].ToInt();
 			s.m_Every = a[4].ToInt();
@@ -369,7 +369,7 @@ class NDZ_PfxLink
 	{
 		StopSource(id);
 		if (!m_HasAnchor)
-			MarkInFront(NDZ_PFXLINK_MARK);
+			MarkInFront(POLYLAB_PFXLINK_MARK);
 		ParticleProperties props = new ParticleProperties(m_Anchor, ParticlePropertiesFlags.PLAY_ON_CREATION, null, vector.Zero, this);
 		ParticleSource ps = ParticleManager.GetInstance().CreateParticleByPath(path, props);
 		if (!ps)
@@ -378,8 +378,8 @@ class NDZ_PfxLink
 			return;
 		}
 		m_Sources.Set(id, ps);
-		string names[NDZ_PFXLINK_EMITTERS];
-		int count = GetParticleEmitors(ps, names, NDZ_PFXLINK_EMITTERS);
+		string names[POLYLAB_PFXLINK_EMITTERS];
+		int count = GetParticleEmitors(ps, names, POLYLAB_PFXLINK_EMITTERS);
 		string line = "spawned " + id.ToString() + " " + seq.ToString() + " " + count.ToString();
 		for (int i = 0; i < count; i++)
 			line = line + " " + names[i];
@@ -516,7 +516,7 @@ class NDZ_PfxLink
 	protected void CamAt(array<string> a)
 	{
 		if (!m_HasAnchor)
-			MarkInFront(NDZ_PFXLINK_MARK);
+			MarkInFront(POLYLAB_PFXLINK_MARK);
 		vector eye = m_Anchor + Vector(a[2].ToFloat(), a[3].ToFloat(), a[4].ToFloat());
 		vector target = m_Anchor + Vector(a[5].ToFloat(), a[6].ToFloat(), a[7].ToFloat());
 		if (!m_Cam)
@@ -554,11 +554,11 @@ class NDZ_PfxLink
 
 	protected void TakeShot(string name)
 	{
-		MakeDirectory(NDZ_PFXLINK_DIR);
-		MakeDirectory(NDZ_PFXLINK_SHOTS);
-		NDZ_PfxLinkShot s = new NDZ_PfxLinkShot();
+		MakeDirectory(POLYLAB_PFXLINK_DIR);
+		MakeDirectory(POLYLAB_PFXLINK_SHOTS);
+		PolyLab_PfxLinkShot s = new PolyLab_PfxLinkShot();
 		s.m_Name = name;
-		s.m_File = NDZ_PFXLINK_SHOTS + "/" + name + ".bmp";
+		s.m_File = POLYLAB_PFXLINK_SHOTS + "/" + name + ".bmp";
 		s.m_Time = g_Game.GetTime();
 		s.m_FrameMs = m_Dt * 1000.0;
 		if (FileExist(s.m_File))
@@ -572,7 +572,7 @@ class NDZ_PfxLink
 	{
 		for (int i = m_Pending.Count() - 1; i >= 0; i--)
 		{
-			NDZ_PfxLinkShot s = m_Pending[i];
+			PolyLab_PfxLinkShot s = m_Pending[i];
 			s.m_Frames++;
 			if (FileExist(s.m_File))
 			{
@@ -586,7 +586,7 @@ class NDZ_PfxLink
 				Out(line);
 				m_Pending.Remove(i);
 			}
-			else if (s.m_Frames >= NDZ_PFXLINK_SHOT_FRAMES)
+			else if (s.m_Frames >= POLYLAB_PFXLINK_SHOT_FRAMES)
 			{
 				Out("noshot " + s.m_Name + " no file");
 				m_Pending.Remove(i);
@@ -598,7 +598,7 @@ class NDZ_PfxLink
 	{
 		for (int i = m_Series.Count() - 1; i >= 0; i--)
 		{
-			NDZ_PfxLinkSeries s = m_Series[i];
+			PolyLab_PfxLinkSeries s = m_Series[i];
 			if (m_ShotThisFrame)
 				return;
 			if (s.m_Wait > 0)
@@ -618,13 +618,13 @@ class NDZ_PfxLink
 
 modded class MissionGameplay
 {
-	protected ref NDZ_PfxLink m_NDZPfxLink;
+	protected ref PolyLab_PfxLink m_PolyLabPfxLink;
 
 	override void OnUpdate(float timeslice)
 	{
 		super.OnUpdate(timeslice);
-		if (!m_NDZPfxLink)
-			m_NDZPfxLink = new NDZ_PfxLink();
-		m_NDZPfxLink.Tick(timeslice);
+		if (!m_PolyLabPfxLink)
+			m_PolyLabPfxLink = new PolyLab_PfxLink();
+		m_PolyLabPfxLink.Tick(timeslice);
 	}
 }

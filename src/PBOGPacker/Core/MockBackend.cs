@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace NDZ.PBOGPacker.Core;
+namespace PolyLab.PBOGPacker.Core;
 
 public sealed class MockBackend : IGraftBackend
 {
@@ -34,9 +34,9 @@ public sealed class MockBackend : IGraftBackend
         _mods = new()
         {
             new("radio", "CG_RadioRange", "0.1.0", @"D:\Mods\CG_RadioRange", new[] { "4_World", "5_Mission" }, "CG",
-                new("ok", now.AddMinutes(-42), 38400), new("ok", "CG"), new("stale", new[] { "live" }, now.AddDays(-2)), "pack://application:,,,/NDZ_PBOGPacker;component/Assets/Photos/logo_radio.jpg"),
+                new("ok", now.AddMinutes(-42), 38400), new("ok", "CG"), new("stale", new[] { "live" }, now.AddDays(-2)), "pack://application:,,,/PBOG_Packer;component/Assets/Photos/logo_radio.jpg"),
             new("stats", "CG_ServerStats", "1.0.2", @"D:\Mods\CG_ServerStats", new[] { "5_Mission" }, "CG",
-                new("ok", now.AddDays(-2), 21700), new("ok", "CG"), new("ok", new[] { "live", "pog" }, now.AddDays(-2)), "pack://application:,,,/NDZ_PBOGPacker;component/Assets/Photos/logo_stats.jpg"),
+                new("ok", now.AddDays(-2), 21700), new("ok", "CG"), new("ok", new[] { "live", "pog" }, now.AddDays(-2)), "pack://application:,,,/PBOG_Packer;component/Assets/Photos/logo_stats.jpg"),
             new("time", "CG_NativeTime", "0.3.0-dev", @"D:\Mods\CG_NativeTime", new[] { "3_Game", "4_World" }, "CG",
                 new("fail", now.AddHours(-3), 0, "build"), new("none"), new("none", Array.Empty<string>())),
             new("radioc", "CG_RadioRangeClient", "0.1.0", @"D:\Mods\CG_RadioRangeClient", new[] { "3_Game", "5_Mission" }, "CG",
@@ -97,7 +97,7 @@ public sealed class MockBackend : IGraftBackend
         string? stored = null;
         if (!string.IsNullOrEmpty(imagePath) && File.Exists(imagePath))
         {
-            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NDZ_PBOGPacker", "logos");
+            var dir = Path.Combine(PackBackend.StateDir, "logos");
             Directory.CreateDirectory(dir);
             stored = Path.Combine(dir, id + "_" + DateTime.Now.Ticks + Path.GetExtension(imagePath));
             File.Copy(imagePath, stored, true);
@@ -383,10 +383,10 @@ public sealed class MockBackend : IGraftBackend
             case "env" when fail:
                 return new()
                 {
-                    (C, "[NDZ] doctor"),
+                    (C, "[PBOG] doctor"),
                     (E, @"clang-cl: not found (C:\Program Files\LLVM\bin\clang-cl.exe)"),
                     (W, "graft.exe v0.1.4 != graft.boot v0.4.0"),
-                    (E, "[NDZ] ERROR: clang-cl is not installed. Install it (winget install LLVM.LLVM) or add the VS 'C++ Clang tools' component, then re-run."),
+                    (E, "[PBOG] ERROR: clang-cl is not installed. Install it (winget install LLVM.LLVM) or add the VS 'C++ Clang tools' component, then re-run."),
                 };
             case "env" when !grafted:
                 return new()
@@ -401,7 +401,7 @@ public sealed class MockBackend : IGraftBackend
             case "env":
                 return new()
                 {
-                    (C, "[NDZ] doctor"),
+                    (C, "[PBOG] doctor"),
                     (I, "clang-cl 23.1.2 · cmake 3.31.6 · ninja 1.12.1 · Windows SDK 10.0.26100"),
                     (I, "AddonBuilder ok · CfgConvert ok · DSSignFile ok · graft v0.4.0 (graft.boot v0.4.0)"),
                     (I, $@"куда: {root}\addons\{m.Name}.pbo"),
@@ -417,7 +417,7 @@ public sealed class MockBackend : IGraftBackend
             case "build" when fail:
                 return new()
                 {
-                    (C, $"[NDZ] cmake configure + build (preset: {o.Preset})"),
+                    (C, $"[PBOG] cmake configure + build (preset: {o.Preset})"),
                     (I, "-- The CXX compiler identification is Clang 23.1.2 with MSVC-like command-line"),
                     (I, "-- graft.boot: graft_import KR_GRAFTED TAG v0.4.0"),
                     (I, "-- Configuring done (1.8s) · Generating done (0.2s)"),
@@ -429,12 +429,12 @@ public sealed class MockBackend : IGraftBackend
                     (I, "      |     ~~~~^"),
                     (E, "1 error generated."),
                     (E, "ninja: build stopped: subcommand failed."),
-                    (E, "[NDZ] ERROR: cmake build failed"),
+                    (E, "[PBOG] ERROR: cmake build failed"),
                 };
             case "build":
                 return new()
                 {
-                    (C, $"[NDZ] cmake configure + build (preset: {o.Preset})"),
+                    (C, $"[PBOG] cmake configure + build (preset: {o.Preset})"),
                     (I, "-- The CXX compiler identification is Clang 23.1.2 with MSVC-like command-line"),
                     (I, "-- graft.boot: graft_import KR_GRAFTED TAG v0.4.0"),
                     (I, $"-- graft_plugin({m.Name} VERSION {m.Version} MODULES {string.Join(' ', m.Modules)})"),
@@ -444,14 +444,14 @@ public sealed class MockBackend : IGraftBackend
                     (W, "src/hooks/transmitter.cpp(88,17): warning: unused variable 'prevIdx' [-Wunused-variable]"),
                     (I, $"[6/9] Building CXX object CMakeFiles/{m.Name}.dir/src/natives/frequency.cpp.obj"),
                     (I, $"[9/9] Linking CXX shared library {m.Name}.grafted.dll"),
-                    (K, $@"[NDZ] plugin DLL: {m.Path}\build\{o.Preset}\{m.Name}.grafted.dll"),
+                    (K, $@"[PBOG] plugin DLL: {m.Path}\build\{o.Preset}\{m.Name}.grafted.dll"),
                 };
             case "protogen":
             {
                 var l = new List<(LogLevel, string)> { (C, $"graft protogen --plugin {m.Name}.grafted.dll --out {m.Name}.scripts") };
                 var counts = new[] { 6, 2, 3 };
                 for (var i = 0; i < m.Modules.Count; i++) l.Add((I, $"  {m.Modules[i]}: {counts[i % 3]} natives -> grafted_natives_{m.Name}.c"));
-                l.Add((K, $@"[NDZ] syncing declarations -> mod\{m.Name}\scripts"));
+                l.Add((K, $@"[PBOG] syncing declarations -> mod\{m.Name}\scripts"));
                 return l;
             }
             case "pack":

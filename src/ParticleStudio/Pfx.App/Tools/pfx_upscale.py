@@ -1,5 +1,5 @@
 """Runs Real-ESRGAN x4 on the CPU through the user's esrgan_cpu.py (ncnn weights executed by PyTorch; the GPU is hidden
-before torch loads, so nothing runs on the graphics card). NDZ Particle Studio starts it with a job file:
+before torch loads, so nothing runs on the graphics card). Particle Studio starts it with a job file:
 
     <python> pfx_upscale.py <job.json>
 

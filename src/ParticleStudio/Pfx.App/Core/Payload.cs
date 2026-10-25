@@ -5,14 +5,14 @@ namespace Pfx.App.Core;
 // and written next to the tool when first needed or when the tool's copy differs.
 public static class Payload
 {
-    public const string LinkPbo = "NDZ_PfxLink.pbo";
+    public const string LinkPbo = "PolyLab_PfxLink.pbo";
     public const string Upscale = "pfx_upscale.py";
 
-    public static string LinkMod => Path.Combine(AppContext.BaseDirectory, "link", "@NDZ_PfxLink");
+    public static string LinkMod => Path.Combine(AppContext.BaseDirectory, "link", "@PolyLab_PfxLink");
 
     private static readonly Dictionary<string, string> Places = new()
     {
-        [LinkPbo] = Path.Combine("link", "@NDZ_PfxLink", "addons", LinkPbo),
+        [LinkPbo] = Path.Combine("link", "@PolyLab_PfxLink", "addons", LinkPbo),
         [Upscale] = Path.Combine("Tools", Upscale),
     };
 
