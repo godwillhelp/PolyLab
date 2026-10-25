@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -27,11 +27,6 @@
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="NAudio.WinMM" Version="2.2.1" />
     <PackageReference Include="NVorbis" Version="0.10.5" />
-    <!-- Vortice's SharpGen.Runtime pulls System.Text.Json 9 in; SharpGen never loads it, so the app keeps the framework's
-         own copy and ships no System.* package DLLs. -->
-    <PackageReference Include="System.Text.Json" Version="9.0.1" ExcludeAssets="compile;runtime" />
-    <PackageReference Include="System.Text.Encodings.Web" Version="9.0.1" ExcludeAssets="compile;runtime" />
-    <PackageReference Include="System.IO.Pipelines" Version="9.0.1" ExcludeAssets="compile;runtime" />
   </ItemGroup>
 
   <ItemGroup>

@@ -37,8 +37,7 @@ Packer's settings.
 
 ## Build from source
 
-You need the [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer on Windows (it reads the `.slnx`
-solution; the programs target .NET 8).
+You need the [.NET SDK](https://dotnet.microsoft.com/download) 10 on Windows (the programs target .NET 10).
 
 ```
 git clone <this repository>
@@ -136,7 +135,7 @@ Poly Lab — бесплатные инструменты с открытым к�
 **GRAFT** (автор 6wingSeraph, GPL-3.0-or-later с исключением для плагинов) в репозиторий не входит. PBOG Packer
 закрепляет поддерживаемый релиз GRAFT, лаунчер скачивает именно его с GitHub и сверяет контрольную сумму.
 
-**Сборка из исходников.** Нужен .NET SDK 9.0.200 или новее: `dotnet build PolyLab.slnx -c Release`. Мод связи с игрой
+**Сборка из исходников.** Нужен .NET SDK 10: `dotnet build PolyLab.slnx -c Release`. Мод связи с игрой
 для Particle Studio сборка пакует сама (DayZ Tools не нужны) и останавливается с файлом и строкой при ошибке в конфиге.
 **Релизы** выпускаются тегом `<id>-v<версия>` (`pbog`, `pfx`, `launcher`; суффикс `-beta.1` — бета), текст тега
 становится заметками релиза; GitHub Actions собирает, тестирует и прикладывает zip (у лаунчера ещё установщик). Тесты: `dotnet test

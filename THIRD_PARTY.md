@@ -17,7 +17,6 @@ Restored at build time, not stored in the repository. Licences as stated in each
 | Vortice.Mathematics | 2.1.0 | MIT | Particle Studio (via Vortice) |
 | SharpGen.Runtime, SharpGen.Runtime.COM | 2.4.2-beta | MIT | Particle Studio (via Vortice) |
 | K4os.Compression.LZ4 | 1.3.8 | MIT (© Milosz Krajewski) | Particle Studio (EDDS) |
-| System.Text.Json, System.Text.Encodings.Web, System.IO.Pipelines | 9.0.1 | MIT (© Microsoft) | referenced with `ExcludeAssets="compile;runtime"`, not shipped |
 | Microsoft.Win32.Registry, System.Memory, System.ValueTuple, System.Security.* | 4.x | MIT (© Microsoft) | transitive, framework-provided |
 | xunit, xunit.runner.visualstudio | 2.9.3, 3.1.4 | Apache-2.0 (© .NET Foundation) | tests only |
 | Microsoft.NET.Test.Sdk | 17.14.1 | MIT (© Microsoft) | tests only |
