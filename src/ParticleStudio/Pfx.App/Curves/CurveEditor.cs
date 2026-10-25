@@ -191,9 +191,9 @@ public sealed class CurveEditor : ObservableObject
 
     // ---- edits ----
 
-    private void Write(List<GraphKey> keys, string label, string? merge = null) => Write(Active.Key, keys, label, merge);
+    private void Write(List<GraphKey> keys, Func<string> label, string? merge = null) => Write(Active.Key, keys, label, merge);
 
-    private void Write(string key, List<GraphKey> keys, string label, string? merge)
+    private void Write(string key, List<GraphKey> keys, Func<string> label, string? merge)
     {
         if (Doc == null || Emitter == null)
             return;
@@ -236,7 +236,7 @@ public sealed class CurveEditor : ObservableObject
         int at = keys.FindIndex(k => k.Time > t);
         at = at < 0 ? keys.Count : at;
         keys.Insert(at, key);
-        Write(keys, Loc.F("Undo.CurveAdd", Loc.T(Active.Name), Format(t * TimeScale)));
+        Write(keys, Loc.Later("Undo.CurveAdd", Loc.Later(Active.Name), Format(t * TimeScale)));
         _selection.Clear();
         _selection.Add(at);
         Notify();
@@ -268,7 +268,7 @@ public sealed class CurveEditor : ObservableObject
             return;
         foreach (int i in gone)
             keys.RemoveAt(i);
-        Write(keys, Loc.F("Undo.CurveDelete", Loc.T(Active.Name), gone.Count));
+        Write(keys, Loc.Later("Undo.CurveDelete", Loc.Later(Active.Name), gone.Count));
         _selection.Clear();
         Notify();
     }
@@ -345,7 +345,7 @@ public sealed class CurveEditor : ObservableObject
             double v = Math.Clamp(SnapValue(start[i].Values[ch] + dv), 0, ViewTop);
             keys[i] = start[i].With(0, Round(t)).With(ch, v);
         }
-        Write(keys, Loc.F("Undo.CurveDrag", Loc.T(Active.Name), sel.Count), _dragMerge);
+        Write(keys, Loc.Later("Undo.CurveDrag", Loc.Later(Active.Name), sel.Count), _dragMerge);
         return (keys[sel[0]].Time, keys[sel[0]].Values[ch]);
     }
 
@@ -372,7 +372,7 @@ public sealed class CurveEditor : ObservableObject
         if (Math.Abs(t - typed / TimeScale) > 1e-9)
             Toast?.Invoke(Loc.F("Toast.CurveTimeClamped", Format(t * TimeScale)), "warn");
         keys[i] = keys[i].With(0, t);
-        Write(keys, Loc.F("Undo.CurveTime", Loc.T(Active.Name), i + 1));
+        Write(keys, Loc.Later("Undo.CurveTime", Loc.Later(Active.Name), i + 1));
         Notify();
     }
 
@@ -387,7 +387,7 @@ public sealed class CurveEditor : ObservableObject
             return;
         }
         keys[i] = keys[i].With(ch, v);
-        Write(keys, Loc.F("Undo.CurveValue", Loc.T(Active.Name), i + 1));
+        Write(keys, Loc.Later("Undo.CurveValue", Loc.Later(Active.Name), i + 1));
         Notify();
     }
 
@@ -422,7 +422,7 @@ public sealed class CurveEditor : ObservableObject
                 keys.Add(key);
         }
         keys.Sort((a, b) => a.Time.CompareTo(b.Time));
-        Write(keys, Loc.F("Undo.CurvePaste", Loc.T(Active.Name), clip.Keys.Count));
+        Write(keys, Loc.Later("Undo.CurvePaste", Loc.Later(Active.Name), clip.Keys.Count));
         _selection.Clear();
         Notify();
     }
@@ -455,7 +455,7 @@ public sealed class CurveEditor : ObservableObject
             return;
         for (int c = 0; c < values.Count && c < layer.Channels; c++)
             keys[key] = keys[key].With(c + 1, Round(values[c]));
-        Write(layer.Key, keys, Loc.F("Undo.CurveStop", Loc.T(layer.IsColor ? "Curve.Colour" : layer.Name), key + 1), merge);
+        Write(layer.Key, keys, Loc.Later("Undo.CurveStop", Loc.Later(layer.IsColor ? "Curve.Colour" : layer.Name), key + 1), merge);
         Notify();
     }
 
@@ -468,7 +468,7 @@ public sealed class CurveEditor : ObservableObject
             return;
         double lo = key > 0 ? keys[key - 1].Time + 0.001 : 0, hi = key + 1 < keys.Count ? keys[key + 1].Time - 0.001 : 1;
         keys[key] = keys[key].With(0, Math.Clamp(SnapTime(t), lo, Math.Max(lo, hi)));
-        Write(layer.Key, keys, Loc.F("Undo.CurveStop", Loc.T(layer.IsColor ? "Curve.Colour" : layer.Name), key + 1), merge);
+        Write(layer.Key, keys, Loc.Later("Undo.CurveStop", Loc.Later(layer.IsColor ? "Curve.Colour" : layer.Name), key + 1), merge);
         Notify();
     }
 
@@ -485,7 +485,7 @@ public sealed class CurveEditor : ObservableObject
         var (curve, corners) = CurvePresets.Get(name);
         var layer = Active;
         // Colour graphs take the preset in all three channels (a fade of brightness).
-        Bake((t, _) => curve(t), corners, layer.IsColor ? -1 : layer.Channel, Loc.F("Undo.CurvePreset", Loc.T(layer.Name), Loc.T("Preset." + name)));
+        Bake((t, _) => curve(t), corners, layer.IsColor ? -1 : layer.Channel, Loc.Later("Undo.CurvePreset", Loc.Later(layer.Name), Loc.Later("Preset." + name)));
     }
 
     // A drawn stroke (t, value) replaces the active channel; the other channels of a colour graph keep their curve
@@ -501,12 +501,12 @@ public sealed class CurveEditor : ObservableObject
         // Outside the stroke's time span the curve stays as it was.
         Func<double, int, double> f = (t, c) => c == channel && t >= from && t <= to ? stroke(t) : old.Evaluate((float)t, c);
         var corners = points.Select(p => p.T).Append(from).Append(to).ToArray();
-        Bake(f, corners, -2, Loc.F("Undo.CurveDraw", Loc.T(Active.Name)));
+        Bake(f, corners, -2, Loc.Later("Undo.CurveDraw", Loc.Later(Active.Name)));
     }
 
     // channel -1: the same curve in every channel; -2: f gives each channel; otherwise f fills that channel and the
     // other channels keep their engine curve.
-    private void Bake(Func<double, int, double> f, IReadOnlyList<double> corners, int channel, string label)
+    private void Bake(Func<double, int, double> f, IReadOnlyList<double> corners, int channel, Func<string> label)
     {
         var layer = Active;
         var old = Curve(layer);

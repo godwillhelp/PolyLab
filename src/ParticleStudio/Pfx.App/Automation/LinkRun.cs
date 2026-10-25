@@ -115,7 +115,7 @@ public sealed class LinkRun
             for (int i = 0; i < VelocityEdits; i++)
             {
                 _timed = new TaskCompletionSource<LinkTiming>();
-                doc.Do(emitter.Set("Velocity", Math.Round(v0 + 0.5 * (i + 1), 3)), "link bench");
+                doc.Do(emitter.Set("Velocity", Math.Round(v0 + 0.5 * (i + 1), 3)), () => "link bench");
                 var t = await _timed.Task;
                 sets.Add(t.Ms);
                 Log(string.Format(CultureInfo.InvariantCulture, "velocity edit {0}: {1} {2:0.0} ms, {3}, read back equal {4}", i + 1, t.Kind, t.Ms, t.What, t.Matches));
@@ -128,7 +128,7 @@ public sealed class LinkRun
                 if (at < IdleWindow)
                     await Task.Delay(IdleStep);
             }
-            doc.Do(emitter.Set("ShapeType", 1), "link bench box");
+            doc.Do(emitter.Set("ShapeType", 1), () => "link bench box");
             _timed = new TaskCompletionSource<LinkTiming>();
             await _timed.Task;
             double before = MemoryMb();
@@ -137,7 +137,7 @@ public sealed class LinkRun
             {
                 _timed = new TaskCompletionSource<LinkTiming>();
                 double s = Math.Round(0.2 + 0.05 * i, 3);
-                doc.Do(emitter.Set("ShapeSize", s, 0.2, s), "link bench shape");
+                doc.Do(emitter.Set("ShapeSize", s, 0.2, s), () => "link bench shape");
                 var t = await _timed.Task;
                 reloads.Add(t.Ms);
                 if ((i + 1) % 5 == 0)

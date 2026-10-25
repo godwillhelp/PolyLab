@@ -65,7 +65,7 @@ public sealed record EmitterFrame(EmitterView View, EmitterParams Params, Vector
 // made with, so each one is made after the one before it has run), all under one merge key = one undo step.
 public static class ToolEdits
 {
-    public static void Steps(EffectDoc doc, string label, string mergeKey, IEnumerable<Func<IEdit?>> makers)
+    public static void Steps(EffectDoc doc, Func<string> label, string mergeKey, IEnumerable<Func<IEdit?>> makers)
     {
         foreach (var make in makers)
             if (make() is { } edit)
@@ -87,7 +87,7 @@ public static class ToolEdits
 
     // The template and n - 1 copies of it (name_2, name_3, ..), each copied from the previous copy so they land in
     // order right after the template; returns all n.
-    public static List<EmitterView> CloneChain(EffectDoc doc, EmitterView template, int n, string label, string merge)
+    public static List<EmitterView> CloneChain(EffectDoc doc, EmitterView template, int n, Func<string> label, string merge)
     {
         var result = new List<EmitterView> { template };
         var taken = doc.Ptc.Emitters.Select(v => v.Name).ToList();

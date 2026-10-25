@@ -125,10 +125,10 @@ public sealed class ComposeRun
                 var doc = _w.NewPart(path) ?? throw new InvalidOperationException("part not created: " + path);
                 foreach (var (name, keys) in emitters)
                 {
-                    doc.Do(doc.Ptc.AddEmitter(name), "add " + name);
+                    doc.Do(doc.Ptc.AddEmitter(name), () => "add " + name);
                     var e = doc.Ptc.Emitter(name)!;
                     foreach (var line in keys)
-                        doc.Do(Edit(e, line), name + " " + line.Split(' ')[0]);
+                        doc.Do(Edit(e, line), () => name + " " + line.Split(' ')[0]);
                 }
                 Log($"part {part}: {emitters.Length} emitters, {emitters.Sum(x => x.Keys.Length)} keys, undo steps {doc.UndoCount}");
             }
@@ -166,7 +166,7 @@ public sealed class ComposeRun
                 f.Anomaly.Tick = 0.5f;
                 f.Anomaly.Shells["sense"] = new Shell { R = 4, YMin = -1, YMax = 3 };
                 f.Anomaly.Shells["hit"] = new Shell { R = 1.6f, YMin = -0.5f, YMax = 2.5f };
-            }, "zharka: lights, haze, sounds, states");
+            }, () => "zharka: lights, haze, sounds, states");
             _w.SetSoundFile("burn", copies[0]);
             _w.SetSoundFile("roar", copies[1]);
             _w.SaveProjectTo(null);

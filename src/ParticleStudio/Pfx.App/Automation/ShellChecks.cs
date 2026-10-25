@@ -194,6 +194,11 @@ public sealed partial class ShellChecks
         _w.RenameEmitter(row, "smoke_main");
         await Built();
         Expect(doc.Ptc.Emitters[0].Name == "smoke_main" && doc.UndoLabel != null, "rename writes the file name and is one undo step");
+        string lang = Loc.Lang;
+        _w.LanguageChanged(Loc.Languages.First(l => l != lang));
+        bool follows = _w.UndoText.Text == Loc.F("Status.Undo", Loc.F("Undo.Rename", name, "smoke_main"));
+        _w.LanguageChanged(lang);
+        Expect(follows, "the undo label in the status bar follows a language switch");
         doc.UndoStep();
         await Built();
         Expect(doc.Ptc.Emitters[0].Name == name, "undo brings the old name back");
@@ -399,7 +404,7 @@ public sealed partial class ShellChecks
         var doc = _w.Docs[0];
         var first = doc.Ptc.Emitters[0];
         double v = first.Number("Velocity") ?? 2;
-        doc.Do(first.Set("Velocity", v + 2), "check");
+        doc.Do(first.Set("Velocity", v + 2), () => "check");
         await Built();
         var edited = _w.Viewport.CaptureFrame(false)!;
         int editDiff = Differing(a, edited);

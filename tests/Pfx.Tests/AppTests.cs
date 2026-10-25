@@ -117,10 +117,10 @@ public class AppTests
     {
         var doc = EffectDoc.Open(Temp("a.ptc", Ptc));
         var e = doc.Ptc.Emitters[0];
-        doc.Do(e.Set("Velocity", 4), "v4", "drag");
-        doc.Do(e.Set("Velocity", 5), "v5", "drag");
+        doc.Do(e.Set("Velocity", 4), () => "v4", "drag");
+        doc.Do(e.Set("Velocity", 5), () => "v5", "drag");
         doc.Seal();
-        doc.Do(e.Set("MaxNum", 60), "max");
+        doc.Do(e.Set("MaxNum", 60), () => "max");
         Assert.True(doc.Dirty);
         Assert.Equal("max", doc.UndoLabel);
         doc.UndoStep();
@@ -132,9 +132,27 @@ public class AppTests
         Assert.Equal(5, doc.Ptc.Emitters[0].Number("Velocity"));
         // After an undo a drag with the same key must start a new step, not merge into the step below.
         doc.UndoStep();
-        doc.Do(e.Set("Velocity", 9), "v9", "drag");
+        doc.Do(e.Set("Velocity", 9), () => "v9", "drag");
         doc.UndoStep();
         Assert.False(doc.Dirty);
+    }
+
+    // Without a WPF application a key is its own text, so the key here is the format; `name` stands for a text in
+    // the interface language.
+    [Fact]
+    public void Undo_labels_are_read_when_shown_with_the_values_of_the_edit()
+    {
+        var doc = EffectDoc.Open(Temp("a.ptc", Ptc));
+        string name = "speed", value = "4";
+        Func<string> field = () => name;
+        doc.Do(doc.Ptc.Emitters[0].Set("Velocity", 4), Loc.Later("{0} = {1}", field, value));
+        name = "Speed";
+        value = "5";
+        Assert.Equal("Speed = 4", doc.UndoLabel);
+        doc.UndoStep();
+        doc.RedoStep();
+        name = "SPEED";
+        Assert.Equal("SPEED = 4", doc.UndoLabel);
     }
 
     [Fact]
@@ -146,7 +164,7 @@ public class AppTests
         var doc = EffectDoc.Open(path);
         doc.LoadMaterials(new DataRoots(new[] { dir }));
         var m = doc.Materials["fx/spark.emat"];
-        doc.Do(m.Emat.Set("Softness", 1), "soft");
+        doc.Do(m.Emat.Set("Softness", 1), () => "soft");
         Assert.True(doc.Dirty);
         Assert.Equal(1, doc.Save());
         Assert.Contains("Softness 1", File.ReadAllText(Path.Combine(dir, "fx", "spark.emat")));

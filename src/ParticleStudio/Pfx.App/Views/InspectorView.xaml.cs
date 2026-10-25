@@ -191,7 +191,7 @@ public partial class InspectorView : UserControl
                     edits.Add(reset);
             }
             return edits.Count == 0 ? null : new Pfx.Core.Editing.CompositeEdit(edits);
-        }, Loc.F("Undo.ResetFile", f.Label), null);
+        }, () => Loc.F("Undo.ResetFile", f.Label), null);
     }
 
     private static void ResetToGame(FieldVm f) =>
@@ -199,7 +199,7 @@ public partial class InspectorView : UserControl
         {
             var edits = f.Keys.Select(k => b.Reset(k)).Where(x => x != null).Cast<Pfx.Core.Editing.IEdit>().ToList();
             return edits.Count == 0 ? null : new Pfx.Core.Editing.CompositeEdit(edits);
-        }, Loc.F("Undo.ResetGame", f.Label), null);
+        }, () => Loc.F("Undo.ResetGame", f.Label), null);
 
     private static void Paste(FieldVm f, string text)
     {
@@ -210,7 +210,7 @@ public partial class InspectorView : UserControl
             case PathField pf: pf.Commit(text.Trim('"')); break;
             default:
                 f.Owner.Apply(f, b => Pfx.Core.Editing.EnfEdits.SetLine(b.Doc, b.Block, f.Key, text.Split(' ', StringSplitOptions.RemoveEmptyEntries), k => b.Schema.Find(b.Scope, k)?.Order),
-                    Loc.F("Undo.Paste", f.Label), null);
+                    () => Loc.F("Undo.Paste", f.Label), null);
                 break;
         }
     }

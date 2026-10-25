@@ -105,7 +105,7 @@ public sealed class ComposeView : UserControl
 
     private CompositionDoc? Doc => _host?.Project;
 
-    private void Edit(Action<ProjectFile> edit, string label, string? merge = null)
+    private void Edit(Action<ProjectFile> edit, Func<string> label, string? merge = null)
     {
         if (Doc == null)
             return;
@@ -144,7 +144,7 @@ public sealed class ComposeView : UserControl
             _item = null;
 
         Section("Cmp.Project");
-        TextRow("Cmp.Name", p.Name, v => { string id = ProjectNames.Id(v); Edit(f => f.Name = id, Loc.F("Undo.Cmp", Loc.T("Cmp.Name"))); });
+        TextRow("Cmp.Name", p.Name, v => { string id = ProjectNames.Id(v); Edit(f => f.Name = id, Loc.Later("Undo.Cmp", Loc.Later("Cmp.Name"))); });
 
         States(p);
         Items(p);
@@ -175,7 +175,7 @@ public sealed class ComposeView : UserControl
         chips.Children.Add(Button("Cmp.AddState", () =>
         {
             string name = ProjectNames.Unique(NextStateName(p), p.States.Select(s => s.Name));
-            Edit(f => f.States.Add(new StateEntry { Name = name, Duration = f.States.Count == 0 ? 0 : 2 }), Loc.F("Undo.CmpAddState", name));
+            Edit(f => f.States.Add(new StateEntry { Name = name, Duration = f.States.Count == 0 ? 0 : 2 }), Loc.Later("Undo.CmpAddState", name));
             _state = p.States.Count;
             Show();
         }));
@@ -192,22 +192,22 @@ public sealed class ComposeView : UserControl
         {
             string id = ProjectNames.Id(v);
             if (id != st.Name)
-                Edit(f => f.States[si].Name = id, Loc.F("Undo.Cmp", Loc.T("Cmp.StateName")));
+                Edit(f => f.States[si].Name = id, Loc.Later("Undo.Cmp", Loc.Later("Cmp.StateName")));
         });
         var names = new WrapPanel { Margin = new Thickness(10 + LabelWidth, 0, 10, 2) };
         foreach (var n in StateNames.Where(n => n != st.Name && p.States.All(s => s.Name != n)))
         {
             var chip = new Button { Content = StateLabel(n), ToolTip = Loc.F("Tip.Cmp.StateNamePick", n), Margin = new Thickness(0, 0, 3, 3), Padding = new Thickness(5, 0, 5, 0) };
-            chip.Click += (_, _) => Edit(f => f.States[si].Name = n, Loc.F("Undo.Cmp", Loc.T("Cmp.StateName")));
+            chip.Click += (_, _) => Edit(f => f.States[si].Name = n, Loc.Later("Undo.Cmp", Loc.Later("Cmp.StateName")));
             names.Children.Add(chip);
         }
         _body.Children.Add(names);
-        NumberRow("Cmp.Duration", st.Duration, 0, 3600, v => Edit(f => f.States[si].Duration = (float)v, Loc.F("Undo.Cmp", Loc.T("Cmp.Duration")), "dur" + si));
-        CheckRow("Cmp.OverIdle", st.OverIdle, v => Edit(f => f.States[si].OverIdle = v, Loc.F("Undo.Cmp", Loc.T("Cmp.OverIdle"))), si > 0);
+        NumberRow("Cmp.Duration", st.Duration, 0, 3600, v => Edit(f => f.States[si].Duration = (float)v, Loc.Later("Undo.Cmp", Loc.Later("Cmp.Duration")), "dur" + si));
+        CheckRow("Cmp.OverIdle", st.OverIdle, v => Edit(f => f.States[si].OverIdle = v, Loc.Later("Undo.Cmp", Loc.Later("Cmp.OverIdle"))), si > 0);
         var moves = new WrapPanel { Margin = new Thickness(10 + LabelWidth, 0, 10, 4) };
-        moves.Children.Add(Button("Cmp.StateLeft", () => { Edit(f => Swap(f.States, si, si - 1), Loc.T("Undo.CmpMoveState")); _state = si - 1; Show(); }, si > 0));
-        moves.Children.Add(Button("Cmp.StateRight", () => { Edit(f => Swap(f.States, si, si + 1), Loc.T("Undo.CmpMoveState")); _state = si + 1; Show(); }, si < p.States.Count - 1));
-        moves.Children.Add(Button("Cmp.RemoveState", () => { Edit(f => f.States.RemoveAt(si), Loc.F("Undo.CmpRemoveState", st.Name)); _state = Math.Max(0, si - 1); Show(); }));
+        moves.Children.Add(Button("Cmp.StateLeft", () => { Edit(f => Swap(f.States, si, si - 1), Loc.Later("Undo.CmpMoveState")); _state = si - 1; Show(); }, si > 0));
+        moves.Children.Add(Button("Cmp.StateRight", () => { Edit(f => Swap(f.States, si, si + 1), Loc.Later("Undo.CmpMoveState")); _state = si + 1; Show(); }, si < p.States.Count - 1));
+        moves.Children.Add(Button("Cmp.RemoveState", () => { Edit(f => f.States.RemoveAt(si), Loc.Later("Undo.CmpRemoveState", st.Name)); _state = Math.Max(0, si - 1); Show(); }));
         _body.Children.Add(moves);
 
         SubHeader("Cmp.StateItems");
@@ -219,10 +219,10 @@ public sealed class ComposeView : UserControl
             var it = st.Items[i];
             var found = p.Find(it.Ref);
             var row = new DockPanel { Margin = new Thickness(10, 1, 10, 1) };
-            var remove = Tiny("Ic.Close", Loc.T("Tip.Cmp.RemoveFromState"), () => Edit(f => f.States[si].Items.RemoveAt(ii), Loc.F("Undo.CmpRemoveItem", it.Ref)));
+            var remove = Tiny("Ic.Close", Loc.T("Tip.Cmp.RemoveFromState"), () => Edit(f => f.States[si].Items.RemoveAt(ii), Loc.Later("Undo.CmpRemoveItem", it.Ref)));
             DockPanel.SetDock(remove, Dock.Right);
             row.Children.Add(remove);
-            var delay = NumberBox(it.Delay, 0, 3600, v => Edit(f => f.States[si].Items[ii].Delay = (float)v, Loc.F("Undo.Cmp", Loc.T("Cmp.Delay")), $"delay{si}.{ii}"));
+            var delay = NumberBox(it.Delay, 0, 3600, v => Edit(f => f.States[si].Items[ii].Delay = (float)v, Loc.Later("Undo.Cmp", Loc.Later("Cmp.Delay")), $"delay{si}.{ii}"));
             delay.Width = 52;
             delay.ToolTip = Loc.T("Tip.Cmp.Delay");
             DockPanel.SetDock(delay, Dock.Right);
@@ -248,7 +248,7 @@ public sealed class ComposeView : UserControl
         add.SelectionChanged += (_, _) =>
         {
             if (add.SelectedItem is ComboBoxItem { Tag: string id })
-                Edit(f => f.States[si].Items.Add(new StateItem { Ref = id }), Loc.F("Undo.CmpAddItem", id));
+                Edit(f => f.States[si].Items.Add(new StateItem { Ref = id }), Loc.Later("Undo.CmpAddItem", id));
         };
         _body.Children.Add(add);
     }
@@ -326,7 +326,7 @@ public sealed class ComposeView : UserControl
         if (Doc == null)
             return;
         string id = NewId(Doc.File, stem);
-        Edit(add, Loc.F("Undo.CmpAddItem", id));
+        Edit(add, Loc.Later("Undo.CmpAddItem", id));
         _item = id;
         Show();
     }
@@ -355,7 +355,7 @@ public sealed class ComposeView : UserControl
         string id = item.Id;
         T? Get<T>(ProjectFile f) where T : class, IProjectItem => f.Find(id) as T;
         void Set<T>(string key, Action<T> change, string? merge = null) where T : class, IProjectItem =>
-            Edit(f => { if (Get<T>(f) is { } x) change(x); }, Loc.F("Undo.Cmp", Loc.T(key)), merge == null ? null : id + "." + merge);
+            Edit(f => { if (Get<T>(f) is { } x) change(x); }, Loc.Later("Undo.Cmp", Loc.Later(key)), merge == null ? null : id + "." + merge);
 
         TextRow("Cmp.Id", id, v =>
         {
@@ -371,7 +371,7 @@ public sealed class ComposeView : UserControl
                 foreach (var k in f.Strikes.Where(k => k.Part == id))
                     k.Part = nid;
                 RecipeRefs.Rename(f, id, nid);
-            }, Loc.F("Undo.CmpRename", id, nid));
+            }, Loc.Later("Undo.CmpRename", id, nid));
             _item = nid;
             Show();
         });
@@ -479,7 +479,7 @@ public sealed class ComposeView : UserControl
                 }
                 foreach (var s in f.States)
                     s.Items.RemoveAll(x => x.Ref == id);
-            }, Loc.F("Undo.CmpRemoveItem", id));
+            }, Loc.Later("Undo.CmpRemoveItem", id));
             _item = null;
             Show();
         }));
@@ -547,7 +547,7 @@ public sealed class ComposeView : UserControl
         arch.SelectionChanged += (_, _) =>
         {
             if (arch.SelectedItem is ComboBoxItem { Tag: string a } && a != p.Anomaly.Archetype)
-                Edit(f => f.Anomaly.Archetype = a, Loc.F("Undo.Cmp", Loc.T("Cmp.Archetype")));
+                Edit(f => f.Anomaly.Archetype = a, Loc.Later("Undo.Cmp", Loc.Later("Cmp.Archetype")));
         };
         Row("Cmp.Archetype", arch);
         var grid = new Grid { Margin = new Thickness(10, 2, 10, 4) };
@@ -580,7 +580,7 @@ public sealed class ComposeView : UserControl
                     var s = f.Anomaly.Shells.GetValueOrDefault(n) ?? new Shell();
                     if (cc == 0) s.R = (float)v; else if (cc == 1) s.YMin = (float)v; else s.YMax = (float)v;
                     f.Anomaly.Shells[n] = s;
-                }, Loc.F("Undo.Cmp", Loc.T("Shell." + n)), $"shell.{n}.{cc}"));
+                }, Loc.Later("Undo.Cmp", Loc.Later("Shell." + n)), $"shell.{n}.{cc}"));
                 box.Margin = new Thickness(4, 1, 0, 1);
                 box.ToolTip = Loc.T("Tip.Shell." + n) + "\n" + Loc.T("Tip." + heads[c]);
                 Grid.SetRow(box, r);
@@ -590,8 +590,8 @@ public sealed class ComposeView : UserControl
             r++;
         }
         _body.Children.Add(grid);
-        NumberRow("Cmp.Tick", p.Anomaly.Tick, 0, 60, v => Edit(f => f.Anomaly.Tick = (float)v, Loc.F("Undo.Cmp", Loc.T("Cmp.Tick")), "tick"));
-        NumberRow("Cmp.HitDelay", p.Anomaly.HitDelay, 0, 60, v => Edit(f => f.Anomaly.HitDelay = (float)v, Loc.F("Undo.Cmp", Loc.T("Cmp.HitDelay")), "hitdelay"));
+        NumberRow("Cmp.Tick", p.Anomaly.Tick, 0, 60, v => Edit(f => f.Anomaly.Tick = (float)v, Loc.Later("Undo.Cmp", Loc.Later("Cmp.Tick")), "tick"));
+        NumberRow("Cmp.HitDelay", p.Anomaly.HitDelay, 0, 60, v => Edit(f => f.Anomaly.HitDelay = (float)v, Loc.Later("Undo.Cmp", Loc.Later("Cmp.HitDelay")), "hitdelay"));
         var timing = StateCycle.Timing(p).Where(t => t.Value > 0).Select(t => $"{t.Key} {Loc.Num(t.Value)}");
         Readout("Cmp.Timing", string.Join(" · ", timing.DefaultIfEmpty(Loc.T("Val.None"))));
     }

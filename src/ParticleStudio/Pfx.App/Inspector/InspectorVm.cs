@@ -229,7 +229,7 @@ public sealed class InspectorVm : ObservableObject
 
     // One undo step for every target. Locked emitters, and other targets of a batch when the field is locked against
     // batch edits, are left out and named in a toast.
-    public void Apply(FieldVm field, Func<KeyedBlock, IEdit?> make, string label, string? merge)
+    public void Apply(FieldVm field, Func<KeyedBlock, IEdit?> make, Func<string> label, string? merge)
     {
         if (Doc == null)
             return;

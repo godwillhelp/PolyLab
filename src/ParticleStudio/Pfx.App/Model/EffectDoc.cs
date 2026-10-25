@@ -51,8 +51,8 @@ public sealed record ScriptMotion(float[]? Times, Vector3[]? Points, bool YawAlo
 public sealed class EffectDoc : IUndoOwner
 {
     private readonly Dictionary<EnfBlock, EnfBlock> _originals = new();
-    private readonly List<string> _done = new();
-    private readonly List<string> _undone = new();
+    private readonly List<Func<string>> _done = new();
+    private readonly List<Func<string>> _undone = new();
     private string? _mergeKey;
 
     private EffectDoc(string path, byte[] bytes, PtcDocument ptc)
@@ -143,8 +143,8 @@ public sealed class EffectDoc : IUndoOwner
 
     public bool Dirty => !Ptc.ToBytes().AsSpan().SequenceEqual(Original) || Materials.Values.Any(m => m.Dirty);
 
-    public string? UndoLabel => _done.Count > 0 ? _done[^1] : null;
-    public string? RedoLabel => _undone.Count > 0 ? _undone[^1] : null;
+    public string? UndoLabel => _done.Count > 0 ? _done[^1]() : null;
+    public string? RedoLabel => _undone.Count > 0 ? _undone[^1]() : null;
 
     // Materials are looked up again after every structural change (an added emitter may use a new one).
     public void LoadMaterials(DataRoots roots)
@@ -168,7 +168,7 @@ public sealed class EffectDoc : IUndoOwner
     }
 
     // Steps with the same merge key in a row (one drag) become one undo step with one label.
-    public void Do(IEdit edit, string label, string? mergeKey = null)
+    public void Do(IEdit edit, Func<string> label, string? mergeKey = null)
     {
         Undo.Do(edit, mergeKey);
         if (mergeKey != null && mergeKey == _mergeKey && _done.Count > 0)

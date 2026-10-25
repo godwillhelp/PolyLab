@@ -24,7 +24,7 @@ public sealed partial class ShellChecks
         await Linted();
         int before = _w.Lint.Issues.Count(i => i.Rule == Linter.Restitution);
         var clock = System.Diagnostics.Stopwatch.StartNew();
-        doc.Do(e.Set("Restitution", 0.5), "check: restitution");
+        doc.Do(e.Set("Restitution", 0.5), () => "check: restitution");
         await Linted();
         var hit = _w.Lint.Issues.FirstOrDefault(i => i.Rule == Linter.Restitution && i.Emitter == 0 && _w.Lint.Parts[i.Part] == doc.Title);
         Expect(hit != null && _w.Lint.Issues.Count(i => i.Rule == Linter.Restitution) == before + 1,

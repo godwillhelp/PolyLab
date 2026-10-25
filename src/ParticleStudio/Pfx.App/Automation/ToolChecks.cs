@@ -129,8 +129,8 @@ public sealed partial class ShellChecks
         _w.Gizmo.Snap = false;
 
         // Shape and cone handles (an ellipse 1 x 1 x 1 for the check).
-        doc.Do(first.SetWord("ShapeType", "Ellipse"), "check");
-        doc.Do(first.Set("ShapeSize", 1, 1, 1), "check");
+        doc.Do(first.SetWord("ShapeType", "Ellipse"), () => "check");
+        doc.Do(first.Set("ShapeSize", 1, 1, 1), () => "check");
         doc.Seal();
         await Settle();
         _w.SetTool("shape");

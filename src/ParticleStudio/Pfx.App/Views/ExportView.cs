@@ -124,7 +124,7 @@ public sealed class ExportView : UserControl
 
     private void Edit(Action<ProjectFile> edit, string key)
     {
-        _host?.Project?.Do(edit, Loc.F("Undo.Cmp", Loc.T(key)));
+        _host?.Project?.Do(edit, Loc.Later("Undo.Cmp", Loc.Later(key)));
     }
 
     private void ShowSettings()

@@ -110,7 +110,7 @@ public partial class MainWindow : ILibraryHost
         RecipeContext.Relead(block, doc.Ptc.Doc, emitors);
         if (block.FindLine("Material")?.Values.FirstOrDefault()?.Value is { } material)
             _roots.AddRootFor(path, material);
-        doc.Do(new SpliceEdit<EnfItem>(emitors.Items, emitors.Items.Count, 0, new EnfItem[] { block }), Loc.F("Undo.LibAdd", name, Path.GetFileName(path)));
+        doc.Do(new SpliceEdit<EnfItem>(emitors.Items, emitors.Items.Count, 0, new EnfItem[] { block }), Loc.Later("Undo.LibAdd", name, Path.GetFileName(path)));
         doc.LoadMaterials(_roots);
         if (doc.Ptc.Emitter(name) is { } added)
             Select(doc, new[] { added.Block }, false);

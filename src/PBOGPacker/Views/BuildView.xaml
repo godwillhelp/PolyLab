@@ -474,12 +474,7 @@
     </Grid>
 
     <Grid Grid.Row="3" Margin="0,6,0,0">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="Auto"/>
-      </Grid.ColumnDefinitions>
-
-      <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
+      <StackPanel VerticalAlignment="Bottom">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,-10,6" Visibility="{Binding HasMod, Converter={StaticResource Vis}}">
           <StackPanel.Resources>
             <Style TargetType="c:Ico">
@@ -626,11 +621,22 @@
           </Border>
         </Popup>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-          <Border Background="{StaticResource B.Panel}" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" Width="340" Height="84" Padding="18,0"
-                  Visibility="{Binding HasMod, Converter={StaticResource Vis}}" Margin="0,0,14,0">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Border Background="{StaticResource B.Panel}" BorderBrush="{StaticResource B.Line2}" BorderThickness="1" MinWidth="340" Height="84" Padding="18,0"
+                  Visibility="{Binding HasMod, Converter={StaticResource Vis}}" Margin="0,0,14,0" HorizontalAlignment="Right">
             <Grid VerticalAlignment="Center">
-              <Grid Visibility="{Binding IsRunning, Converter={StaticResource Vis}, ConverterParameter=!}">
+              <Grid x:Name="InfoIdle">
+                <Grid.Style>
+                  <Style TargetType="Grid">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsRunning}" Value="True"><Setter Property="Visibility" Value="Hidden"/></DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </Grid.Style>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="Auto"/>
                   <ColumnDefinition Width="*"/>
@@ -651,7 +657,7 @@
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DestShort}" ToolTip="{Binding DestText}" Foreground="{StaticResource B.Text2}"
                            FontFamily="{StaticResource F.Mono}" FontSize="12" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
               </Grid>
-              <StackPanel Visibility="{Binding IsRunning, Converter={StaticResource Vis}}">
+              <StackPanel Visibility="{Binding IsRunning, Converter={StaticResource Vis}}" Width="{Binding ActualWidth, ElementName=InfoIdle}">
                 <DockPanel>
                   <TextBlock DockPanel.Dock="Right" Text="{Binding ElapsedText}" Style="{StaticResource T.Mono}" FontSize="13" Foreground="{StaticResource B.Text}"/>
                   <TextBlock Text="{Binding StepLine}" FontSize="15" TextTrimming="CharacterEllipsis"/>
@@ -685,7 +691,7 @@
             </Grid>
           </Border>
 
-          <Grid>
+          <Grid Grid.Column="1">
             <Button ToolTip="{DynamicResource Tip.Build}" x:Name="BigBtn" Style="{StaticResource Btn.Big}" Command="{Binding BuildCmd}">
               <Button.Visibility>
                 <MultiBinding Converter="{StaticResource AllVis}">
@@ -723,7 +729,7 @@
               </StackPanel>
             </Button>
           </Grid>
-        </StackPanel>
+        </Grid>
       </StackPanel>
     </Grid>
   </Grid>

@@ -239,7 +239,7 @@ public partial class MainWindow : IToolHost
             Toast(Loc.T("Toast.PresetNoEmitter"), "info");
             return;
         }
-        string label = Loc.T("Undo.Preset." + kind);
+        var label = Loc.Later("Undo.Preset." + kind);
         string merge = "preset:" + Guid.NewGuid().ToString("N");
         if (kind == "cross")
         {

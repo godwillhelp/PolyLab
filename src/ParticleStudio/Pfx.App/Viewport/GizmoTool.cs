@@ -417,7 +417,7 @@ public sealed class GizmoTool : IViewportTool
         double mpp = MetresPerPixel(f.Origin);
         double precision = ToolEdits.Precision(mpp);
         var makers = new List<Func<Pfx.Core.Editing.IEdit?>>();
-        string label;
+        Func<string> label;
         switch (d.Handle.Kind)
         {
             case HandleKind.MoveAxis:
@@ -444,7 +444,7 @@ public sealed class GizmoTool : IViewportTool
                 var local = f.ToSource(world);
                 foreach (var e in d.Start)
                     makers.Add(ToolEdits.SetVec(e.View, "Offset", Shift(e.Offset, local, precision)));
-                label = Loc.T("Undo.GizmoMove");
+                label = Loc.Later("Undo.GizmoMove");
                 break;
             }
             case HandleKind.Ring:
@@ -473,7 +473,7 @@ public sealed class GizmoTool : IViewportTool
                     v[k] = ToolEdits.Round(e.Angles[k] + delta, step);
                     makers.Add(ToolEdits.SetVec(e.View, "Angles", v));
                 }
-                label = Loc.T("Undo.GizmoRotate");
+                label = Loc.Later("Undo.GizmoRotate");
                 break;
             }
             case HandleKind.ScaleAxis:
@@ -505,7 +505,7 @@ public sealed class GizmoTool : IViewportTool
                     }
                     makers.Add(ToolEdits.SetVec(e.View, "ShapeSize", v));
                 }
-                label = Loc.T("Undo.GizmoScale");
+                label = Loc.Later("Undo.GizmoScale");
                 break;
             }
             case HandleKind.ShapeFace:
@@ -521,7 +521,7 @@ public sealed class GizmoTool : IViewportTool
                     v[c] = Math.Max(0, ToolEdits.Round(e.Size[c] + grow, snap ? StepMetres : precision));
                     makers.Add(ToolEdits.SetVec(e.View, "ShapeSize", v));
                 }
-                label = Loc.T("Undo.GizmoShape");
+                label = Loc.Later("Undo.GizmoShape");
                 break;
             }
             default:
@@ -537,7 +537,7 @@ public sealed class GizmoTool : IViewportTool
                     v[k] = value;
                     makers.Add(ToolEdits.SetVec(e.View, "ConeAngle", v));
                 }
-                label = Loc.T("Undo.GizmoCone");
+                label = Loc.Later("Undo.GizmoCone");
                 break;
             }
         }

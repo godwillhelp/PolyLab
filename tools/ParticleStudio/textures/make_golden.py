@@ -3,9 +3,12 @@
 usage: py -3.12 make_golden.py <hires.py folder> <out folder>
 
 Inputs are synthetic and seeded, so a rerun writes the same files. texconv outputs (DXT1/DXT5 of one level, exactly as
-hires.py encode() makes them) are written only when hires.py finds its texconv.
+hires.py encode() makes them, and texconv's RGBA decode of random BC7 blocks) are written only when hires.py finds its
+texconv.
 """
 import os
+import struct
+import subprocess
 import sys
 
 import numpy as np
@@ -28,6 +31,37 @@ def flipbook(fw, fh, cols, rows, seed):
     for i, f in enumerate(frames):
         out.paste(f, ((i % cols) * fw, (i // cols) * fh))
     return out
+
+
+# Row k < 8 holds eight random blocks of BC7 mode k (the lowest set bit of the first byte); the last row starts with a
+# reserved block (no mode bit) and goes on with random modes.
+def bc7_blocks(seed):
+    rng = np.random.default_rng(seed)
+    blocks = rng.integers(0, 256, (9, 8, 16), dtype=np.uint8)
+    for mode in range(8):
+        blocks[mode, :, 0] = blocks[mode, :, 0] & ((0xFF << (mode + 1)) & 0xFF) | 1 << mode
+    blocks[8, 0, 0] = 0
+    return blocks
+
+
+# DDS with a DX10 header, DXGI 98 (BC7_UNORM), one level.
+def bc7_dds(blocks):
+    rows, cols = blocks.shape[:2]
+    header = struct.pack("<4s7I44x2I4s5I5I5I", b"DDS ", 124, 0x81007, rows * 4, cols * 4, blocks.size, 0, 1,
+                         32, 0x4, b"DX10", 0, 0, 0, 0, 0, 0x1000, 0, 0, 0, 0, 98, 3, 0, 1, 0)
+    return header + blocks.tobytes()
+
+
+def texconv_rgba(exe, dds, work):
+    src, out = os.path.join(work, "bc7.dds"), os.path.join(work, "bc7_out")
+    os.makedirs(out, exist_ok=True)
+    with open(src, "wb") as f:
+        f.write(dds)
+    subprocess.run([exe, "-f", "R8G8B8A8_UNORM", "-m", "1", "-nogpu", "-y", "-nologo", "-o", out, src],
+                   check=True, capture_output=True)
+    with open(os.path.join(out, "bc7.dds"), "rb") as f:
+        data = f.read()
+    return data[148 if data[84:88] == b"DX10" else 128:]
 
 
 def main():
@@ -66,6 +100,11 @@ def main():
             with open(os.path.join(out, "texconv_sq_%s.bin" % fmt), "wb") as f:
                 for raw in hires.encode(levels, fmt, os.path.join(out, "_work")):
                     f.write(raw)
+        bc7 = bc7_dds(bc7_blocks(4))
+        with open(os.path.join(out, "bc7_modes.dds"), "wb") as f:
+            f.write(bc7)
+        with open(os.path.join(out, "texconv_bc7_modes.bin"), "wb") as f:
+            f.write(texconv_rgba(hires.TEXCONV_EXE, bc7, os.path.join(out, "_work")))
         import shutil
         shutil.rmtree(os.path.join(out, "_work"), ignore_errors=True)
 

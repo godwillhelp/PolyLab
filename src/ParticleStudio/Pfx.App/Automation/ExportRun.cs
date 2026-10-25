@@ -63,7 +63,7 @@ public sealed class ExportRun
                     f.Export.Dayz.Prefix = _l.ExportPrefix ?? f.Export.Dayz.Prefix;
                     f.Export.Dayz.DataPrefix = _l.ExportDataPrefix ?? "";
                 }
-            }, "export settings");
+            }, () => "export settings");
             var plan = await Plan() ?? throw new InvalidOperationException("no plan");
             Log($"export {p.Path} profile {p.File.Export.Profile} -> {to}");
             foreach (var e in plan.Errors)

@@ -45,7 +45,7 @@ public sealed class PathTool : IViewportTool
     private bool _drawing;
     private Stroke? _stroke;
     private int _generation;
-    private (EffectDoc Doc, int Count, string Label)? _applied;
+    private (EffectDoc Doc, int Count, Func<string> Label)? _applied;
 
     public PathTool(IToolHost host) => _host = host;
 
@@ -328,11 +328,11 @@ public sealed class PathTool : IViewportTool
             Finished?.Invoke(null);
             return;
         }
-        if (_applied is { } a && a.Doc == doc && doc.UndoCount == a.Count && doc.UndoLabel == a.Label)
+        if (_applied is { } a && a.Doc == doc && doc.UndoCount == a.Count && doc.UndoLabel == a.Label())
             doc.UndoStep();
         var e = doc.Ptc.Emitters.First(v => v.Block == s.Emitter.Block);
         var p = s.Frame.Params;
-        string label = Loc.T("Undo.Path." + fit.Use);
+        var label = Loc.Later("Undo.Path." + fit.Use);
         string merge = "path:" + Guid.NewGuid().ToString("N");
         // Composed when shown, so it follows the interface language.
         Func<string> readout;
@@ -429,7 +429,7 @@ public sealed class PathTool : IViewportTool
     // Use 5: the emitter and N - 1 copies of it along the stroke, each born in its own window of the effect time
     // (BRateMast 0 -> 1 -> 0 around (i + 0.5) / N, neighbours overlapping), so the births travel along the path once
     // per EffectTime.
-    private Func<string> ChainEdits(EffectDoc doc, EmitterView template, Stroke s, Vector3[] points, string label, string merge)
+    private Func<string> ChainEdits(EffectDoc doc, EmitterView template, Stroke s, Vector3[] points, Func<string> label, string merge)
     {
         int n = points.Length;
         var chain = ToolEdits.CloneChain(doc, template, n, label, merge);

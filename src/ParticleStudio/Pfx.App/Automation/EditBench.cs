@@ -73,7 +73,7 @@ public sealed class EditBench
         {
             _built = new TaskCompletionSource<(double, double)>();
             var clock = Stopwatch.StartNew();
-            doc.Do(emitter.Set("Velocity", baseValue + 0.1 * (i + 1)), "bench");
+            doc.Do(emitter.Set("Velocity", baseValue + 0.1 * (i + 1)), () => "bench");
             ui.Add(clock.Elapsed.TotalMilliseconds);
             var (t, w) = await _built.Task;
             total.Add(t);

@@ -168,6 +168,19 @@ public class TextureTests
     }
 
     [Fact]
+    public void Bc7_blocks_of_every_mode_decode_like_texconv()
+    {
+        // Eight random blocks per mode and a reserved one; the expected bytes are texconv's RGBA8 decode.
+        var data = File.ReadAllBytes(Golden("bc7_modes.dds"));
+        var want = File.ReadAllBytes(Golden("texconv_bc7_modes.bin"));
+        var dds = DdsFile.Read(data);
+        Assert.Equal(("BC7", 98), (dds.Header.FormatName, dds.Header.DxgiFormat));
+        Assert.Equal(want, dds.Decode().Pixels);
+        data[DdsHeader.BaseSize] = 99;
+        Assert.Equal(want, DdsFile.Read(data).Decode().Pixels);
+    }
+
+    [Fact]
     public void Lzo_literals_matches_overlaps_and_end_marker()
     {
         var abcd = Encoding.ASCII.GetBytes("abcd");

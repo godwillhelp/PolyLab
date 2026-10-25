@@ -48,7 +48,7 @@ public partial class MainWindow : IRecipesHost
     }
 
     // Runs `run` on a copy of the project; null from it = commit, a language key = refused (nothing changes).
-    private bool RunRecipes(string label, Func<RecipeScene, ProjectFile, string?> run)
+    private bool RunRecipes(Func<string> label, Func<RecipeScene, ProjectFile, string?> run)
     {
         if (_project == null)
             NewProject();
@@ -155,7 +155,7 @@ public partial class MainWindow : IRecipesHost
     public void AddRecipe(Recipe recipe, OwnRecipe? own, IReadOnlyList<RecipeTarget>? targets, IReadOnlyDictionary<string, string>? values)
     {
         string? added = null;
-        RunRecipes(Loc.F("Undo.RcpAdd", RecipeName(recipe, own)), (scene, copy) =>
+        RunRecipes(() => Loc.F("Undo.RcpAdd", RecipeName(recipe, own)), (scene, copy) =>
         {
             var node = new RecipeNode
             {
@@ -179,7 +179,7 @@ public partial class MainWindow : IRecipesHost
     }
 
     public void SetRecipeParam(string nodeId, string key, string value) =>
-        RunRecipes(Loc.F("Undo.RcpParam", nodeId), (scene, copy) =>
+        RunRecipes(Loc.Later("Undo.RcpParam", nodeId), (scene, copy) =>
         {
             var node = copy.Recipes.First(r => r.Id == nodeId);
             node.Params[key] = value;
@@ -187,7 +187,7 @@ public partial class MainWindow : IRecipesHost
         });
 
     public void ToggleRecipe(string nodeId) =>
-        RunRecipes(Loc.F("Undo.RcpToggle", nodeId), (scene, copy) =>
+        RunRecipes(Loc.Later("Undo.RcpToggle", nodeId), (scene, copy) =>
         {
             var node = copy.Recipes.First(r => r.Id == nodeId);
             node.On = !node.On;
@@ -195,7 +195,7 @@ public partial class MainWindow : IRecipesHost
         });
 
     public void RemoveRecipe(string nodeId) =>
-        RunRecipes(Loc.F("Undo.RcpRemove", nodeId), (scene, copy) =>
+        RunRecipes(Loc.Later("Undo.RcpRemove", nodeId), (scene, copy) =>
         {
             var node = copy.Recipes.First(r => r.Id == nodeId);
             RecipeUndo.Revert(node, scene);

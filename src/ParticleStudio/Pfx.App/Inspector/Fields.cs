@@ -86,7 +86,7 @@ public abstract class FieldVm : ObservableObject
     // Values per target as text ("" when every target agrees on nothing).
     protected IReadOnlyList<string?> Texts(string key) => Targets.Select(t => t.Block.Text(key)).ToList();
 
-    protected void Apply(Func<KeyedBlock, IEdit?> make, string label, string? merge = null) => Owner.Apply(this, make, label, merge);
+    protected void Apply(Func<KeyedBlock, IEdit?> make, Func<string> label, string? merge = null) => Owner.Apply(this, make, label, merge);
 
     public string Summary
     {
@@ -150,12 +150,12 @@ public sealed class NumberField : FieldVm
     }
 
     // Typed text: a number, an expression or a relative change, applied to each target's own value.
-    public void Commit(string text) => Change(v => Expr.TryApply(text, v, out var r) ? r : null, Loc.F("Undo.Set", Label), null, text);
+    public void Commit(string text) => Change(v => Expr.TryApply(text, v, out var r) ? r : null, () => Loc.F("Undo.Set", Label), null, text);
 
     // Scrub label / slider drag: one undo step per drag (merge key), value from the drag start.
-    public void SetFromDrag(Func<double, double> f, string merge) => Change(v => f(v), Loc.F("Undo.Set", Label), merge, null);
+    public void SetFromDrag(Func<double, double> f, string merge) => Change(v => f(v), () => Loc.F("Undo.Set", Label), merge, null);
 
-    private void Change(Func<double, double?> f, string label, string? merge, string? typed)
+    private void Change(Func<double, double?> f, Func<string> label, string? merge, string? typed)
     {
         string? clampNote = null;
         Apply(b =>
@@ -248,7 +248,7 @@ public sealed class VectorField : FieldVm
                 return null;
             v[axis] = r;
             return b.Set(Key, v);
-        }, Loc.F("Undo.SetAxis", Label, "XYZ"[axis]));
+        }, () => Loc.F("Undo.SetAxis", Label, "XYZ"[axis]));
         if (Targets.All(t => !Expr.TryApply(text, Of(t.Block)[axis], out _)))
             ShowNote(Loc.F("Note.NotNumber", text));
     }
@@ -259,7 +259,7 @@ public sealed class VectorField : FieldVm
             var v = (double[])Of(b).Clone();
             v[axis] = f(v[axis]);
             return b.Set(Key, v);
-        }, Loc.F("Undo.SetAxis", Label, "XYZ"[axis]), merge);
+        }, () => Loc.F("Undo.SetAxis", Label, "XYZ"[axis]), merge);
 }
 
 public sealed class ToggleField : FieldVm
@@ -290,7 +290,7 @@ public sealed class ToggleField : FieldVm
             string? now = Raw.Of(b.Block, Key);
             bool words = now is "true" or "false";
             return b.SetWord(Key, words ? (target ? "true" : "false") : (target ? "1" : "0"));
-        }, Loc.F(target ? "Undo.On" : "Undo.Off", Label));
+        }, () => Loc.F(target ? "Undo.On" : "Undo.Off", Label));
     }
 }
 
@@ -338,7 +338,7 @@ public sealed class ChoiceField : FieldVm
         base.Refresh();
     }
 
-    public void Choose(string value) => Apply(b => b.SetWord(Key, value), Loc.F("Undo.Choose", Label, Loc.TryT("E." + Key + "." + value) ?? value));
+    public void Choose(string value) => Apply(b => b.SetWord(Key, value), () => Loc.F("Undo.Choose", Label, Loc.TryT("E." + Key + "." + value) ?? value));
 }
 
 public sealed class ChoiceOption : ObservableObject
@@ -431,7 +431,7 @@ public sealed class PathField : FieldVm
             if (line != null)
                 values.AddRange(line.Values.Skip(1).Select(v => v.Text));
             return Raw.Of(b.Block, Key) == string.Join(" ", values) ? null : EnfEdits.SetLine(b.Doc, b.Block, Key, values, k => b.Schema.Find(b.Scope, k)?.Order);
-        }, Loc.F("Undo.Set", Label));
+        }, () => Loc.F("Undo.Set", Label));
     }
 }
 
@@ -470,7 +470,7 @@ public sealed class ColorField : FieldVm
             return null;
         v[channel] = r;
         return b.Set(Key, v);
-    }, Loc.F("Undo.SetAxis", Label, "RGBA"[channel]));
+    }, () => Loc.F("Undo.SetAxis", Label, "RGBA"[channel]));
 }
 
 // Free text: strings (PhysMaterial), matrices (AlbedoMapTexMat) and keys the schema does not know. Written back as
@@ -502,7 +502,7 @@ public sealed class TextField : FieldVm
         if (tokens.Count == 0)
             return;
         Apply(b => Raw.Of(b.Block, Key) == string.Join(" ", tokens) ? null
-            : EnfEdits.SetLine(b.Doc, b.Block, Key, tokens, k => b.Schema.Find(b.Scope, k)?.Order), Loc.F("Undo.Set", Label));
+            : EnfEdits.SetLine(b.Doc, b.Block, Key, tokens, k => b.Schema.Find(b.Scope, k)?.Order), () => Loc.F("Undo.Set", Label));
     }
 
     private static List<string> Tokenize(string text)

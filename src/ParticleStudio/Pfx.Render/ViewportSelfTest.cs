@@ -53,9 +53,11 @@ public sealed class ViewportSelfTest
             case 1:
                 var after = _viewport.CaptureFrame(false);
                 Log($"frame {_frames}: device re-created (resets {_viewport.DeviceResets}), {Compare(_before, after)}");
-                // Step and size first: a window resize sends WM_SIZE at once.
+                // Step and size first: a window resize sends WM_SIZE at once. A maximised window (the shell opens so)
+                // only keeps Width and Height as its restore size, so it is restored first.
                 _step = 2;
                 _size = (_viewport.PixelWidth, _viewport.PixelHeight);
+                _window.WindowState = WindowState.Normal;
                 _window.Width = 1000;
                 _window.Height = 600;
                 break;

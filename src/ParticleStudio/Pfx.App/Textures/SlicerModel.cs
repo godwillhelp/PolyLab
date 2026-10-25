@@ -213,7 +213,7 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
         u = Math.Clamp(u, 1, MaxTiles);
         v = Math.Clamp(v, 1, MaxTiles);
         var emat = Material.Emat;
-        Steps(Loc.F("Undo.SetTiles", u, v), null,
+        Steps(Loc.Later("Undo.SetTiles", u, v), null,
             () => emat.Number("TileU") == u && emat.Has("TileU") ? null : emat.Set("TileU", u),
             () => emat.Number("TileV") == v && emat.Has("TileV") ? null : emat.Set("TileV", v));
     }
@@ -228,7 +228,7 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
             Toast?.Invoke(Loc.F("Toast.Clamped", Loc.T("Slicer.Fps"), Loc.Num(clamped)), "warn");
         if (Emitter.Number("AnimFPS") == clamped && Emitter.Has("AnimFPS"))
             return;
-        Doc.Do(Emitter.Set("AnimFPS", clamped), Loc.F("Undo.Set", "AnimFPS"));
+        Doc.Do(Emitter.Set("AnimFPS", clamped), Loc.Later("Undo.Set", "AnimFPS"));
     }
 
     // Written as the file already spells it (0/1 or false/true), new keys as 0/1, like the inspector's switches.
@@ -239,7 +239,7 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
         string? now = Emitter.Text(key);
         bool on = now is "1" or "true" or "True";
         bool words = now is "true" or "false";
-        Doc.Do(Emitter.SetWord(key, words ? (on ? "false" : "true") : (on ? "0" : "1")), Loc.F(on ? "Undo.Off" : "Undo.On", key));
+        Doc.Do(Emitter.SetWord(key, words ? (on ? "false" : "true") : (on ? "0" : "1")), Loc.Later(on ? "Undo.Off" : "Undo.On", key));
     }
 
     // Pivot and scale share one undo step per drag: call with drag = true while dragging, then EndDrag.
@@ -266,14 +266,14 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
         x = Snap(keyX, x);
         y = Snap(keyY, y);
         string? merge = drag ? _merge ??= label + ":" + Guid.NewGuid().ToString("N") : null;
-        Steps(Loc.T(label), merge,
+        Steps(Loc.Later(label), merge,
             () => e.Number(keyX) == x && e.Has(keyX) ? null : e.Set(keyX, x),
             () => e.Number(keyY) == y && e.Has(keyY) ? null : e.Set(keyY, y));
     }
 
     // Edits splice token lists at the indices they were made with, so each is made after the one before it has run;
     // one merge key makes them one undo step. Without a drag key the step is sealed at once.
-    private void Steps(string label, string? merge, params Func<Pfx.Core.Editing.IEdit?>[] makers)
+    private void Steps(Func<string> label, string? merge, params Func<Pfx.Core.Editing.IEdit?>[] makers)
     {
         if (Doc == null)
             return;
@@ -306,7 +306,7 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
             return was == null ? e.Reset(key)
                 : e.Set(key, double.Parse(was, NumberStyles.Float, CultureInfo.InvariantCulture));
         };
-        Steps(Loc.T("Undo.PivotFile"), null, Back("CenterX"), Back("CenterY"), Back("ScaleX"), Back("ScaleY"));
+        Steps(Loc.Later("Undo.PivotFile"), null, Back("CenterX"), Back("CenterY"), Back("ScaleX"), Back("ScaleY"));
     }
 
     public void DefaultPivot()
@@ -315,7 +315,7 @@ public sealed class SlicerModel : ObservableObject, ISheetSource
             return;
         var e = Emitter;
         Func<Pfx.Core.Editing.IEdit?> To(string key, double v) => () => e.Number(key) == v ? null : e.Set(key, v);
-        Steps(Loc.T("Undo.PivotDefault"), null, To("CenterX", 0), To("CenterY", 0), To("ScaleX", 1), To("ScaleY", 1));
+        Steps(Loc.Later("Undo.PivotDefault"), null, To("CenterX", 0), To("CenterY", 0), To("ScaleX", 1), To("ScaleY", 1));
     }
 
     private void Notify() => Changed?.Invoke();

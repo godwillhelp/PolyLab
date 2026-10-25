@@ -330,7 +330,7 @@ public partial class MainWindow : IComposeHost, IExportHost
             f.Parts.Add(new PartEntry { Id = id, Path = rel });
             if (state < f.States.Count)
                 f.States[state].Items.Add(new StateItem { Ref = id });
-        }, Loc.F("Undo.CmpAddItem", id));
+        }, Loc.Later("Undo.CmpAddItem", id));
     }
 
     // A sound file: copied in place only by reference (relative to the project); an X-Ray .ogg brings its range and
@@ -371,7 +371,7 @@ public partial class MainWindow : IComposeHost, IExportHost
                 s.Range = (float)range;
             if (x?.Volume is double volume)
                 s.Volume = (float)volume;
-        }, Loc.F("Undo.Cmp", Loc.T("Cmp.SoundFile")));
+        }, Loc.Later("Undo.Cmp", Loc.Later("Cmp.SoundFile")));
     }
 
     public void PreviewSound(string soundId)

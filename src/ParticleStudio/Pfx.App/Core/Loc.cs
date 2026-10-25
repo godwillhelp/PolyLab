@@ -41,5 +41,10 @@ public static class Loc
 
     public static string F(string key, params object?[] args) => string.Format(Culture, T(key), args);
 
+    // A text kept for later (undo labels): the arguments are taken now, the text is looked up on every read, so it
+    // follows a language switch. An argument that is a Func<string> (a nested Later, a field's label) is read then too.
+    public static Func<string> Later(string key, params object?[] args) =>
+        () => args.Length == 0 ? T(key) : F(key, args.Select(a => a is Func<string> f ? f() : a).ToArray());
+
     public static string Num(double v) => v.ToString("0.####", CultureInfo.InvariantCulture);
 }

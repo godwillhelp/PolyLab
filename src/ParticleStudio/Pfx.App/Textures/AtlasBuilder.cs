@@ -360,7 +360,7 @@ public sealed class AtlasBuilder : ObservableObject, ISheetSource
         if (line != null)
             values.AddRange(line.Values.Skip(1).Select(v => v.Text));
         string merge = "atlas-apply:" + Guid.NewGuid().ToString("N");
-        string label = Loc.F("Undo.ApplyAtlas", Path.GetFileName(gamePath));
+        var label = Loc.Later("Undo.ApplyAtlas", Path.GetFileName(gamePath));
         var makers = new Func<IEdit?>[]
         {
             () => EnfEdits.SetLine(emat.Doc, emat.Block, "AlbedoMap", values, k => emat.Schema.Find(emat.Scope, k)?.Order),

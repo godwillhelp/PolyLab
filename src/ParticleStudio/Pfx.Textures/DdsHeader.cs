@@ -10,6 +10,7 @@ public enum BlockFormat
     Dxt5,
     Bc4,
     Bc5,
+    Bc7,
 }
 
 // The formats the EDDS writer produces: what vanilla particle textures use.
@@ -27,7 +28,7 @@ public sealed class DdsHeader
     public const int BaseSize = 128;
     private const int Dx10Size = 20;
     private const uint PfAlphaPixels = 0x1, PfAlpha = 0x2, PfFourCc = 0x4, PfRgb = 0x40, PfLuminance = 0x20000;
-    private const int DxgiBc4Unorm = 80, DxgiBc5Unorm = 83;
+    private const int DxgiBc4Unorm = 80, DxgiBc5Unorm = 83, DxgiBc7Unorm = 98, DxgiBc7Srgb = 99;
     private const uint FlagDepth = 0x800000;
 
     // Values of every vanilla EDDS of that format (P:\graphics, 2026-10-11 and 2026-10-14 surveys, memory
@@ -70,6 +71,7 @@ public sealed class DdsHeader
                 "DXT5" => BlockFormat.Dxt5,
                 "DX10" when DxgiFormat == DxgiBc4Unorm => BlockFormat.Bc4,
                 "DX10" when DxgiFormat == DxgiBc5Unorm => BlockFormat.Bc5,
+                "DX10" when DxgiFormat is DxgiBc7Unorm or DxgiBc7Srgb => BlockFormat.Bc7,
                 "DX10" => throw new NotSupportedException($"DX10 DXGI format {DxgiFormat}"),
                 _ => throw new NotSupportedException($"FourCC '{FourCc.TrimEnd('\0')}'"),
             };

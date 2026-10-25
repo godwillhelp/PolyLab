@@ -28,16 +28,16 @@ public sealed partial class ShellChecks
             f.States[0].Items.Add(new StateItem { Ref = "glow" });
             f.Sounds.Add(new SoundEntry { Id = "roar", GameSet = "HeavyFire_SoundSet" });
             f.States.Add(new StateEntry { Name = "active", Duration = 2, Items = { new() { Ref = second, Delay = 0.5f }, new() { Ref = "roar" } } });
-        }, "check: states");
+        }, () => "check: states");
         _w.ComposeTab.SelectItem("glow");
         await Settled();
 
         // One history: a project edit, then a part edit; Ctrl+Z takes back the part edit first.
-        p.Do(f => f.Lights[0].Radius = 8, "check: radius");
+        p.Do(f => f.Lights[0].Radius = 8, () => "check: radius");
         var doc = _w.Docs[0];
         var e = doc.Ptc.Emitters[0];
         double? before = e.Number("Velocity");
-        doc.Do(e.Set("Velocity", (before ?? 0) + 1), "check: velocity");
+        doc.Do(e.Set("Velocity", (before ?? 0) + 1), () => "check: velocity");
         _w.UndoActive();
         bool partFirst = e.Number("Velocity") == before && p.File.Lights[0].Radius == 8;
         _w.UndoActive();
@@ -90,7 +90,7 @@ public sealed partial class ShellChecks
             f.Export.Profile = "dayz";
             f.Export.Dayz.ModFolder = mod;
             f.Export.Dayz.Prefix = "CHK";
-        }, "check: export");
+        }, () => "check: export");
         var plan = await ExportPlanNow();
         Expect(plan is { CanWrite: true } && plan.Files.Count > 3 && plan.Files.All(f => f.State == FileState.New),
             $"export plan: {plan?.Files.Count} files, all new, errors {string.Join("; ", plan?.Errors.Select(x => x.Key) ?? Array.Empty<string>())}");

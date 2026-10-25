@@ -397,7 +397,7 @@ public partial class MainWindow : Window, ILayersHost, ISettingsHost, ITimelineH
         if (row.View is not { } v)
             return;
         string old = v.Name;
-        row.Part.Do(v.Rename(name), Loc.F("Undo.Rename", old, name));
+        row.Part.Do(v.Rename(name), Loc.Later("Undo.Rename", old, name));
     }
 
     public void AddEmitter()
@@ -406,7 +406,7 @@ public partial class MainWindow : Window, ILayersHost, ISettingsHost, ITimelineH
         if (doc == null)
             return;
         string name = Names.Unique("emitor1", doc.Ptc.Emitters.Select(e => e.Name));
-        doc.Do(doc.Ptc.AddEmitter(name), Loc.F("Undo.Add", name));
+        doc.Do(doc.Ptc.AddEmitter(name), Loc.Later("Undo.Add", name));
         var added = doc.Ptc.Emitter(name);
         if (added != null)
             Select(doc, new[] { added.Block }, false);
@@ -419,7 +419,7 @@ public partial class MainWindow : Window, ILayersHost, ISettingsHost, ITimelineH
             return;
         var doc = _active;
         string name = Names.Unique(views[0].Name + "_cloned", doc.Ptc.Emitters.Select(e => e.Name));
-        doc.Do(doc.Ptc.CloneEmitter(views[0], name), Loc.F("Undo.Clone", views[0].Name));
+        doc.Do(doc.Ptc.CloneEmitter(views[0], name), Loc.Later("Undo.Clone", views[0].Name));
         if (doc.Ptc.Emitter(name) is { } clone)
             Select(doc, new[] { clone.Block }, false);
     }
@@ -436,7 +436,7 @@ public partial class MainWindow : Window, ILayersHost, ISettingsHost, ITimelineH
         var all = doc.Ptc.Emitters.ToList();
         var edits = views.OrderByDescending(v => all.FindIndex(e => e.Block == v.Block)).Select(v => doc.Ptc.RemoveEmitter(v)).ToList();
         int keep = all.FindIndex(e => e.Block == views[0].Block);
-        doc.Do(new CompositeEdit(edits), Loc.F("Undo.Delete", string.Join(", ", views.Select(v => v.Name))));
+        doc.Do(new CompositeEdit(edits), Loc.Later("Undo.Delete", string.Join(", ", views.Select(v => v.Name))));
         var left = doc.Ptc.Emitters;
         Select(doc, left.Count > 0 ? new[] { left[Math.Clamp(keep, 0, left.Count - 1)].Block } : Array.Empty<EnfBlock>(), left.Count == 0);
         Toast(Loc.F("Toast.Deleted", views.Count), "info");
@@ -447,7 +447,7 @@ public partial class MainWindow : Window, ILayersHost, ISettingsHost, ITimelineH
         if (row.View is not { } v || target.View is not { } t)
             return;
         int to = row.Part.Ptc.Emitters.ToList().FindIndex(e => e.Block == t.Block);
-        row.Part.Do(row.Part.Ptc.MoveEmitter(v, to), Loc.F("Undo.Move", v.Name));
+        row.Part.Do(row.Part.Ptc.MoveEmitter(v, to), Loc.Later("Undo.Move", v.Name));
     }
 
     // ---- ITimelineHost ----

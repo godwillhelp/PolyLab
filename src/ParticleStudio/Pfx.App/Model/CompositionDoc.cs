@@ -11,8 +11,8 @@ namespace Pfx.App.Model;
 // there, in the part's own history); Snapshot() takes it from the open parts, Open hands it to them.
 public sealed class CompositionDoc : IUndoOwner
 {
-    private readonly List<string> _done = new();
-    private readonly List<string> _undone = new();
+    private readonly List<Func<string>> _done = new();
+    private readonly List<Func<string>> _undone = new();
     private string? _mergeKey;
     private byte[] _saved;
 
@@ -31,7 +31,7 @@ public sealed class CompositionDoc : IUndoOwner
     public string? Folder => Path != null ? System.IO.Path.GetDirectoryName(Path) : null;
     public int UndoCount => _done.Count;
     public int RedoCount => _undone.Count;
-    public string? UndoLabel => _done.Count > 0 ? _done[^1] : null;
+    public string? UndoLabel => _done.Count > 0 ? _done[^1]() : null;
 
     // The parts' open documents, by part id (set by the shell).
     public Func<PartEntry, EffectDoc?> DocOf { get; set; } = _ => null;
@@ -72,7 +72,7 @@ public sealed class CompositionDoc : IUndoOwner
 
     // One undoable change: `edit` changes a copy of the project. Steps with the same merge key in a row (one drag in a
     // field) become one undo step.
-    public void Do(Action<ProjectFile> edit, string label, string? mergeKey = null)
+    public void Do(Action<ProjectFile> edit, Func<string> label, string? mergeKey = null)
     {
         var before = File;
         var after = Composition.Parse(Composition.Bytes(File));
@@ -88,7 +88,7 @@ public sealed class CompositionDoc : IUndoOwner
     }
 
     // One undoable change that replaces the whole project with a finished copy (a recipe run built it).
-    public void Replace(ProjectFile after, string label)
+    public void Replace(ProjectFile after, Func<string> label)
     {
         Undo.Do(new SwapEdit(this, File, after));
         _done.Add(label);
