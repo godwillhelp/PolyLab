@@ -182,7 +182,9 @@ public class InstallerTests(RealBuilds real) : IClassFixture<RealBuilds>
             finally
             {
                 p.Kill();
-                await p.WaitForExitAsync();
+                // Not WaitForExitAsync: it trusts the exit code, which TerminateProcess sets before the process is gone
+                // (still listed with its modules), so the uninstall below would see the tool running.
+                p.WaitForExit();
             }
         }
 
