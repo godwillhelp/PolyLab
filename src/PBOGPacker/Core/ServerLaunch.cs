@@ -34,10 +34,11 @@ public static class ServerLaunch
         return Scripts(s.Path).FirstOrDefault();
     }
 
-    // Runs the script in its own console window with the server folder as working directory. Opened
-    // from a launcher that keeps its tools in a kill-on-close job, this process sits in that job and so
-    // would every child: the server would die with the launcher. WMI creates the process outside any job (and
-    // without the launcher's environment), so that path is used whenever we are inside one.
+    // Runs the script in its own console window with the server folder as working directory. Started by a
+    // parent that keeps its children in a kill-on-close job (some IDEs, terminals and process managers do; the
+    // Poly Lab launcher does not), this process sits in that job and so would every child: the server would die
+    // with that parent. WMI creates the process outside any job (and without the parent's environment), so that
+    // path is used whenever we are inside one.
     // Returns the pid of the script's cmd.exe, 0 when unknown.
     public static int Start(string serverDir, string bat)
     {

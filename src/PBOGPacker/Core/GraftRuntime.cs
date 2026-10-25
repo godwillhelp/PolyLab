@@ -2,10 +2,11 @@ using System.IO;
 
 namespace PolyLab.PBOGPacker.Core;
 
-// The GRAFT runtime the Poly Lab launcher keeps up to date (graft.exe, hid.dll, .version). The launcher
-// passes its folder in POLYLAB_GRAFT_DIR; a tool installed by the launcher also finds it two levels up
-// (<launcher>\tools\pbog\ -> <launcher>\graft). Its version is the one the owner published and tested,
-// so it drives the ABI checks, the TAG of new C++ projects and the texts, instead of a hardcoded pin.
+// The GRAFT runtime the Poly Lab launcher installs (graft.exe, hid.dll, .version) from the GRAFT upstream
+// release named by this tool's tool.json ("graft", kept equal to Pinned when a release is packed). The
+// launcher passes its folder in POLYLAB_GRAFT_DIR; a tool installed by the launcher also finds it two levels
+// up (<launcher>\tools\pbog\ -> <launcher>\graft). Its .version drives the ABI checks, the TAG of new C++
+// projects and the texts; without a managed runtime the tool falls back to Pinned.
 public static class GraftRuntime
 {
     public const string Pinned = "v0.4.0";

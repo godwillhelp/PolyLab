@@ -36,7 +36,7 @@ public static class Toolchain
     public static string? ClangDir =>
         Directory.Exists(@"C:\Program Files\LLVM\bin") ? @"C:\Program Files\LLVM\bin" : null;
 
-    // The launcher-managed GRAFT wins: it is the version the owner published for everyone. Paths from
+    // The launcher-managed GRAFT wins: it is the release this tool version is built for. Paths from
     // the settings are the fallback for a tool run outside the launcher (dev machine, manual setup).
     public static string? Graft(ToolPaths t) => GraftRuntime.GraftExe ?? Exists(t.Graft);
     public static string? HostDll(ToolPaths t) => GraftRuntime.GraftExe != null ? GraftRuntime.HostDll : Exists(t.HostDll);

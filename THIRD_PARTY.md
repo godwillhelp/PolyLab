@@ -22,6 +22,9 @@ Restored at build time, not stored in the repository. Licences as stated in each
 | xunit, xunit.runner.visualstudio | 2.9.3, 3.1.4 | Apache-2.0 (© .NET Foundation) | tests only |
 | Microsoft.NET.Test.Sdk | 17.14.1 | MIT (© Microsoft) | tests only |
 
+The launcher tests also use ASP.NET Core (Kestrel) for a local fake of the GitHub releases API; it is part of the .NET
+shared framework (`FrameworkReference Microsoft.AspNetCore.App`, MIT), not a package, and is not shipped.
+
 ## Code ported from other projects
 
 ### lzokay — `src/ParticleStudio/Pfx.Textures/Lzo1x.cs`
@@ -144,6 +147,9 @@ byte-identical copies of the PBOG Packer files of the same name.
   Editor screenshot of a hand-made test curve (`tools/ParticleStudio/sim/make_spline_golden.py`; the screenshot is not
   stored).
 - `tools/ParticleStudio/render/*.ptc`: our own benchmark effects (they name a vanilla material path, no game data).
+- `tests/PolyLab.Launcher.Tests/Golden/github_releases.json`: two entries of the public GitHub API release list of
+  GRAFT (KR_GRAFTED), with the author / uploader objects removed and the release notes replaced; it checks that the
+  launcher reads GitHub's field names.
 
 ## Game knowledge, not game data
 
@@ -161,3 +167,8 @@ with DayZ:
 
 DayZ Tools (Bohemia Interactive), texconv (Microsoft DirectXTex, MIT), Mikero tools, Python with Pillow/numpy, and
 GRAFT are found on the user's machine or downloaded by the user; none of them is redistributed here.
+
+The launcher downloads GRAFT itself: the release named by PBOG Packer's `tool.json` (`"graft": "v0.4.0"`), from the
+upstream GitHub releases of KR_GRAFTED, checked against the release's SHA-256 digest and unpacked unmodified into
+`<install folder>\graft` with its `LICENSE` and `LICENSE-EXCEPTION`, plus a `GRAFT_SOURCE.txt` that points to the
+complete source. GRAFT is not part of this repository or of the Poly Lab release zips.

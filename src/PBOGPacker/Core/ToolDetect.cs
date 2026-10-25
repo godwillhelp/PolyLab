@@ -53,7 +53,7 @@ public static class ToolDetect
         items.Add(new("dssign", "DSSignFile", null, dssign != null ? CheckState.Ok : CheckState.Warn,
             dssign != null ? "ok" : "", dssign ?? ""));
 
-        // graft.exe carries no --version flag and no file version info, so the pin is owner-tracked.
+        // graft.exe carries no --version flag and no file version info, so the version is the runtime's .version or the pin.
         // Cross-reference the co-shipped hid.dll version when readable; otherwise report presence.
         var expected = GraftDoctor.Release;
         var graft = Toolchain.Graft(t);

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>PolyLab</AssemblyName>
+    <RootNamespace>PolyLab.Launcher</RootNamespace>
+    <Version>1.0.0</Version>
+    <Product>Poly Lab</Product>
+    <Description>Poly Lab launcher</Description>
+    <Company>Poly Lab</Company>
+    <ApplicationIcon>..\Ui\Assets\Brand\polylab.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>ru;uk</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ui\PolyLab.Ui.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="..\Ui\Assets\Brand\polylab.ico" Link="polylab.ico" />
+  </ItemGroup>
+
+</Project>

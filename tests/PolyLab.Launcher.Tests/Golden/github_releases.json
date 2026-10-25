@@ -1,0 +1,76 @@
+[
+  {
+    "url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402591568",
+    "assets_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402591568/assets",
+    "upload_url": "https://uploads.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402591568/assets{?name,label}",
+    "html_url": "https://github.com/KRdayzmodding/KR_GRAFTED/releases/tag/v0.4.0",
+    "id": 402591568,
+    "node_id": "RE_kwDOT8Y_B84X_w9Q",
+    "tag_name": "v0.4.0",
+    "target_commitish": "13556ae7dcc1911bda07fb75bde32d6c0b11d130",
+    "name": "v0.4.0",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "created_at": "2026-10-03T16:17:14Z",
+    "updated_at": "2026-10-03T16:20:59Z",
+    "published_at": "2026-10-03T16:20:59Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/assets/608122292",
+        "id": 608122292,
+        "node_id": "RA_kwDOT8Y_B84kPzW0",
+        "name": "graft-v0.4.0-windows-x64.zip",
+        "label": "",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 790109,
+        "digest": "sha256:b366881dc54b2fb9298b7265fa0aacc6541fa6ce27b4bb293a8d44af2841cad1",
+        "download_count": 74,
+        "created_at": "2026-10-03T16:20:58Z",
+        "updated_at": "2026-10-03T16:20:58Z",
+        "browser_download_url": "https://github.com/KRdayzmodding/KR_GRAFTED/releases/download/v0.4.0/graft-v0.4.0-windows-x64.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/tarball/v0.4.0",
+    "zipball_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/zipball/v0.4.0",
+    "body": "Release notes removed for the test fixture.\r\n\r\n- item"
+  },
+  {
+    "url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402481008",
+    "assets_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402481008/assets",
+    "upload_url": "https://uploads.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/402481008/assets{?name,label}",
+    "html_url": "https://github.com/KRdayzmodding/KR_GRAFTED/releases/tag/v0.3.1",
+    "id": 402481008,
+    "node_id": "RE_kwDOT8Y_B84X_V9w",
+    "tag_name": "v0.3.1",
+    "target_commitish": "cdb9c8804e2c1821f409a14b38f21590bbd1cd76",
+    "name": "v0.3.1",
+    "draft": false,
+    "immutable": false,
+    "prerelease": false,
+    "created_at": "2026-10-03T11:23:58Z",
+    "updated_at": "2026-10-03T11:28:18Z",
+    "published_at": "2026-10-03T11:28:18Z",
+    "assets": [
+      {
+        "url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/releases/assets/607697363",
+        "id": 607697363,
+        "node_id": "RA_kwDOT8Y_B84kOLnT",
+        "name": "graft-v0.3.1-windows-x64.zip",
+        "label": "",
+        "content_type": "application/zip",
+        "state": "uploaded",
+        "size": 795954,
+        "digest": "sha256:b0c0c0ffae2dedc4a33a64f7c4a1cc8625282985622cd95bead394ba9df8cb49",
+        "download_count": 1,
+        "created_at": "2026-10-03T11:28:17Z",
+        "updated_at": "2026-10-03T11:28:17Z",
+        "browser_download_url": "https://github.com/KRdayzmodding/KR_GRAFTED/releases/download/v0.3.1/graft-v0.3.1-windows-x64.zip"
+      }
+    ],
+    "tarball_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/tarball/v0.3.1",
+    "zipball_url": "https://api.github.com/repos/KRdayzmodding/KR_GRAFTED/zipball/v0.3.1",
+    "body": "Release notes removed for the test fixture.\r\n\r\n- item"
+  }
+]
