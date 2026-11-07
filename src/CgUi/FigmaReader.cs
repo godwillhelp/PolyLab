@@ -208,7 +208,7 @@ public sealed partial class FigmaReader
         _ => 0
     };
 
-    [GeneratedRegex("^pattern:(grid|scan)([0-9]+)$")]
+    [GeneratedRegex("^pattern:(grid|scan|stripe)([0-9]+)$")]
     private static partial Regex PatternName();
 
     private Node? Visit(JsonElement e, Ctx ctx)
@@ -265,7 +265,7 @@ public sealed partial class FigmaReader
                 return n;
             }
             int argb = CanvasArgb(e, ColourOf(stroke), AlphaOf(stroke) * opacity, ctx.D);
-            int kind = pm.Groups[1].Value == "grid" ? 0 : 1;
+            int kind = pm.Groups[1].Value switch { "grid" => 0, "scan" => 1, _ => 2 };
             if (kind == 0 && (argb >>> 24) < 255)
                 Diag(e, false, "translucent grid: crossings blend twice");
             n.X = n.Y = 0;

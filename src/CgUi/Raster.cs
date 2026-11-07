@@ -119,11 +119,12 @@ public sealed class Raster
     private void Pattern(PatternRec p, Box box, Box clip, int me, int layer)
     {
         var area = box.Clip(clip);
-        if (p.Kind == 0)
+        if (p.Kind != 1)
             for (int x = box.X0; x < box.X1; x += p.Pitch)
                 Add(new Box(x, box.Y0, Math.Min(x + p.LineW, box.X1), box.Y1), p.Argb, area, me, layer);
-        for (int y = box.Y0; y < box.Y1; y += p.Pitch)
-            Add(new Box(box.X0, y, box.X1, Math.Min(y + p.LineW, box.Y1)), p.Argb, area, me, layer);
+        if (p.Kind != 2)
+            for (int y = box.Y0; y < box.Y1; y += p.Pitch)
+                Add(new Box(box.X0, y, box.X1, Math.Min(y + p.LineW, box.Y1)), p.Argb, area, me, layer);
     }
 
     private Pt Local(double cx, double cy, int ax, int ay) =>

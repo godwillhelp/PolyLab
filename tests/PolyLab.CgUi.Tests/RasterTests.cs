@@ -124,4 +124,14 @@ public class RasterTests
         Assert.Equal(10 + 3, new Raster(s, 1080).Lines.Count);
         Assert.Equal(7 + 2, new Raster(s, 720).Lines.Count);
     }
+
+    [Fact]
+    public void StripePatternDrawsColumnsOnly()
+    {
+        var node = new Node { Flags = Flags.Visible, W = 30 * 16, H = 9 * 16, Pattern = new PatternRec(2, 2, 1, -1) };
+        var s = new Screen { W = 1920 * 16, H = 1080 * 16, Root = new Node { Flags = Flags.Visible, W = 1920 * 16, H = 1080 * 16, Children = [node] } };
+        var lines = new Raster(s, 1080).Lines;
+        Assert.Equal(15, lines.Count);
+        Assert.All(lines, l => Assert.Equal((1, 0, 9), (l.Box.X1 - l.Box.X0, l.Box.Y0, l.Box.Y1)));
+    }
 }
