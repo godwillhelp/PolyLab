@@ -3,6 +3,7 @@
     <Project Path="src/Ui/PolyLab.Ui.csproj" />
     <Project Path="src/PBOGPacker/PBOG_Packer.csproj" />
     <Project Path="src/Launcher/PolyLab.Launcher.csproj" />
+    <Project Path="src/CgUi/PolyLab.CgUi.csproj" />
   </Folder>
   <Folder Name="/src/ParticleStudio/">
     <Project Path="src/ParticleStudio/Pfx.App/Pfx.App.csproj" />
@@ -17,6 +18,7 @@
     <Project Path="tests/PBOGPacker.Tests/PBOGPacker.Tests.csproj" />
     <Project Path="tests/Pfx.Tests/Pfx.Tests.csproj" />
     <Project Path="tests/PolyLab.Launcher.Tests/PolyLab.Launcher.Tests.csproj" />
+    <Project Path="tests/PolyLab.CgUi.Tests/PolyLab.CgUi.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/ParticleStudio/">
     <Project Path="tools/ParticleStudio/PfxSim/PfxSim.csproj" />
