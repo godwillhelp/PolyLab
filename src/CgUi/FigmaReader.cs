@@ -440,15 +440,14 @@ public sealed partial class FigmaReader
         {
             var a = items[i];
             int layer = 0;
-            for (int j = 0; j < i; j++)
+            for (int j = 0; j < i && (a.N.IsShape || a.N.IsWidget); j++)
             {
                 var b = items[j];
-                if (b.Ghost || !(a.X0 < b.X1 && b.X0 < a.X1 && a.Y0 < b.Y1 && b.Y0 < a.Y1))
+                if (b.Ghost || !(b.N.IsShape || b.N.IsWidget) || !(a.X0 < b.X1 && b.X0 < a.X1 && a.Y0 < b.Y1 && b.Y0 < a.Y1))
                     continue;
+                layer = Math.Max(layer, b.N.Layer);
                 if (a.N.IsShape && b.N.IsWidget)
                     layer = Math.Max(layer, b.N.Layer + 1);
-                if (a.N.IsWidget && b.N.IsShape)
-                    layer = Math.Max(layer, b.N.Layer);
             }
             a.N.Layer = layer;
         }
