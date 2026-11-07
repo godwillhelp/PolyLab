@@ -4,7 +4,7 @@ using PolyLab.CgUi;
 
 const string usage = """
     cgui compile <readback.json> --out <dir> --screen <nodeId>=<Name> [--screen ...]
-                 [--sheet <nodeId>=<Name>] [--live $a,$b] [--prefix CG_UIData_]
+                 [--sheet <nodeId>=<Name>] [--live $a,$b] [--prefix CG_UIData_] [--shots <dir>]
       readback.json = REST GET /v1/files/:key/nodes?ids=...&geometry=paths&plugin_data=shared
     """;
 
@@ -14,7 +14,7 @@ if (args.Length < 2 || args[0] != "compile")
     return 2;
 }
 
-string input = args[1], outDir = "", prefix = "CG_UIData_";
+string input = args[1], outDir = "", prefix = "CG_UIData_", shotsDir = "";
 var screens = new List<(string Id, string Name)>();
 var sheets = new List<(string Id, string Name)>();
 var live = new List<string>();
@@ -29,6 +29,7 @@ for (int i = 2; i < args.Length; i++)
         case "--sheet": sheets.Add(Pair(Next())); break;
         case "--live": live.AddRange(Next().Split(',', StringSplitOptions.RemoveEmptyEntries)); break;
         case "--prefix": prefix = Next(); break;
+        case "--shots": shotsDir = Next(); break;
         default:
             Console.Error.WriteLine($"unknown argument {args[i]}\n{usage}");
             return 2;
@@ -63,8 +64,21 @@ foreach (var (id, name, sheet) in screens.Select(s => (s.Id, s.Name, false)).Con
     items.Add(new GalleryItem(ir, enc, shots, sheet));
     int errors = ir.Diags.Count(d => d.Error);
     failed |= errors > 0;
-    if (!sheet)
-        source.Append(EnforceOut.ClassSource(prefix + name, enc));
+    source.Append(EnforceOut.ClassSource(prefix + name, enc));
+    if (shotsDir != "")
+    {
+        Directory.CreateDirectory(shotsDir);
+        foreach (int h in Gallery.Heights)
+        {
+            var bare = Gallery.Shoot(decoded, decoded, h);
+            string stem = Path.Combine(shotsDir, $"{name}_{h}");
+            File.WriteAllBytes(stem + ".png", bare.Png);
+            File.WriteAllLines(stem + ".lines", bare.Raster.Lines.Select(l =>
+                $"{l.Box.X0} {l.Box.Y0} {l.Box.X1} {l.Box.Y1} {l.Argb} {l.Layer}"));
+            File.WriteAllLines(stem + ".widgets", bare.Raster.Widgets.Select(w =>
+                $"{w.Box.X0} {w.Box.Y0} {w.Box.X1} {w.Box.Y1} {(w.Node.Text != null ? "text" : w.Node.Image != null ? "image" : "live")}"));
+        }
+    }
     Console.WriteLine($"{name} ({id}): {enc.Ints.Length} ints, {enc.Strs.Length} strings, lines " +
                       string.Join(" / ", shots.Select(s => $"{s.Raster.Lines.Count} @{s.ScreenH}p")) +
                       $", {errors} errors, {ir.Diags.Count - errors} warnings");
