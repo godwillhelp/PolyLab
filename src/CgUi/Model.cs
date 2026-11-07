@@ -22,10 +22,12 @@ public sealed class Paint
 [JsonDerivedType(typeof(FillBox), "fillbox")]
 [JsonDerivedType(typeof(StrokeBox), "strokebox")]
 [JsonDerivedType(typeof(Poly), "poly")]
+[JsonDerivedType(typeof(Rects), "rects")]
 public abstract record Draw(Paint Paint);
 public sealed record FillBox(Paint Paint) : Draw(Paint);
 public sealed record StrokeBox(Paint Paint, int T, int R, int B, int L, int Align) : Draw(Paint);
 public sealed record Poly(Paint Paint, int Rule, int[][] Contours) : Draw(Paint);
+public sealed record Rects(Paint Paint, int[] Boxes) : Draw(Paint);
 
 public sealed record LayoutRec(int Dir, int Gap, int PadT, int PadR, int PadB, int PadL, int Main, int Cross, int Wrap,
     int MinH, int StrokesInLayout);

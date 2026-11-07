@@ -3,7 +3,7 @@ namespace PolyLab.CgUi;
 public static class Op
 {
     public const int Header = 1, Node = 2, End = 3, Layout = 4, FillBox = 5, StrokeBox = 6, Poly = 7, Pattern = 8,
-        Text = 9, Image = 10, Instance = 11, Component = 12;
+        Text = 9, Image = 10, Instance = 11, Component = 12, Rects = 13;
     public const int Version = 1;
 }
 
@@ -65,6 +65,9 @@ public static class IntStream
                             body.AddRange(c);
                         }
                         Rec(Op.Poly, [.. body]);
+                        break;
+                    case Rects r:
+                        Rec(Op.Rects, [.. PaintInts(r.Paint), r.Boxes.Length / 4, .. r.Boxes]);
                         break;
                 }
             }
@@ -170,6 +173,11 @@ public static class IntStream
                         p += 2 * pts;
                     }
                     cur!.Draws.Add(new Poly(pp, rule, contours));
+                    break;
+                case Op.Rects:
+                    var rp = ReadPaint();
+                    int boxes = v[p++];
+                    cur!.Draws.Add(new Rects(rp, v[p..(p + 4 * boxes)]));
                     break;
                 case Op.Pattern:
                     cur!.Pattern = new PatternRec(v[p], v[p + 1], v[p + 2], v[p + 3]);

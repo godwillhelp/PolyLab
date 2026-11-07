@@ -75,7 +75,8 @@ public class GoldenTests
         Assert.Equal("CG_Dialogs/GUI/icons/cg_dlg_portrait_bg.paa", nodes.Single(n => n.N.Name.StartsWith("img:CG_Dialogs")).N.Image!.Ref);
         Assert.Equal("cg_emblems_sq/loner", nodes.Single(n => n.N.Name == "$emblem").N.Image!.Ref);
         Assert.Equal(9, ir.Components.Count);
-        Assert.Equal([4650, 3542], Gallery.Heights.Select(h => new Raster(decoded, h).Lines.Count));
+        Assert.All(nodes.Where(n => n.N.Name.StartsWith("Обводка")), n => Assert.All(n.N.Draws, d => Assert.IsType<Rects>(d)));
+        Assert.Equal([3020, 2092], Gallery.Heights.Select(h => new Raster(decoded, h).Lines.Count));
     }
 
     [ReadbackFact("CGUI_READBACK_C")]

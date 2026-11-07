@@ -420,7 +420,11 @@ public sealed partial class FigmaReader
                     Diag(e, true, ex.Message);
                 }
             }
-            if (contours.Count > 0)
+            if (contours.Count == 0)
+                continue;
+            if (Geometry.AsRects(contours, g.Key) is { } boxes)
+                n.Draws.Add(new Rects(paint, boxes));
+            else
                 n.Draws.Add(new Poly(paint, g.Key, [.. contours]));
         }
     }

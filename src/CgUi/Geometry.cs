@@ -14,6 +14,74 @@ public static class Geometry
 {
     public const double Tolerance = 1.0 / 16;
 
+    public static int[]? AsRects(IReadOnlyList<int[]> contours, int rule)
+    {
+        var pieces = new List<(int X, int Y, int W, int H)>();
+        int winding = 0;
+        foreach (var c in contours)
+        {
+            int n = c.Length / 2;
+            if (n < 4)
+                return null;
+            int x0 = int.MaxValue, y0 = int.MaxValue, x1 = int.MinValue, y1 = int.MinValue;
+            for (int i = 0; i < n; i++)
+            {
+                x0 = Math.Min(x0, c[2 * i]);
+                x1 = Math.Max(x1, c[2 * i]);
+                y0 = Math.Min(y0, c[2 * i + 1]);
+                y1 = Math.Max(y1, c[2 * i + 1]);
+            }
+            if (x1 <= x0 || y1 <= y0)
+                return null;
+            long area2 = 0;
+            for (int i = 0; i < n; i++)
+            {
+                int j = (i + 1) % n;
+                int x = c[2 * i], y = c[2 * i + 1];
+                if (x != x0 && x != x1 && y != y0 && y != y1)
+                    return null;
+                area2 += (long)x * c[2 * j + 1] - (long)c[2 * j] * y;
+            }
+            if (Math.Abs(area2) != 2L * (x1 - x0) * (y1 - y0))
+                return null;
+            int sign = Math.Sign(area2);
+            if (winding != 0 && sign != winding)
+                return null;
+            winding = sign;
+            var add = new List<(int X, int Y, int W, int H)> { (x0, y0, x1 - x0, y1 - y0) };
+            foreach (var old in pieces)
+            {
+                var next = new List<(int X, int Y, int W, int H)>();
+                foreach (var r in add)
+                {
+                    bool overlap = r.X < old.X + old.W && old.X < r.X + r.W && r.Y < old.Y + old.H && old.Y < r.Y + r.H;
+                    if (!overlap)
+                    {
+                        next.Add(r);
+                        continue;
+                    }
+                    if (rule != 0)
+                        return null;
+                    int top = Math.Max(r.Y, old.Y), bottom = Math.Min(r.Y + r.H, old.Y + old.H);
+                    if (old.Y > r.Y)
+                        next.Add((r.X, r.Y, r.W, old.Y - r.Y));
+                    if (old.Y + old.H < r.Y + r.H)
+                        next.Add((r.X, old.Y + old.H, r.W, r.Y + r.H - old.Y - old.H));
+                    if (old.X > r.X)
+                        next.Add((r.X, top, old.X - r.X, bottom - top));
+                    if (old.X + old.W < r.X + r.W)
+                        next.Add((old.X + old.W, top, r.X + r.W - old.X - old.W, bottom - top));
+                }
+                add = next;
+            }
+            pieces.AddRange(add);
+        }
+        var boxes = new int[pieces.Count * 4];
+        for (int k = 0; k < pieces.Count; k++)
+            (boxes[4 * k], boxes[4 * k + 1], boxes[4 * k + 2], boxes[4 * k + 3]) = pieces[k];
+        return boxes;
+    }
+
     public static int QuadSteps(Pt p0, Pt p1, Pt p2, double tol) =>
         Math.Max(1, (int)Math.Ceiling(Math.Sqrt(2 * (p0 - 2 * p1 + p2).Len / (8 * tol))));
 

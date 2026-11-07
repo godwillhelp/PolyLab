@@ -64,6 +64,11 @@ public sealed class Raster
                     case Poly p:
                         FillPoly(p, ax, ay, n, clip, me);
                         break;
+                    case Rects r:
+                        for (int i = 0; i + 3 < r.Boxes.Length; i += 4)
+                            FillRect(BoxOf(ax + r.Boxes[i], ay + r.Boxes[i + 1], r.Boxes[i + 2], r.Boxes[i + 3]), r.Paint, ax,
+                                ay, n, clip, me);
+                        break;
                 }
             }
             if (n.Pattern is { } pt)

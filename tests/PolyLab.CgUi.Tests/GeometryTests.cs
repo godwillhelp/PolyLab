@@ -2,6 +2,29 @@ namespace PolyLab.CgUi.Tests;
 
 public class GeometryTests
 {
+    [Fact]
+    public void AxisAlignedDashesBecomeRects()
+    {
+        int[][] contours = [[8, 0, 0, 0, 0, 1408, 8, 1408, 16, 1408, 16, 0], [32, 0, 32, 16, 96, 16, 96, 0]];
+        Assert.Equal([0, 0, 16, 1408, 32, 0, 64, 16], Geometry.AsRects(contours, 0)!);
+    }
+
+    [Fact]
+    public void OverlappingCornerIsCutFromTheLaterRect()
+    {
+        int[][] contours = [[0, 0, 0, 160, 16, 160, 16, 0], [0, 0, 0, 16, 64, 16, 64, 0]];
+        Assert.Equal([0, 0, 16, 160, 16, 0, 48, 16], Geometry.AsRects(contours, 0)!);
+        Assert.Null(Geometry.AsRects(contours, 1));
+    }
+
+    [Fact]
+    public void NonRectOrMixedWindingStayPolygons()
+    {
+        Assert.Null(Geometry.AsRects([[0, 0, 32, 0, 32, 16, 8, 16]], 0));
+        Assert.Null(Geometry.AsRects([[0, 0, 32, 0, 32, 16, 16, 8, 0, 16]], 0));
+        Assert.Null(Geometry.AsRects([[0, 0, 32, 0, 32, 16, 0, 16], [64, 0, 64, 16, 96, 16, 96, 0]], 0));
+    }
+
     private static double DistToPolyline(Pt p, IReadOnlyList<Pt> line)
     {
         double best = double.MaxValue;
