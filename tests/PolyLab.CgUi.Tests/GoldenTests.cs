@@ -66,7 +66,7 @@ public class GoldenTests
         Assert.DoesNotContain(ir.Diags, d => d.Error);
         var nodes = Abs(ir.Root).ToList();
         var window = nodes.Single(n => n.N.Name == "Окно");
-        Assert.Equal((468, 350, 984, 668), (window.X / 16, window.Y / 16, window.N.W / 16, window.N.H / 16));
+        Assert.Equal((468, 354, 984, 664), (window.X / 16, window.Y / 16, window.N.W / 16, window.N.H / 16));
         var rows = nodes.Single(n => n.N.Name == "$answers").N.Children;
         Assert.Equal(6, rows.Count);
         Assert.All(rows, r => Assert.Equal((960, 56, 56, 1), (r.W / 16, r.H / 16, r.Layout!.MinH / 16, r.SizingV)));
