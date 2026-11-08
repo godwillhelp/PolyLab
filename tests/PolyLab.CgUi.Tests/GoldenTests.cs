@@ -62,7 +62,7 @@ public class GoldenTests
     [ReadbackFact("CGUI_READBACK_C")]
     public void DialogC()
     {
-        var (ir, decoded) = Compile("155:468", "Dialog", "CGUI_READBACK_C");
+        var (ir, decoded) = Compile("157:1419", "Dialog", "CGUI_READBACK_C");
         Assert.DoesNotContain(ir.Diags, d => d.Error);
         var nodes = Abs(ir.Root).ToList();
         var window = nodes.Single(n => n.N.Name == "Окно");
@@ -80,13 +80,13 @@ public class GoldenTests
         Assert.Equal("cg_emblems_sq/loner", nodes.Single(n => n.N.Name == "$emblem").N.Image!.Ref);
         Assert.Equal(9, ir.Components.Count);
         Assert.All(nodes.Where(n => n.N.Name.StartsWith("Обводка")), n => Assert.All(n.N.Draws, d => Assert.IsType<Rects>(d)));
-        Assert.Equal([3019, 2095], Gallery.Heights.Select(h => new Raster(decoded, h).Lines.Count));
+        Assert.Equal([3019, 2091], Gallery.Heights.Select(h => new Raster(decoded, h).Lines.Count));
     }
 
     [ReadbackFact("CGUI_READBACK_C")]
     public void MaterialsPopupAboveDim()
     {
-        var (ir, _) = Compile("155:697", "DialogMats", "CGUI_READBACK_C");
+        var (ir, _) = Compile("157:1648", "DialogMats", "CGUI_READBACK_C");
         var nodes = Abs(ir.Root).ToList();
         int dim = nodes.Single(n => n.N.Name == "$dim").N.Layer;
         var pop = nodes.Single(n => n.N.Name == "$matPopover").N;
