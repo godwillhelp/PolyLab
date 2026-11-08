@@ -30,7 +30,7 @@ public sealed record Poly(Paint Paint, int Rule, int[][] Contours) : Draw(Paint)
 public sealed record Rects(Paint Paint, int[] Boxes) : Draw(Paint);
 
 public sealed record LayoutRec(int Dir, int Gap, int PadT, int PadR, int PadB, int PadL, int Main, int Cross, int Wrap,
-    int MinH, int StrokesInLayout);
+    int MinH, int StrokesInLayout, int MinW);
 public sealed record PatternRec(int Kind, int Pitch, int LineW, int Argb);
 public sealed record TextRec(string Chars, int Size, int LineH, int Argb, int AlignH, int AlignV, int AutoResize);
 public sealed record ImageRec(string Ref, int Tint);

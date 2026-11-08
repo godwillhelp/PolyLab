@@ -62,16 +62,20 @@ public class GoldenTests
     [ReadbackFact("CGUI_READBACK_C")]
     public void DialogC()
     {
-        var (ir, decoded) = Compile("140:18689", "Dialog", "CGUI_READBACK_C");
+        var (ir, decoded) = Compile("152:22393", "Dialog", "CGUI_READBACK_C");
         Assert.DoesNotContain(ir.Diags, d => d.Error);
         var nodes = Abs(ir.Root).ToList();
         var window = nodes.Single(n => n.N.Name == "Окно");
         Assert.Equal((468, 350, 984, 668), (window.X / 16, window.Y / 16, window.N.W / 16, window.N.H / 16));
         var rows = nodes.Single(n => n.N.Name == "$answers").N.Children;
         Assert.Equal(6, rows.Count);
-        Assert.All(rows, r => Assert.Equal((960, 56), (r.W / 16, r.H / 16)));
+        Assert.All(rows, r => Assert.Equal((960, 56, 56, 1), (r.W / 16, r.H / 16, r.Layout!.MinH / 16, r.SizingV)));
+        var selected = rows.Single(r => r.Children.Any(c => c.Name == "$chip"));
+        var faint = selected.Children.Single(c => c.Name == "Обводка тусклая");
+        Assert.Equal(selected.W - 8, faint.X + faint.W);
         var pop = nodes.Single(n => n.N.Name == "$matPopover");
         Assert.Equal((660, 372, 600, 336), (pop.X / 16, pop.Y / 16, pop.N.W / 16, pop.N.H / 16));
+        Assert.Equal(255, (pop.N.Draws[0].Paint.Argb >> 24) & 255);
         Assert.Equal("CG_Dialogs/GUI/icons/cg_dlg_portrait_bg.paa", nodes.Single(n => n.N.Name.StartsWith("img:CG_Dialogs")).N.Image!.Ref);
         Assert.Equal("cg_emblems_sq/loner", nodes.Single(n => n.N.Name == "$emblem").N.Image!.Ref);
         Assert.Equal(9, ir.Components.Count);
@@ -82,7 +86,7 @@ public class GoldenTests
     [ReadbackFact("CGUI_READBACK_C")]
     public void MaterialsPopupAboveDim()
     {
-        var (ir, _) = Compile("140:18918", "DialogMats", "CGUI_READBACK_C");
+        var (ir, _) = Compile("152:22622", "DialogMats", "CGUI_READBACK_C");
         var nodes = Abs(ir.Root).ToList();
         int dim = nodes.Single(n => n.N.Name == "$dim").N.Layer;
         var pop = nodes.Single(n => n.N.Name == "$matPopover").N;

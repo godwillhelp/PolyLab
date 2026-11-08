@@ -46,7 +46,7 @@ public static class IntStream
             Rec(Op.Node, Str(n.Binding), n.Flags, n.X, n.Y, n.W, n.H, n.Layer, n.SizingH, n.SizingV, n.ConsH, n.ConsV);
             if (n.Layout is { } l)
                 Rec(Op.Layout, l.Dir, l.Gap, l.PadT, l.PadR, l.PadB, l.PadL, l.Main, l.Cross, l.Wrap, l.MinH,
-                    l.StrokesInLayout);
+                    l.StrokesInLayout, l.MinW);
             foreach (var d in n.Draws)
             {
                 switch (d)
@@ -153,7 +153,7 @@ public static class IntStream
                     break;
                 case Op.Layout:
                     cur!.Layout = new LayoutRec(v[p], v[p + 1], v[p + 2], v[p + 3], v[p + 4], v[p + 5], v[p + 6],
-                        v[p + 7], v[p + 8], v[p + 9], v[p + 10]);
+                        v[p + 7], v[p + 8], v[p + 9], v[p + 10], v[p + 11]);
                     break;
                 case Op.FillBox:
                     cur!.Draws.Add(new FillBox(ReadPaint()));

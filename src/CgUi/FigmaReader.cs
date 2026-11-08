@@ -326,7 +326,7 @@ public sealed partial class FigmaReader
                 Str(e, "primaryAxisAlignItems") switch { "CENTER" => 1, "MAX" => 2, "SPACE_BETWEEN" => 3, _ => 0 },
                 Str(e, "counterAxisAlignItems") switch { "CENTER" => 1, "MAX" => 2, "BASELINE" => 3, _ => 0 },
                 Str(e, "layoutWrap") == "WRAP" ? 1 : 0, Geometry.R16(Num(e, "minHeight", 0)),
-                Flag(e, "strokesIncludedInLayout", false) ? 1 : 0);
+                Flag(e, "strokesIncludedInLayout", false) ? 1 : 0, Geometry.R16(Num(e, "minWidth", 0)));
 
         bool box = !rotated && BoxTypes.Contains(type) && Num(e, "cornerRadius", 0) == 0
                    && (!e.TryGetProperty("rectangleCornerRadii", out var rr) || rr.EnumerateArray().All(r => r.GetDouble() == 0));

@@ -38,7 +38,7 @@ public class DataTests
         var root = new Node
         {
             Flags = Flags.Visible | Flags.Clip, W = 30720, H = 17280,
-            Layout = new LayoutRec(1, 16, 24, 29, 24, 29, 0, 1, 0, 848, 1),
+            Layout = new LayoutRec(1, 16, 24, 29, 24, 29, 0, 1, 0, 848, 1, 4480),
             Pattern = new PatternRec(0, 3, 1, Colour.Argb(255, 33, 33, 33)),
             Instance = new InstanceRec(0, "Тип=Разговор, Состояние=Обычное"),
             Children = [leaf, new Node { Flags = Flags.Live, Image = new ImageRec("cg_lucide/lock", -1) }]
