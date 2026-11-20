@@ -214,7 +214,7 @@ public sealed class Raster
         }
     }
 
-    public static int Level(double cov) => Math.Clamp((int)Math.Floor(cov * 16 + 0.5), 0, 16);
+    public static int Level(double cov) => Math.Clamp((int)Math.Floor(cov * 4 + 0.5) * 4, 0, 16);
 
     private void Runs(int y, List<Span> spans, Paint p, Func<int, int>? colour, Box clip, int me, int layer)
     {

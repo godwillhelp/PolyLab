@@ -30,6 +30,8 @@ public class ColourTests
         Assert.Equal(255, Colour.Alpha8(white, 1, null));
         Assert.Equal(128, Colour.Alpha8(white, 128 / 255.0, null));
         Assert.Equal(128, Colour.Alpha8(panel, 128 / 255.0, panel));
+        Rgb modal = Rgb.Of8(5, 9, 9);
+        Assert.Equal(240, Colour.Alpha8(modal, 0.94, modal));
     }
 
     [Fact]

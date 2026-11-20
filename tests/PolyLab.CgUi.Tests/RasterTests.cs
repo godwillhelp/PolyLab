@@ -48,11 +48,13 @@ public class RasterTests
 
     [Theory]
     [InlineData(0.0, 0)]
-    [InlineData(1 / 32.0, 1)]
+    [InlineData(0.1, 0)]
+    [InlineData(0.2, 4)]
     [InlineData(0.5, 8)]
+    [InlineData(0.8, 12)]
     [InlineData(0.999, 16)]
     [InlineData(1.0, 16)]
-    public void CoverageQuantisesTo16Levels(double cov, int level) => Assert.Equal(level, Raster.Level(cov));
+    public void CoverageQuantisesToQuarterLevels(double cov, int level) => Assert.Equal(level, Raster.Level(cov));
 
     [Theory]
     [InlineData(0, 720, 0)]

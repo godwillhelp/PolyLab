@@ -38,7 +38,7 @@ public static class Colour
     {
         if (a >= 1)
             return 255;
-        if (d is not { } dd)
+        if (d is not { } dd || dd == s)
             return To8(a);
         var target = s.Over(dd, a);
         int best = To8(a);
