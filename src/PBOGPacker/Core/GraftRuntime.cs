@@ -9,7 +9,7 @@ namespace PolyLab.PBOGPacker.Core;
 // projects and the texts; without a managed runtime the tool falls back to Pinned.
 public static class GraftRuntime
 {
-    public const string Pinned = "v0.4.0";
+    public const string Pinned = "v0.6.0";
     public const string DirEnv = "POLYLAB_GRAFT_DIR";
     private const string VersionFile = ".version";
 

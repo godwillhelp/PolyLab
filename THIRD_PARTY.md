@@ -185,7 +185,7 @@ with DayZ:
 DayZ Tools (Bohemia Interactive), texconv (Microsoft DirectXTex, MIT), Mikero tools, Python with Pillow/numpy, and
 GRAFT are found on the user's machine or downloaded by the user; none of them is redistributed here.
 
-The launcher downloads GRAFT itself: the release named by PBOG Packer's `tool.json` (`"graft": "v0.4.0"`), from the
+The launcher downloads GRAFT itself: the release named by PBOG Packer's `tool.json` (`"graft": "v0.6.0"`), from the
 upstream GitHub releases of KR_GRAFTED, checked against the release's SHA-256 digest and unpacked unmodified into
 `<install folder>\graft` with its `LICENSE` and `LICENSE-EXCEPTION`, plus a `GRAFT_SOURCE.txt` that points to the
 complete source. GRAFT is not part of this repository or of the Poly Lab release zips.

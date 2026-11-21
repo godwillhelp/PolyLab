@@ -10,7 +10,7 @@ namespace PolyLab.PBOGPacker.Core;
 // lets it see, the plugins it would load, what graft.exe doctor says and what the last start logged.
 public static class GraftDoctor
 {
-    public const string TargetBuild = "1.29.0.163709";
+    public const string TargetBuild = "1.30.164289.70";
     public static string Release => GraftRuntime.Version;
     private const string Host = "hid.dll";
     private const string OldHost = "dwmapi.dll";
